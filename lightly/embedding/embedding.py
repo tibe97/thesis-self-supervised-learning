@@ -8,7 +8,7 @@ import time
 import torch
 import lightly
 from lightly.embedding._base import BaseEmbedding
-from lightly.models.modules import NNMemoryBankModule
+from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from tqdm import tqdm
 
 if lightly._is_prefetch_generator_available():
@@ -179,11 +179,12 @@ class NNCLRSelfSupervisedEmbedding(BaseEmbedding):
                  criterion: torch.nn.Module,
                  optimizer: torch.optim.Optimizer,
                  dataloader: torch.utils.data.DataLoader,
+                 nn_replacer: MyNNMemoryBankModule,
                  scheduler=None):
 
         super(NNCLRSelfSupervisedEmbedding, self).__init__(
             model, criterion, optimizer, dataloader, scheduler)
-        self.nn_replacer = NNMemoryBankModule(size=2 ** 16)
+        self.nn_replacer = nn_replacer
 
     def embed(self,
               dataloader: torch.utils.data.DataLoader,
@@ -262,11 +263,11 @@ class NNCLRSelfSupervisedEmbedding(BaseEmbedding):
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
-        (z0, p0), (z1, p1) = self(x0, x1)
+        (z0, p0, q0), (z1, p1, q1) = self(x0, x1)
         # calculate loss for NNCLR
         z0 = self.nn_replacer(z0.detach(), update=False)
         z1 = self.nn_replacer(z1.detach(), update=True)
-        loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
+        loss = 0.5 * (self.criterion(self.model, z0, p1, q0) + self.criterion(self.model, z1, p0, q1))
         # log loss and return
         self.log('loss', loss)
         return loss

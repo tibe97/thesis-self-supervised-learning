@@ -105,7 +105,7 @@ def _prototype_layer(proj_dim: int,
     return prototypes
 
 
-class NNCLR(nn.Module):
+class MyNet(nn.Module):
     """Implementation of the NNCLR[0] architecture
 
     Recommended loss: :py:class:`lightly.loss.ntx_ent_loss.NTXentLoss`
@@ -152,7 +152,7 @@ class NNCLR(nn.Module):
                  num_mlp_layers: int = 3,
                  normalize=True):
 
-        super(NNCLR, self).__init__()
+        super(MyNet, self).__init__()
 
         self.l2norm = normalize # normalize projection and prediction outputs
         self.backbone = backbone
