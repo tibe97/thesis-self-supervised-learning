@@ -134,3 +134,5 @@ class BaseEmbedding(lightning.LightningModule):
                 save_top_k=save_top_k,
                 monitor=monitor,
                 auto_insert_metric_name=False)
+
+

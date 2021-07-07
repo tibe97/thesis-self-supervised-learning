@@ -94,7 +94,7 @@ class NTXentLoss(MemoryBankModule):
         # out1: shape: (batch_size, embedding_size)
         # negatives: shape: (embedding_size, memory_bank_size)
         out1, negatives = \
-            super(NTXentLoss, self).forward(out1, update=out0.requires_grad)
+            super(NTXentLoss, self).forward(out1, update=out0.requires_grad) #change here to sample hard negatives
 
         # We use the cosine similarity, which is a dot product (einsum) here,
         # as all vectors are already normalized to unit length.
