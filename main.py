@@ -4,15 +4,17 @@ import torchvision
 import torch.nn as nn
 import argparse
 import pytorch_lightning as pl
+
+
 import lightly.models as models
 import lightly.loss as loss
 import lightly.data as data
 import lightly.embedding as embedding
-
 from lightly.embedding.embedding import NNCLRSelfSupervisedEmbedding
 from lightly.models.mynet import MyNet
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
+
 
 def main(args):
     gpus = 1 if torch.cuda.is_available() else 0
@@ -91,7 +93,7 @@ def main(args):
                             progress_bar_refresh_rate=100,
                             max_epochs=max_epochs)
 
-"""
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Self-Supervised Learning')
@@ -112,4 +114,3 @@ if __name__ == '__main__':
     parser.add_argument('--use-sinkhorn', type=bool, default=False,
                         help='Whether to use Sinkhorn algorithm when assigning clusters')
 
-"""
