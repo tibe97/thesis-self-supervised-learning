@@ -69,7 +69,7 @@ def main(args):
     nn_replacer = MyNNMemoryBankModule(model, size=memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
 
     #criterion = loss.NTXentLoss()
-    criterion = MyNTXentLoss(nn_replacer)
+    criterion = MyNTXentLoss(nn_replacer, temperature=0.1)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
 
 
