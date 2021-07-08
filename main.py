@@ -25,8 +25,25 @@ def main(args):
     memory_bank_size = args.memory_bank_size
     num_clusters = args.num_clusters
     use_sinkhorn = args.use_sinkhorn
+    input_dir = args.input_dir
 
-    training_info = "Starting training with: \nmax_epochs: {} \nbatch_size: {} \ninput_size: {} \nmemory_bank_size: {} \nnum_clusters: {} \nuse_sinkhorn: {}\n".format(
+
+    # the collate function applies random transforms to the input images
+    collate_fn = data.ImageCollateFunction(input_size=input_size, cj_prob=0.5)
+
+    # create a dataset from your image folder
+    dataset = data.LightlyDataset(input_dir=input_dir)
+
+
+    # build a PyTorch dataloader
+    dataloader = torch.utils.data.DataLoader(
+        dataset,                # pass the dataset to the dataloader
+        batch_size,             # a large batch size helps with the learning
+        shuffle=True,           # shuffling is important!
+        collate_fn=collate_fn)  # apply transformations to the input images
+
+    training_info = "Starting training with: \ndataset_size: {} \nmax_epochs: {} \nbatch_size: {} \ninput_size: {} \nmemory_bank_size: {} \nnum_clusters: {} \nuse_sinkhorn: {}\n".format(
+        len(dataset),
         max_epochs,
         batch_size,
         input_size,
@@ -35,20 +52,6 @@ def main(args):
         use_sinkhorn
     )
     print(training_info)
-
-
-    # the collate function applies random transforms to the input images
-    collate_fn = data.ImageCollateFunction(input_size=input_size, cj_prob=0.5)
-
-    # create a dataset from your image folder
-    dataset = data.LightlyDataset(input_dir='imagenette2-160/train')
-
-    # build a PyTorch dataloader
-    dataloader = torch.utils.data.DataLoader(
-        dataset,                # pass the dataset to the dataloader
-        batch_size,             # a large batch size helps with the learning
-        shuffle=True,           # shuffling is important!
-        collate_fn=collate_fn)  # apply transformations to the input images
 
 
     resnet = torchvision.models.resnet18()
@@ -113,6 +116,8 @@ if __name__ == '__main__':
                         help='Seed')
     parser.add_argument('--use-sinkhorn', type=bool, default=False,
                         help='Whether to use Sinkhorn algorithm when assigning clusters')
+    parser.add_argument('--input-dir', type=str, default="imagenette2-160/train",
+                        help='path to the dataset')
 
 args = parser.parse_args()
 main(args)
