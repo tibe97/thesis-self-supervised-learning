@@ -114,3 +114,5 @@ if __name__ == '__main__':
     parser.add_argument('--use-sinkhorn', type=bool, default=False,
                         help='Whether to use Sinkhorn algorithm when assigning clusters')
 
+args = parser.parse_args()
+main(args)
