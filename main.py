@@ -107,7 +107,7 @@ if __name__ == '__main__':
                         help='Image input size')
     parser.add_argument('--memory-bank-size', type=int, default=2**16,
                         help='Size of the memory bank')
-    parser.add_argument('---num-clusters', type=int, default=3000,
+    parser.add_argument('--num-clusters', type=int, default=3000,
                         help='Number of clusters. Default for full Imagenet is 3000')
     parser.add_argument('--seed', type=int, default=1,
                         help='Seed')
