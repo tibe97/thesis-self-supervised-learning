@@ -26,7 +26,7 @@ def main(args):
     num_clusters = args.num_clusters
     use_sinkhorn = args.use_sinkhorn
     input_dir = args.input_dir
-
+    num_workers = args.num_workers
 
     # the collate function applies random transforms to the input images
     collate_fn = data.ImageCollateFunction(input_size=input_size, cj_prob=0.5)
@@ -40,7 +40,8 @@ def main(args):
         dataset,                # pass the dataset to the dataloader
         batch_size,             # a large batch size helps with the learning
         shuffle=True,           # shuffling is important!
-        collate_fn=collate_fn)  # apply transformations to the input images
+        collate_fn=collate_fn,  # apply transformations to the input images
+        num_workers=num_workers)
 
     training_info = "Starting training with: \ndataset_size: {} \nmax_epochs: {} \nbatch_size: {} \ninput_size: {} \nmemory_bank_size: {} \nnum_clusters: {} \nuse_sinkhorn: {}\n".format(
         len(dataset),
@@ -114,6 +115,8 @@ if __name__ == '__main__':
                         help='Number of clusters. Default for full Imagenet is 3000')
     parser.add_argument('--seed', type=int, default=1,
                         help='Seed')
+    parser.add_argument('--num-workers', type=int, default=0,
+                        help='Number of workers. Suggested 4')
     parser.add_argument('--use-sinkhorn', type=bool, default=False,
                         help='Whether to use Sinkhorn algorithm when assigning clusters')
     parser.add_argument('--input-dir', type=str, default="imagenette2-160/train",
