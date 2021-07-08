@@ -6,6 +6,7 @@ import os
 import copy
 
 import pytorch_lightning as pl
+from pytorch_lightning import profiler
 import pytorch_lightning.core.lightning as lightning
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 import torch.nn as nn
@@ -85,7 +86,7 @@ class BaseEmbedding(lightning.LightningModule):
 
         """
 
-        trainer = pl.Trainer(**kwargs, callbacks=[self.checkpoint_callback])
+        trainer = pl.Trainer(**kwargs, callbacks=[self.checkpoint_callback], profiler="pytorch")
 
         trainer.fit(self)
 

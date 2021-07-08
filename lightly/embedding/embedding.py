@@ -267,7 +267,7 @@ class NNCLRSelfSupervisedEmbedding(BaseEmbedding):
         # calculate loss for NNCLR
         z0 = self.nn_replacer(z0.detach(), update=False)
         z1 = self.nn_replacer(z1.detach(), update=True)
-        loss = 0.5 * (self.criterion(self.model, z0, p1, q0) + self.criterion(self.model, z1, p0, q1))
+        loss = 0.5 * (self.criterion(z0, p1, q0) + self.criterion(z1, p0, q1))
         # log loss and return
         self.log('loss', loss)
         return loss

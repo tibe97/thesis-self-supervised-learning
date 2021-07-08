@@ -49,7 +49,7 @@ class MyNTXentLoss(MemoryBankModule):
 
     def __init__(self,
                  nn_replacer: MyNNMemoryBankModule,
-                 temperature: float = 0.5,
+                 temperature: float = 0.2,
                  memory_bank_size: int = 0):
         super(MyNTXentLoss, self).__init__(size=memory_bank_size)
         self.nn_replacer = nn_replacer
@@ -62,7 +62,6 @@ class MyNTXentLoss(MemoryBankModule):
                              .format(self.temperature))
 
     def forward(self,
-                model,
                 out0: torch.Tensor,
                 out1: torch.Tensor,
                 positive_scores: torch.Tensor):

@@ -4,6 +4,7 @@
 # All Rights Reserved
 
 import torch
+import time
 import numpy as np
 from lightly.loss.memory_bank import MemoryBankModule
 
@@ -57,7 +58,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             update: If `True` updated the memory bank by adding output to it
 
         """
-
+        #start_time = time.time()
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
 
@@ -90,6 +91,8 @@ class MyNNMemoryBankModule(MemoryBankModule):
                 
         index_nearest_neighbours = torch.argmax(similarity_matrix, dim=1)
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
+        #end_time = time.time()
+        #print("Time Forward: {}".format(end_time-start_time))
 
         return nearest_neighbours
 
@@ -123,7 +126,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             update: If `True` updated the memory bank by adding output to it
 
         """
-
+        #start_time = time.time()
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
 
@@ -165,7 +168,9 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
         # stack all negative similarities for each positive along row dimension
         sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
-        
+        #end_time = time.time()
+        #print("Time Sample Negative: {}".format(end_time-start_time))
+
         return output, sim_negatives
 
 
