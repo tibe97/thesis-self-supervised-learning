@@ -91,6 +91,7 @@ def main(args):
                             progress_bar_refresh_rate=100,
                             max_epochs=max_epochs)
 
+"""
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Self-Supervised Learning')
@@ -110,3 +111,5 @@ if __name__ == '__main__':
                         help='Seed')
     parser.add_argument('--use-sinkhorn', type=bool, default=False,
                         help='Whether to use Sinkhorn algorithm when assigning clusters')
+
+"""
