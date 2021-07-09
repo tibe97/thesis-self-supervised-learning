@@ -183,7 +183,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
                 K, B = Q.shape
 
-                if self.gpus > 0:
+                if self.gpus != 0:
                     u = torch.zeros(K).cuda()
                     r = torch.ones(K).cuda() / K
                     c = torch.ones(B).cuda() / B
