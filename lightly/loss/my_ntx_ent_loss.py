@@ -50,12 +50,14 @@ class MyNTXentLoss(MemoryBankModule):
     def __init__(self,
                  nn_replacer: MyNNMemoryBankModule,
                  temperature: float = 0.2,
+                 num_negatives: int = 256,
                  memory_bank_size: int = 0):
         super(MyNTXentLoss, self).__init__(size=memory_bank_size)
         self.nn_replacer = nn_replacer
         self.temperature = temperature
         self.cross_entropy = torch.nn.CrossEntropyLoss(reduction="mean")
         self.eps = 1e-8
+        self.num_negatives = num_negatives
 
         if abs(self.temperature) < self.eps:
             raise ValueError('Illegal temperature: abs({}) < 1e-8'
@@ -99,7 +101,7 @@ class MyNTXentLoss(MemoryBankModule):
         # negatives: shape: (embedding_size, memory_bank_size)
 
         #out1, negatives = super(MyNTXentLoss, self).forward(out1, update=out0.requires_grad) #change here to sample hard negatives
-        out1, sim_negatives = self.nn_replacer.sample_negatives(out1, positive_scores, num_nn=255, update=out0.requires_grad)
+        out1, sim_negatives = self.nn_replacer.sample_negatives(out1, positive_scores, num_nn=self.num_negatives, update=out0.requires_grad)
 
         # We use the cosine similarity, which is a dot product (einsum) here,
         # as all vectors are already normalized to unit length.
@@ -107,11 +109,11 @@ class MyNTXentLoss(MemoryBankModule):
 
         if sim_negatives is not None:
             # use negatives from memory bank
-            negatives = sim_negatives.to(device)
+            sim_negatives = sim_negatives.to(device)
 
             # sim_pos is of shape (batch_size, 1) and sim_pos[i] denotes the similarity
             # of the i-th sample in the batch to its positive pair
-            sim_pos = torch.einsum('nc,nc->n', out0, out1).unsqueeze(-1)
+            sim_pos = torch.einsum('nc,nc->n', out0, out1).unsqueeze(-1).to(device)
 
 
             # set the labels to the first "class", i.e. sim_pos,

@@ -4,6 +4,7 @@ import torchvision
 import torch.nn as nn
 import argparse
 import pytorch_lightning as pl
+import wandb
 
 
 import lightly.models as models
@@ -17,6 +18,7 @@ from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 
 
 def main(args):
+    wandb.login()
     gpus = 1 if torch.cuda.is_available() else 0
     device = 'cuda' if gpus==1 else 'cpu'
     max_epochs=args.max_epochs
@@ -27,6 +29,7 @@ def main(args):
     use_sinkhorn = args.use_sinkhorn
     input_dir = args.input_dir
     num_workers = args.num_workers
+    num_negatives = args.num_negatives
 
     # the collate function applies random transforms to the input images
     collate_fn = data.ImageCollateFunction(input_size=input_size, cj_prob=0.5)
@@ -113,6 +116,8 @@ if __name__ == '__main__':
                         help='Size of the memory bank')
     parser.add_argument('--num-clusters', type=int, default=3000,
                         help='Number of clusters. Default for full Imagenet is 3000')
+    parser.add_argument('--num-negatives', type=int, default=256,
+                        help='Number of negatives for each sample for the contrastive loss')
     parser.add_argument('--seed', type=int, default=1,
                         help='Seed')
     parser.add_argument('--num-workers', type=int, default=0,

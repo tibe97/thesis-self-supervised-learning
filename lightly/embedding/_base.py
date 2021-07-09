@@ -10,6 +10,8 @@ from pytorch_lightning import profiler
 import pytorch_lightning.core.lightning as lightning
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 import torch.nn as nn
+from pytorch_lightning.loggers import WandbLogger  
+from datetime import datetime
 
 from lightly.embedding._callback import CustomModelCheckpoint
 
@@ -46,6 +48,7 @@ class BaseEmbedding(lightning.LightningModule):
 
         self.checkpoint_callback = None
         self.init_checkpoint_callback()
+        self.save_hyperparameters()
 
     def forward(self, x0, x1):
         return self.model(x0, x1)
@@ -85,8 +88,9 @@ class BaseEmbedding(lightning.LightningModule):
             A trained encoder, ready for embedding datasets.
 
         """
-
-        trainer = pl.Trainer(**kwargs, callbacks=[self.checkpoint_callback], profiler="pytorch")
+        project_name=datetime.today().strftime('%Y-%m-%d')
+        wandb_logger = WandbLogger(project=project_name)  
+        trainer = pl.Trainer(**kwargs, callbacks=[self.checkpoint_callback], profiler="pytorch", logger=wandb_logger)
 
         trainer.fit(self)
 
