@@ -10,6 +10,7 @@ import lightly
 from lightly.embedding._base import BaseEmbedding
 from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from tqdm import tqdm
+from datetime import datetime
 
 if lightly._is_prefetch_generator_available():
     from prefetch_generator import BackgroundGenerator
@@ -184,6 +185,10 @@ class NNCLRSelfSupervisedEmbedding(BaseEmbedding):
 
         super(NNCLRSelfSupervisedEmbedding, self).__init__(
             model, criterion, optimizer, dataloader, scheduler)
+        
+        dirpath="checkpoints/" + datetime.today().strftime('%Y-%m-%d')
+        super(NNCLRSelfSupervisedEmbedding, self).init_checkpoint_callback(
+            save_last=True, save_top_k=1, monitor='loss', dirpath=dirpath)
         self.nn_replacer = nn_replacer
 
     def embed(self,
