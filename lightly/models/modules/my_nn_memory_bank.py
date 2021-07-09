@@ -46,6 +46,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         self.sinkhorn_iterations = sinkhorn_iterations
         self.gpus = gpus
         self.use_sinkhorn = use_sinkhorn
+        
 
     def forward(self,
                 output: torch.Tensor,

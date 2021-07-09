@@ -36,6 +36,11 @@ def main(args):
     # the collate function applies random transforms to the input images
     collate_fn = data.ImageCollateFunction(input_size=input_size, cj_prob=0.5)
 
+    # Use SimCLR augmentations
+    #collate_fn = lightly.data.SimCLRCollateFunction(
+    #    input_size=input_size,
+    #)
+
     # create a dataset from your image folder
     dataset = data.LightlyDataset(input_dir=input_dir)
 
@@ -94,7 +99,8 @@ def main(args):
         criterion,
         optimizer,
         dataloader,
-        nn_replacer
+        nn_replacer,
+        warmup_epochs
     )
 
     encoder = encoder.to(device)

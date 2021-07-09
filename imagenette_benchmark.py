@@ -244,7 +244,7 @@ class NNCLRModel(BenchmarkModule):
         return [optim], [scheduler]
 
 class NNNModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, warmup_epochs: int=50):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -256,10 +256,10 @@ class NNNModel(BenchmarkModule):
         # create a simclr model based on ResNet
         self.model = \
             MyNet(self.backbone, nmb_prototypes=30, num_ftrs=num_ftrs, num_mlp_layers=2)
-
+        
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=1024, gpus=gpus, use_sinkhorn=True)
         self.criterion = MyNTXentLoss(self.nn_replacer, temperature=0.1, num_negatives=256)
-
+        self.warmup_epochs = warmup_epochs
 
     def forward(self, x):
         self.model(x)
@@ -270,8 +270,9 @@ class NNNModel(BenchmarkModule):
         # forward pass of the transformations
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
-        z0 = self.nn_replacer(z0.detach(), update=False)
-        z1 = self.nn_replacer(z1.detach(), update=True)
+        if self.current_epoch < self.warmup_epochs:
+            z0 = self.nn_replacer(z0.detach(), update=False)
+            z1 = self.nn_replacer(z1.detach(), update=True)
         loss = 0.5 * (self.criterion(z0, p1, q0) + self.criterion(z1, p0, q1))
         # log loss and return
         self.log('train_loss_ssl', loss)

@@ -181,6 +181,7 @@ class NNCLRSelfSupervisedEmbedding(BaseEmbedding):
                  optimizer: torch.optim.Optimizer,
                  dataloader: torch.utils.data.DataLoader,
                  nn_replacer: MyNNMemoryBankModule,
+                 warmup_epochs: int = 0,
                  scheduler=None):
 
         super(NNCLRSelfSupervisedEmbedding, self).__init__(
@@ -190,6 +191,7 @@ class NNCLRSelfSupervisedEmbedding(BaseEmbedding):
         super(NNCLRSelfSupervisedEmbedding, self).init_checkpoint_callback(
             save_last=True, save_top_k=1, monitor='loss', dirpath=dirpath)
         self.nn_replacer = nn_replacer
+        self.warmup_epochs = warmup_epochs
 
     def embed(self,
               dataloader: torch.utils.data.DataLoader,
@@ -270,8 +272,9 @@ class NNCLRSelfSupervisedEmbedding(BaseEmbedding):
         # forward pass of the transformations
         (z0, p0, q0), (z1, p1, q1) = self(x0, x1)
         # calculate loss for NNCLR
-        z0 = self.nn_replacer(z0.detach(), update=False)
-        z1 = self.nn_replacer(z1.detach(), update=True)
+        if self.current_epoch < self.warmup_epochs: # instance discrimination without nearest neighbor sampling if warming up
+            z0 = self.nn_replacer(z0.detach(), update=False)
+            z1 = self.nn_replacer(z1.detach(), update=True)
         loss = 0.5 * (self.criterion(z0, p1, q0) + self.criterion(z1, p0, q1))
         # log loss and return
         self.log('loss', loss)
