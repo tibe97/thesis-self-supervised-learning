@@ -260,3 +260,9 @@ class MyNet(nn.Module):
 
         # return both outputs
         return out0, out1
+
+        
+    def on_after_backward(self):
+        for name, p in self.named_parameters():
+            if "prototypes_layer" in name:
+                p.grad = None

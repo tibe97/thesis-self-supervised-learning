@@ -140,15 +140,15 @@ class MyNNMemoryBankModule(MemoryBankModule):
         with torch.no_grad():
             cluster_scores = torch.cat((cluster_scores_positives, torch.mm(bank_normed, self.model.prototypes_layer.weight.t())))
 
-        q = torch.exp(cluster_scores / self.epsilon).t()
-        q = self.get_assignments(q, self.sinkhorn_iterations)
-        
-        # separate assignments for positives from negatives 
-        q_positives = q[:cluster_scores_positives.shape[0]]
-        q_negatives = q[cluster_scores_positives.shape[0]:]
-        # transform soft assignment into hard assignments to get cluster
-        positive_clusters = torch.argmax(q_positives, dim=1)
-        negative_clusters = torch.argmax(q_negatives, dim=1)
+            q = torch.exp(cluster_scores / self.epsilon).t()
+            q = self.get_assignments(q, self.sinkhorn_iterations)
+            
+            # separate assignments for positives from negatives 
+            q_positives = q[:cluster_scores_positives.shape[0]]
+            q_negatives = q[cluster_scores_positives.shape[0]:]
+            # transform soft assignment into hard assignments to get cluster
+            positive_clusters = torch.argmax(q_positives, dim=1)
+            negative_clusters = torch.argmax(q_negatives, dim=1)
 
         sim_negatives = []
     

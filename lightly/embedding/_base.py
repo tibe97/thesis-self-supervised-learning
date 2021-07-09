@@ -88,7 +88,7 @@ class BaseEmbedding(lightning.LightningModule):
             A trained encoder, ready for embedding datasets.
 
         """
-        project_name=datetime.today().strftime('%Y-%m-%d')
+        project_name=datetime.today().strftime('%Y-%m-%d_%H-%M')
         wandb_logger = WandbLogger(project=project_name)  
         trainer = pl.Trainer(**kwargs, callbacks=[self.checkpoint_callback], profiler="pytorch", logger=wandb_logger)
 

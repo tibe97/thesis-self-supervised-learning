@@ -30,6 +30,8 @@ def main(args):
     input_dir = args.input_dir
     num_workers = args.num_workers
     num_negatives = args.num_negatives
+    warmup_epochs = args.warmup_epochs
+    temperature = args.temperature
 
     # the collate function applies random transforms to the input images
     collate_fn = data.ImageCollateFunction(input_size=input_size, cj_prob=0.5)
@@ -46,13 +48,24 @@ def main(args):
         collate_fn=collate_fn,  # apply transformations to the input images
         num_workers=num_workers)
 
-    training_info = "Starting training with: \ndataset_size: {} \nmax_epochs: {} \nbatch_size: {} \ninput_size: {} \nmemory_bank_size: {} \nnum_clusters: {} \nuse_sinkhorn: {}\n".format(
+    training_info = "Starting training with: \
+        \ndataset_size: {} \
+        \nmax_epochs: {} \
+        \nbatch_size: {} \
+        \ninput_size: {} \
+        \nmemory_bank_size: {} \
+        \nnum_clusters: {} \
+        \nnum_negatives: {} \
+        \nwarmup_epochs: {} \
+        \nuse_sinkhorn: {}\n".format(
         len(dataset),
         max_epochs,
         batch_size,
         input_size,
         memory_bank_size,
         num_clusters,
+        num_negatives,
+        warmup_epochs,
         use_sinkhorn
     )
     print(training_info)
@@ -72,18 +85,9 @@ def main(args):
     nn_replacer = MyNNMemoryBankModule(model, size=memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
 
     #criterion = loss.NTXentLoss()
-    criterion = MyNTXentLoss(nn_replacer, temperature=0.1)
+    criterion = MyNTXentLoss(nn_replacer, temperature=temperature, num_negatives=num_negatives)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
 
-
-    """
-    encoder = embedding.SelfSupervisedEmbedding(
-        model,
-        criterion,
-        optimizer,
-        dataloader
-    )
-    """
 
     encoder = NNCLRSelfSupervisedEmbedding(
         model,
@@ -92,7 +96,6 @@ def main(args):
         dataloader,
         nn_replacer
     )
-
 
     encoder = encoder.to(device)
 
@@ -122,6 +125,10 @@ if __name__ == '__main__':
                         help='Seed')
     parser.add_argument('--num-workers', type=int, default=0,
                         help='Number of workers. Suggested 4')
+    parser.add_argument('--warmup-epochs', type=int, default=0,
+                        help='Number of epochs without sampling nearest neighbors as positives')
+    parser.add_argument('--temperature', type=float, default=0.1,
+                        help='Temperature for the InfoNCE loss')
     parser.add_argument('--use-sinkhorn', type=bool, default=False,
                         help='Whether to use Sinkhorn algorithm when assigning clusters')
     parser.add_argument('--input-dir', type=str, default="imagenette2-160/train",
