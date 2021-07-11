@@ -32,7 +32,11 @@ MY Runs: (we keep the optimizer fixed for now)
 - decent_lake (no warmup): temp=0.1, memory_bank_size=1024, warmup_epochs=0, nmb_prototypes=30, num_negatives=256
 - different_elevator: temp=0.1, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
 - swept_deluge: temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-- new_run: try decreasing temp. In different_elevator loss decreases quicker probably thanks to lower temp.
+- wise_dew: try decreasing temp. In different_elevator loss decreases quicker probably thanks to lower temp.
+  temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
+  Similar results to different_elevator in term of knn-accuracy convergence.
+- new_run: same as different_elevator, but with temp=0.5 
+  temp=0.5, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
 - new_run: try more warm up epochs
 - new_run: increase num_negatives
 - new_run: increase mem bank
@@ -278,8 +282,8 @@ class NNNModel(BenchmarkModule):
         self.model = \
             MyNet(self.backbone, nmb_prototypes=30, num_ftrs=num_ftrs, num_mlp_layers=2)
         
-        self.nn_replacer = MyNNMemoryBankModule(self.model, size=2048, gpus=gpus, use_sinkhorn=True)
-        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=0.1, num_negatives=512)
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=1024, gpus=gpus, use_sinkhorn=True)
+        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=0.5, num_negatives=256)
         self.warmup_epochs = warmup_epochs
 
     def forward(self, x):
