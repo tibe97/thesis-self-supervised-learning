@@ -60,6 +60,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 import lightly
+from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
 from lightly.models.mynet import MyNet
@@ -69,6 +70,22 @@ from pytorch_lightning.loggers import WandbLogger
 
 num_workers = 12
 memory_bank_size = 4096
+
+my_nn_memory_bank_size = 2048
+temperature=0.1
+warmup_epochs=50
+nmb_prototypes=30
+num_negatives=256
+use_sinkhorn = True
+
+params_dict = dict({
+    "memory_bank_size": my_nn_memory_bank_size,
+    "temperature": temperature,
+    "warmup_epochs": warmup_epochs,
+    "nmb_prototypes": nmb_prototypes,
+    "num_negatives": num_negatives,
+    "use_sinkhorn": use_sinkhorn
+})
 
 logs_root_dir = os.path.join(os.getcwd(), 'imagenette_logs')
 
@@ -270,7 +287,7 @@ class NNCLRModel(BenchmarkModule):
         return [optim], [scheduler]
 
 class NNNModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes, warmup_epochs: int=50):
+    def __init__(self, dataloader_kNN, num_classes, warmup_epochs: int=warmup_epochs):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -281,10 +298,10 @@ class NNNModel(BenchmarkModule):
         )
         # create a simclr model based on ResNet
         self.model = \
-            MyNet(self.backbone, nmb_prototypes=30, num_ftrs=num_ftrs, num_mlp_layers=2)
+            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
-        self.nn_replacer = MyNNMemoryBankModule(self.model, size=2048, gpus=gpus, use_sinkhorn=True)
-        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=0.1, num_negatives=256)
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=my_nn_memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
+        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives)
         self.warmup_epochs = warmup_epochs
 
     def forward(self, x):
@@ -504,7 +521,7 @@ for batch_size in batch_sizes:
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ss_knn_validation")  
-
+            logger.log_hyperparams(params=params_dict)
             trainer = pl.Trainer(max_epochs=max_epochs, 
                                 gpus=gpus,
                                 logger=logger,
