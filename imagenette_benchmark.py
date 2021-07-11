@@ -38,8 +38,10 @@ MY Runs: (we keep the optimizer fixed for now)
 - POLAR_GALAXY: same as different_elevator, but with temp=0.5 
   temp=0.5, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
   Seems to achieve same performance as different_elevator. In this setting temperature param doesn't affect.
-- new_run: temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
+- LYRIC_MORNING: increasing memory_bank_size
+    temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
 - new_run: increase num_negatives
+    temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
 - new_run: increase mem bank
 ------all these previous changes for faster convergence------
 - new_run: increase num_clusters
@@ -75,7 +77,7 @@ my_nn_memory_bank_size = 2048
 temperature=0.1
 warmup_epochs=50
 nmb_prototypes=30
-num_negatives=256
+num_negatives=512
 use_sinkhorn = True
 
 params_dict = dict({
