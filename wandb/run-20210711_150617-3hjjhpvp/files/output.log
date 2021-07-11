@@ -1,0 +1,161 @@
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+  | Name        | Type                 | Params
+-----------------------------------------------------
+0 | backbone    | Sequential           | 11.4 M
+1 | model       | MyNet                | 16.2 M
+2 | nn_replacer | MyNNMemoryBankModule | 16.2 M
+3 | criterion   | MyNTXentLoss         | 16.2 M
+-----------------------------------------------------
+16.2 M    Trainable params
+0         Non-trainable params
+16.2 M    Total params
+64.740    Total estimated model params size (MB)
+/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/torch/utils/data/dataloader.py:478: UserWarning: This DataLoader will create 12 worker processes in total. Our suggested max number of worker in current system is 8 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+Validation sanity check:   0%|                                                                                       | 0/2 [00:00<?, ?it/s]
+Global seed set to 0
+/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/torch/utils/data/dataloader.py:478: UserWarning: This DataLoader will create 12 worker processes in total. Our suggested max number of worker in current system is 8 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+[34m[1mwandb[39m[22m: Currently logged in as: [33mtibe[39m (use `wandb login --relogin` to force relogin)
+Traceback (most recent call last):
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 761, in init
+    run = wi.init()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 422, in init
+    backend.ensure_launched()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/wandb/sdk/backend/backend.py", line 137, in ensure_launched
+    self.wandb_process.start()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/context.py", line 284, in _Popen
+    return Popen(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 42, in _launch
+    prep_data = spawn.get_preparation_data(process_obj._name)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 154, in get_preparation_data
+    _check_not_importing_main()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 134, in _check_not_importing_main
+    raise RuntimeError('''
+RuntimeError:
+        An attempt has been made to start a new process before the
+        current process has finished its bootstrapping phase.
+        This probably means that you are not using fork to start your
+        child processes and you have forgotten to use the proper idiom
+        in the main module:
+            if __name__ == '__main__':
+                freeze_support()
+                ...
+        The "freeze_support()" line can be omitted if the program
+
+Validation sanity check:   0%|                                                                                       | 0/2 [00:00<?, ?it/s]Problem at: /Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/loggers/wandb.py 169 experiment
+[34m[1mwandb[39m[22m: [32m[41mERROR[39m[49m Abnormal program exit
+Traceback (most recent call last):
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 761, in init
+    run = wi.init()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 422, in init
+    backend.ensure_launched()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/wandb/sdk/backend/backend.py", line 137, in ensure_launched
+    self.wandb_process.start()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/context.py", line 284, in _Popen
+    return Popen(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 42, in _launch
+    prep_data = spawn.get_preparation_data(process_obj._name)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 154, in get_preparation_data
+    _check_not_importing_main()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 134, in _check_not_importing_main
+    raise RuntimeError('''
+RuntimeError:
+        An attempt has been made to start a new process before the
+        current process has finished its bootstrapping phase.
+        This probably means that you are not using fork to start your
+        child processes and you have forgotten to use the proper idiom
+        in the main module:
+            if __name__ == '__main__':
+                freeze_support()
+                ...
+        The "freeze_support()" line can be omitted if the program
+        is not going to be frozen to produce an executable.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 236, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/spawn.py", line 287, in _fixup_main_from_path
+    main_content = runpy.run_path(main_path,
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/runpy.py", line 268, in run_path
+    return _run_module_code(code, init_globals, run_name,
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/runpy.py", line 97, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/Users/tiberio/Desktop/lightly-master/imagenette_benchmark.py", line 522, in <module>
+    logger.log_hyperparams(params=params_dict)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/utilities/distributed.py", line 49, in wrapped_fn
+    return fn(*args, **kwargs)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/loggers/wandb.py", line 190, in log_hyperparams
+    self.experiment.config.update(params, allow_val_change=True)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/loggers/base.py", line 41, in experiment
+    return get_experiment() or DummyExperiment()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/utilities/distributed.py", line 49, in wrapped_fn
+    return fn(*args, **kwargs)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/loggers/base.py", line 39, in get_experiment
+    return fn(self)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/loggers/wandb.py", line 169, in experiment
+    self._experiment = wandb.init(**self._wandb_init) if wandb.run is None else wandb.run
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 798, in init
+    six.raise_from(Exception("problem"), error_seen)
+  File "<string>", line 3, in raise_from
+Exception: problem
+Traceback (most recent call last):
+  File "/Users/tiberio/Desktop/lightly-master/imagenette_benchmark.py", line 528, in <module>
+    trainer.fit(
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 460, in fit
+    self._run(model)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 758, in _run
+    self.dispatch()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 799, in dispatch
+    self.accelerator.start_training(self)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/accelerators/accelerator.py", line 96, in start_training
+    self.training_type_plugin.start_training(trainer)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py", line 144, in start_training
+    self._results = trainer.run_stage()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 809, in run_stage
+    return self.run_train()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 844, in run_train
+    self.run_sanity_check(self.lightning_module)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1112, in run_sanity_check
+    self.run_evaluation()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 954, in run_evaluation
+    for batch_idx, batch in enumerate(dataloader):
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 359, in __iter__
+    return self._get_iterator()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 305, in _get_iterator
+    return _MultiProcessingDataLoaderIter(self)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 918, in __init__
+    w.start()
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/context.py", line 284, in _Popen
+    return Popen(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/lib/python3.9/multiprocessing/popen_spawn_posix.py", line 62, in _launch
+    f.write(fp.getbuffer())
+KeyboardInterrupt

@@ -1,0 +1,22 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.9.5",
+    "heartbeatAt": "2021-07-11T13:06:18.243631",
+    "startedAt": "2021-07-11T13:06:17.172548",
+    "docker": null,
+    "cpu_count": 8,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/tiberio/Desktop/lightly-master/imagenette_benchmark.py",
+    "codePath": "imagenette_benchmark.py",
+    "git": {
+        "remote": "https://github.com/tibe97/thesis-self-supervised-learning.git",
+        "commit": "9d2d80d789548a5552dd7eb355294dc6e2b09fec"
+    },
+    "email": "tiberio-97@hotmail.it",
+    "root": "/Users/tiberio/Desktop/lightly-master",
+    "host": "Tiberios-MacBook-Pro.local",
+    "username": "tiberio",
+    "executable": "/Users/tiberio/opt/anaconda3/envs/ssl_thesis/bin/python"
+}
