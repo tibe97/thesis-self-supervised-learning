@@ -44,7 +44,7 @@ MY Runs: (we keep the optimizer fixed for now)
     temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
 
 ------all these previous changes for faster convergence------
-- new_run: decrease num_clusters to match true num classes
+- FANCIFUL_MONKEY: decrease num_clusters to match true num classes
     temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=10, num_negatives=512
 - new_run: increase warmup_epochs
 - new_run: don't use sinkhorn
@@ -78,7 +78,7 @@ memory_bank_size = 4096
 my_nn_memory_bank_size = 2048
 temperature=0.5
 warmup_epochs=50
-nmb_prototypes=10
+nmb_prototypes=100
 num_negatives=512
 use_sinkhorn = True
 
