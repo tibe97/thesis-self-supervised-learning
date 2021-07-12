@@ -40,11 +40,13 @@ MY Runs: (we keep the optimizer fixed for now)
   Seems to achieve same performance as different_elevator. In this setting temperature param doesn't affect.
 - LYRIC_MORNING: increasing memory_bank_size
     temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
-- new_run: increase num_negatives
+- HARDY_PAPER: increase num_negatives (same as WISE_DEW, obtained similar results)
     temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-- new_run: increase mem bank
+
 ------all these previous changes for faster convergence------
-- new_run: increase num_clusters
+- new_run: decrease num_clusters to match true num classes
+    temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=10, num_negatives=512
+- new_run: increase warmup_epochs
 - new_run: don't use sinkhorn
 - new_run: nnclr with negative sampling
 - new_run: ablation, try running best config without warmup
@@ -74,9 +76,9 @@ num_workers = 12
 memory_bank_size = 4096
 
 my_nn_memory_bank_size = 2048
-temperature=0.1
+temperature=0.5
 warmup_epochs=50
-nmb_prototypes=30
+nmb_prototypes=10
 num_negatives=512
 use_sinkhorn = True
 
