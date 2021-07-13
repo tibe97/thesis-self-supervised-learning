@@ -48,8 +48,9 @@ MY Runs: (we keep the optimizer fixed for now)
     temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=10, num_negatives=512
 - FAITHFUL_SURF: increase num_clusters to 100
     temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=100, num_negatives=512
-- new_run: increase warmup_epochs
+- SMART_SPONGE: increase warmup_epochs -> Bad results
     temp=0.5, memory_bank_size=2048, warmup_epochs=200, nmb_prototypes=30, num_negatives=512
+-new run: don't warmup
 - new_run: don't use sinkhorn
     temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512, sinkhorn=False
 - new_run: nnclr with negative sampling
@@ -81,10 +82,10 @@ memory_bank_size = 4096
 
 my_nn_memory_bank_size = 2048
 temperature=0.5
-warmup_epochs=50
+warmup_epochs=0
 nmb_prototypes=30
 num_negatives=512
-use_sinkhorn = False
+use_sinkhorn = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
