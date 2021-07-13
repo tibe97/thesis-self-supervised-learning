@@ -85,7 +85,7 @@ temperature=0.5
 warmup_epochs=0
 nmb_prototypes=30
 num_negatives=512
-use_sinkhorn = True
+use_sinkhorn = False
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
