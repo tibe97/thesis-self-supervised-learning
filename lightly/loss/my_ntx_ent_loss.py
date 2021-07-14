@@ -3,8 +3,9 @@
 # Copyright (c) 2020. Lightly AG and its affiliates.
 # All Rights Reserved
 
+from numpy import add
 import torch
-
+from torch import nn
 from lightly.loss.memory_bank import MemoryBankModule
 from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 
@@ -51,13 +52,16 @@ class MyNTXentLoss(MemoryBankModule):
                  nn_replacer: MyNNMemoryBankModule,
                  temperature: float = 0.2,
                  num_negatives: int = 256,
-                 memory_bank_size: int = 0):
+                 memory_bank_size: int = 0,
+                 add_swav_loss: bool = False):
         super(MyNTXentLoss, self).__init__(size=memory_bank_size)
         self.nn_replacer = nn_replacer
         self.temperature = temperature
         self.cross_entropy = torch.nn.CrossEntropyLoss(reduction="mean")
         self.eps = 1e-8
         self.num_negatives = num_negatives
+        self.softmax = nn.Softmax(dim=1)
+        self.add_swav_loss = add_swav_loss
 
         if abs(self.temperature) < self.eps:
             raise ValueError('Illegal temperature: abs({}) < 1e-8'
@@ -101,7 +105,7 @@ class MyNTXentLoss(MemoryBankModule):
         # negatives: shape: (embedding_size, memory_bank_size)
 
         #out1, negatives = super(MyNTXentLoss, self).forward(out1, update=out0.requires_grad) #change here to sample hard negatives
-        out1, sim_negatives = self.nn_replacer.sample_negatives(out1, positive_scores, num_nn=self.num_negatives, update=out0.requires_grad)
+        out1, sim_negatives, q1_positives = self.nn_replacer.sample_negatives(out1, positive_scores, num_nn=self.num_negatives, update=out0.requires_grad)
 
         # We use the cosine similarity, which is a dot product (einsum) here,
         # as all vectors are already normalized to unit length.
@@ -133,7 +137,11 @@ class MyNTXentLoss(MemoryBankModule):
             # The labels point from a sample in out_i to its equivalent in out_(1-i)
             labels = torch.arange(batch_size, device=device, dtype=torch.long)
             labels = torch.cat([labels + batch_size - 1, labels])
+        
 
         loss = self.cross_entropy(logits, labels)
+        if self.add_swav_loss:
+            p0 = self.softmax(out0 / self.temperature)
+            loss = 0.5 * (loss - torch.mean(torch.sum(q1_positives * torch.log(p0), dim=1))) 
 
         return loss

@@ -55,7 +55,7 @@ MY Runs: (we keep the optimizer fixed for now)
 - ETHEREAL_TERRAIN: don't use sinkhorn -> too unstable
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
 - new_run: nnclr with negative sampling
-- new_run: update learnable cluster centroids
+- new_run: update learnable cluster centroids, use additional SwAV loss
 
 
 """
@@ -87,7 +87,8 @@ temperature=0.5
 warmup_epochs=0
 nmb_prototypes=30
 num_negatives=512
-use_sinkhorn = False
+use_sinkhorn = True
+add_swav_loss = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -95,7 +96,8 @@ params_dict = dict({
     "warmup_epochs": warmup_epochs,
     "nmb_prototypes": nmb_prototypes,
     "num_negatives": num_negatives,
-    "use_sinkhorn": use_sinkhorn
+    "use_sinkhorn": use_sinkhorn,
+    "add_swav_loss": add_swav_loss
 })
 
 logs_root_dir = os.path.join(os.getcwd(), 'imagenette_logs')
@@ -312,7 +314,7 @@ class NNNModel(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=my_nn_memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
-        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives)
+        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
 
     def forward(self, x):

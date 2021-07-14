@@ -172,7 +172,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #end_time = time.time()
         #print("Time Sample Negative: {}".format(end_time-start_time))
 
-        return output, sim_negatives
+        return output, sim_negatives, q_positives
 
 
 
