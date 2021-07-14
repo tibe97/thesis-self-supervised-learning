@@ -50,11 +50,13 @@ MY Runs: (we keep the optimizer fixed for now)
     temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=100, num_negatives=512
 - SMART_SPONGE: increase warmup_epochs -> Bad results
     temp=0.5, memory_bank_size=2048, warmup_epochs=200, nmb_prototypes=30, num_negatives=512
--new run: don't warmup
-- new_run: don't use sinkhorn
-    temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512, sinkhorn=False
+-GENTLE_MICROWAVE: don't warmup
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512
+- ETHEREAL_TERRAIN: don't use sinkhorn -> too unstable
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
 - new_run: nnclr with negative sampling
-- new_run: ablation, try running best config without warmup
+- new_run: update learnable cluster centroids
+
 
 """
 import os
@@ -513,8 +515,11 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN"]
-models = [NNNModel]
+#model_names = ["NNN"]
+#models = [NNNModel]
+model_names = ['NNCLR_256']
+
+models = [NNCLRModel]
 
 bench_results = []
 gpu_memory_usage = []
