@@ -70,7 +70,8 @@ class MyNTXentLoss(MemoryBankModule):
     def forward(self,
                 out0: torch.Tensor,
                 out1: torch.Tensor,
-                positive_scores: torch.Tensor):
+                q0_pos: torch.Tensor,
+                q1: torch.Tensor):
         """Forward pass through Contrastive Cross-Entropy Loss.
 
         If used with a memory bank, the samples from the memory bank are used
@@ -105,7 +106,7 @@ class MyNTXentLoss(MemoryBankModule):
         # negatives: shape: (embedding_size, memory_bank_size)
 
         #out1, negatives = super(MyNTXentLoss, self).forward(out1, update=out0.requires_grad) #change here to sample hard negatives
-        out1, sim_negatives, q1_positives = self.nn_replacer.sample_negatives(out1, positive_scores, num_nn=self.num_negatives, update=out0.requires_grad)
+        out1, sim_negatives, q0_assign = self.nn_replacer.sample_negatives(out1, q0_pos, num_nn=self.num_negatives, update=out0.requires_grad)
 
         # We use the cosine similarity, which is a dot product (einsum) here,
         # as all vectors are already normalized to unit length.
@@ -141,7 +142,7 @@ class MyNTXentLoss(MemoryBankModule):
 
         loss = self.cross_entropy(logits, labels)
         if self.add_swav_loss:
-            p0 = self.softmax(out0 / self.temperature)
-            loss = 0.5 * (loss - torch.mean(torch.sum(q1_positives * torch.log(p0), dim=1))) 
+            p1 = self.softmax(q1 / self.temperature)
+            loss = 0.5 * (loss - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))) 
 
         return loss

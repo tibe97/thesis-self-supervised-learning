@@ -329,7 +329,7 @@ class NNNModel(BenchmarkModule):
         if self.current_epoch < self.warmup_epochs:
             z0 = self.nn_replacer(z0.detach(), update=False)
             z1 = self.nn_replacer(z1.detach(), update=True)
-        loss = 0.5 * (self.criterion(z0, p1, q0) + self.criterion(z1, p0, q1))
+        loss = 0.5 * (self.criterion(z0, p1, q0, q1) + self.criterion(z1, p0, q1, q0))
         # log loss and return
         self.log('train_loss_ssl', loss)
         return loss
