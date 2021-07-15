@@ -55,7 +55,9 @@ MY Runs: (we keep the optimizer fixed for now)
 - ETHEREAL_TERRAIN: don't use sinkhorn -> too unstable
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
 - new_run: nnclr with negative sampling
-- new_run: update learnable cluster centroids, use additional SwAV loss
+- SUMMER_DURIAN: update learnable cluster centroids, use additional SwAV loss. FORGOT to normalize protos
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
+- new_run: normalize protos
 
 
 """
