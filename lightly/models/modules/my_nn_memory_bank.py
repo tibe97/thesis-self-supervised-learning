@@ -68,6 +68,9 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
         #compute cluster assignments
         with torch.no_grad():
+            w = self.model.prototypes_layer.weight.data.clone()
+            w = torch.nn.functional.normalize(w, dim=1, p=2)
+            self.model.prototypes_layer.weight.copy_(w)
             cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
 
         q = torch.exp(cluster_scores / self.epsilon).t()
@@ -84,7 +87,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
         similarity_matrix += -10 # we penalize all and the recover the true positives
         for i in range(similarity_matrix.shape[0]): # for each positive sample
             row = similarity_matrix[i]
-            #mask out samples with the same cluster assignment by putting -1 as corresponding value
             p_cluster = positive_clusters[i]
             mask_indices = np.where(negative_clusters.cpu()==p_cluster.cpu())[0]
             for idx in mask_indices:
