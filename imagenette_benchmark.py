@@ -544,7 +544,7 @@ for batch_size in batch_sizes:
             logger.log_hyperparams(params=params_dict)
 
             checkpoint_callback = ModelCheckpoint(
-                monitor='val_loss',
+                monitor='train_loss_ssl',
                 dirpath=logs_root_dir,
                 filename='imagenette-{epoch:02d}-{val_loss:.2f}',
                 save_top_k=3,
