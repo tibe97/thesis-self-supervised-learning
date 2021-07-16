@@ -1,5 +1,5 @@
-from pl_bolts.utils import _TORCHVISION_AVAILABLE
-from pl_bolts.utils.warnings import warn_missing_pkg
+from lightly.linear_evaluation.pl_bolts.utils import _TORCHVISION_AVAILABLE
+from lightly.linear_evaluation.pl_bolts.utils.warnings import warn_missing_pkg
 
 if _TORCHVISION_AVAILABLE:
     from torchvision import transforms
