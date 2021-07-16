@@ -83,6 +83,7 @@ from lightly.models.mynet import MyNet
 from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 num_workers = 12
 memory_bank_size = 4096
@@ -541,11 +542,20 @@ for batch_size in batch_sizes:
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ss_knn_validation")  
             logger.log_hyperparams(params=params_dict)
+
+            checkpoint_callback = ModelCheckpoint(
+                monitor='val_loss',
+                dirpath=logs_root_dir,
+                filename='imagenette-{epoch:02d}-{val_loss:.2f}',
+                save_top_k=3,
+                mode='min',
+            )
             trainer = pl.Trainer(max_epochs=max_epochs, 
                                 gpus=gpus,
                                 logger=logger,
                                 distributed_backend=distributed_backend,
-                                default_root_dir=logs_root_dir)
+                                default_root_dir=logs_root_dir,
+                                callbacks=[checkpoint_callback])
             trainer.fit(
                 benchmark_model,
                 train_dataloader=dataloader_train_ssl,
