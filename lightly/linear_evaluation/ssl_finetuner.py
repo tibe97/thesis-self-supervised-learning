@@ -116,8 +116,7 @@ class SSLFineTuner(LightningModule):
         return loss
 
     def shared_step(self, batch):
-        ipdb.set_trace()
-        x, y = batch
+        x, y, _ = batch
 
         with torch.no_grad():
             feats = self.backbone(x)
