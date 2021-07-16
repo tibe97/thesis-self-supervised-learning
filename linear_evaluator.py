@@ -591,7 +591,7 @@ def cli_main():  # pragma: no cover
                     sync_batchnorm=True if gpus > 1 else False,
                 )
 
-                trainer.fit(tuner, train_dataloader=dataloader_train_ssl, val_dataloaders=dataloader_test)
+                trainer.fit(tuner, train_dataloader=dataloader_train_kNN, val_dataloaders=dataloader_test)
                 trainer.test(test_dataloaders=dataloader_test)
 
 
