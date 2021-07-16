@@ -263,7 +263,7 @@ class NNCLRModel(BenchmarkModule):
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
 
-class NNCLR(pl.LightningModule):
+class MockupModel(pl.LightningModule):
     def __init__(self):
         super().__init__()
         # create a ResNet backbone and remove the classification head
@@ -546,7 +546,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["NNN"]
-    models = [NNNModel]
+    models = [MockupModel]
 
     ckpt_path = args.ckpt_path
 
