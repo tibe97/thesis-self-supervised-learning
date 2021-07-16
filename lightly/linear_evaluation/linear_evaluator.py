@@ -6,13 +6,13 @@ import torch.nn.functional as F
 import torchvision
 import numpy as np
 import pytorch_lightning as pl
+import lightly
 from argparse import ArgumentParser
 from pytorch_lightning import seed_everything, Trainer
 from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
-import lightly
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
