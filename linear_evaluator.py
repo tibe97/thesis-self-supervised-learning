@@ -545,8 +545,8 @@ def cli_main():  # pragma: no cover
     args = parser.parse_args()
 
 
-    model_names = ["NNCLR_256"]
-    models = [NNCLR]
+    model_names = ["NNN"]
+    models = [NNNModel]
 
     ckpt_path = args.ckpt_path
 
