@@ -1,4 +1,4 @@
-from linear_evaluation.evaluator import SSLEvaluator
+from lightly.linear_evaluation.evaluator import SSLEvaluator
 from typing import List, Optional
 
 import torch
