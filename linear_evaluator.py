@@ -512,7 +512,7 @@ def cli_main():  # pragma: no cover
     model_names = ["NNCLR_256"]
     models = [NNCLRModel]
 
-    ckpt_path = 'epoch=799-step=28799.ckpt'
+    ckpt_path = 'lightly/linear_evaluation/epoch=799-step=28799.ckpt'
 
     bench_results = []
     gpu_memory_usage = []
