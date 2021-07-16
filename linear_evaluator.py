@@ -70,7 +70,7 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
-data_dir = '../imagenette2-160'
+data_dir = 'imagenette2-160'
 path_to_train = 'imagenette2-160/train/'
 path_to_test = 'imagenette2-160/val/'
 
