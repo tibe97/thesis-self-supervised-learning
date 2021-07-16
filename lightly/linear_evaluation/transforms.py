@@ -2,7 +2,7 @@ from typing import List
 
 import numpy as np
 
-'''
+
 from lightly.linear_evaluation.pl_bolts.utils import _OPENCV_AVAILABLE, _TORCHVISION_AVAILABLE
 from lightly.linear_evaluation.pl_bolts.utils.warnings import warn_missing_pkg
 
@@ -17,7 +17,7 @@ if _OPENCV_AVAILABLE:
     import cv2
 else:  # pragma: no cover
     warn_missing_pkg('cv2', pypi_name='opencv-python')
-'''
+
 
 class SwAVTrainDataTransform(object):
 
