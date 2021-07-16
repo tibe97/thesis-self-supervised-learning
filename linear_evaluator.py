@@ -533,7 +533,7 @@ def cli_main():  # pragma: no cover
     parser.add_argument('--num_epochs', default=100, type=int, help="number of epochs")
 
     # fine-tuner params
-    parser.add_argument('--in_features', type=int, default=2048)
+    parser.add_argument('--in_features', type=int, default=512)
     parser.add_argument('--dropout', type=float, default=0.)
     parser.add_argument('--learning_rate', type=float, default=0.3)
     parser.add_argument('--weight_decay', type=float, default=1e-6)
@@ -589,6 +589,7 @@ def cli_main():  # pragma: no cover
                     max_epochs=args.num_epochs,
                     distributed_backend=distributed_backend,
                     sync_batchnorm=True if gpus > 1 else False,
+                    logger=logger
                 )
 
                 trainer.fit(tuner, train_dataloader=dataloader_train_kNN, val_dataloaders=dataloader_test)
