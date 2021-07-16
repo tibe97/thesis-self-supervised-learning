@@ -263,6 +263,42 @@ class NNCLRModel(BenchmarkModule):
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
 
+class NNCLR(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        # create a ResNet backbone and remove the classification head
+        resnet = torchvision.models.resnet18()
+        last_conv_channels = list(resnet.children())[-1].in_features
+        self.backbone = nn.Sequential(
+            *list(resnet.children())[:-1],
+            nn.Conv2d(last_conv_channels, num_ftrs, 1),
+        )
+        # create a simclr model based on ResNet
+        self.resnet_simclr = \
+            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
+        self.criterion = lightly.loss.NTXentLoss()
+
+        self.nn_replacer = NNMemoryBankModule(size=nn_size)
+
+    def forward(self, x):
+        self.resnet_simclr(x)
+
+    def training_step(self, batch, batch_idx):
+        (x0, x1), _, _ = batch
+        (z0, p0), (z1, p1) = self.resnet_simclr(x0, x1)
+        z0 = self.nn_replacer(z0.detach(), update=False)
+        z1 = self.nn_replacer(z1.detach(), update=True)
+        loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
+        self.log('train_loss_ssl', loss)
+        return loss
+
+    def configure_optimizers(self):
+        optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=6e-2,
+                                momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        return [optim], [scheduler]
+
+
 class NNNModel(BenchmarkModule):
     def __init__(self, dataloader_kNN, num_classes, warmup_epochs: int=warmup_epochs):
         super().__init__(dataloader_kNN, num_classes)
@@ -510,7 +546,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["NNCLR_256"]
-    models = [NNCLRModel]
+    models = [NNCLR]
 
     ckpt_path = 'lightly/linear_evaluation/epoch=799-step=28799.ckpt'
 
