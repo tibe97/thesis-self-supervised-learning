@@ -559,7 +559,7 @@ def cli_main():  # pragma: no cover
             runs = []
             for seed in range(n_runs):
                 pl.seed_everything(seed)
-                _, dataloader_train_kNN, _ = get_data_loaders(batch_size)
+                dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
                 #benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, dataloader_train_kNN, dm.num_classes, strict=False)
                 benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
 
@@ -591,8 +591,8 @@ def cli_main():  # pragma: no cover
                     sync_batchnorm=True if gpus > 1 else False,
                 )
 
-                trainer.fit(tuner, dm)
-                trainer.test(datamodule=dm)
+                trainer.fit(tuner, train_dataloader=dataloader_train_ssl, val_dataloaders=dataloader_test)
+                trainer.test(test_dataloaders=dataloader_test)
 
 
                 # delete model and trainer + free up cuda memory
