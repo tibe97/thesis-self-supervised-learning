@@ -42,6 +42,8 @@ MY Runs: (we keep the optimizer fixed for now)
     temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
 - HARDY_PAPER: increase num_negatives (same as WISE_DEW, obtained similar results)
     temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
+- NEW_RUN: different_elevator but without warmup   
+    temp=0.1, memory_bank_size=1024, warmup_epochs=0, nmb_prototypes=30, num_negatives=256
 
 ------all these previous changes for faster convergence------
 - FANCIFUL_MONKEY: decrease num_clusters to match true num classes
@@ -57,9 +59,10 @@ MY Runs: (we keep the optimizer fixed for now)
 - new_run: nnclr with negative sampling
 - SUMMER_DURIAN: update learnable cluster centroids, use additional SwAV loss. FORGOT to normalize protos
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
-- new_run: normalize protos
+- BRIGHT_MOUNTAIN: normalize protos -> better not to normalize the protos
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
 
-
+- new_run: take hidden layer from projection MLP for clustering
 """
 import os
 
@@ -84,11 +87,11 @@ from pytorch_lightning.loggers import WandbLogger
 num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 2048
-temperature=0.5
+my_nn_memory_bank_size = 1024
+temperature=0.1
 warmup_epochs=0
 nmb_prototypes=30
-num_negatives=512
+num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
 
@@ -102,7 +105,7 @@ params_dict = dict({
     "add_swav_loss": add_swav_loss
 })
 
-logs_root_dir = os.path.join(os.getcwd(), 'imagenette_logs')
+logs_root_dir = ('imagenette_logs')
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 max_epochs = 800
