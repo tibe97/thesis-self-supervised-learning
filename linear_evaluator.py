@@ -488,7 +488,7 @@ def cli_main():  # pragma: no cover
 
     parser = ArgumentParser()
     parser.add_argument('--dataset', type=str, help='stl10, imagenet', default='stl10')
-    parser.add_argument('--ckpt_path', type=str, help='path to ckpt')
+    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='lightly/linear_evaluation/epoch=799-step=28799.ckpt')
     parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
 
     parser.add_argument("--batch_size", default=64, type=int, help="batch size per gpu")
