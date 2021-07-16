@@ -560,7 +560,9 @@ def cli_main():  # pragma: no cover
             for seed in range(n_runs):
                 pl.seed_everything(seed)
                 _, dataloader_train_kNN, _ = get_data_loaders(batch_size)
-                benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, dataloader_train_kNN, dm.num_classes, strict=False)
+                #benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, dataloader_train_kNN, dm.num_classes, strict=False)
+                benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
+
 
                 logger = WandbLogger(project="ssl_linear_evaluation")  
                 logger.log_hyperparams(params=params_dict)
