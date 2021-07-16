@@ -1,69 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Note that this benchmark also supports a multi-GPU setup. If you run it on
-a system with multiple GPUs make sure that you kill all the processes when
-killing the application. Due to the way we setup this benchmark the distributed
-processes might continue the benchmark if one of the nodes is killed.
-If you know how to fix this don't hesitate to create an issue or PR :)
-You can download the ImageNette dataset from here: https://github.com/fastai/imagenette
-
-
-Code to reproduce the benchmark results:
-
-| Model       | Epochs | Batch Size | Test Accuracy | Peak GPU usage |
-|-------------|--------|------------|---------------|----------------|
-| MoCo        |  800   | 256        | 0.83          | 4.4 GBytes     |
-| SimCLR      |  800   | 256        | 0.85          | 4.4 GBytes     |
-| SimSiam     |  800   | 256        | 0.84          | 4.5 GBytes     |
-| BarlowTwins |  200   | 256        | 0.80          | 4.5 GBytes     |
-| BYOL        |  200   | 256        | 0.85          | 4.6 GBytes     |
-| NNCLR       |  200   | 256        | 0.83          | 4.5 GBytes     |
-| NNSimSiam   |  800   | 256        | 0.82          | 4.9 GBytes     |
-| NNBYOL      |  800   | 256        | 0.85          | 4.6 GBytes     |
-
-
-| My runs     | Epochs | Batch Size | Test Accuracy | Peak GPU usage |
-|-------------|--------|------------|---------------|----------------|
-| diff_elevat.|  800   | 256        | 0.82          |                |
-| swept_deluge|  800   | 256        | 0.83          |                |
-
-
-MY Runs: (we keep the optimizer fixed for now)
-- decent_lake (no warmup): temp=0.1, memory_bank_size=1024, warmup_epochs=0, nmb_prototypes=30, num_negatives=256
-- DIFFERENT_ELEVATOR: temp=0.1, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
-- SWEPT_DELUGE: temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-- WISE_DEW: try decreasing temp. In different_elevator loss decreases quicker probably thanks to lower temp.
-  temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-  Similar results to different_elevator in term of knn-accuracy convergence.
-- POLAR_GALAXY: same as different_elevator, but with temp=0.5 
-  temp=0.5, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
-  Seems to achieve same performance as different_elevator. In this setting temperature param doesn't affect.
-- LYRIC_MORNING: increasing memory_bank_size
-    temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
-- HARDY_PAPER: increase num_negatives (same as WISE_DEW, obtained similar results)
-    temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-- NEW_RUN: different_elevator but without warmup   
-    temp=0.1, memory_bank_size=1024, warmup_epochs=0, nmb_prototypes=30, num_negatives=256
-
-------all these previous changes for faster convergence------
-- FANCIFUL_MONKEY: decrease num_clusters to match true num classes
-    temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=10, num_negatives=512
-- FAITHFUL_SURF: increase num_clusters to 100
-    temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=100, num_negatives=512
-- SMART_SPONGE: increase warmup_epochs -> Bad results
-    temp=0.5, memory_bank_size=2048, warmup_epochs=200, nmb_prototypes=30, num_negatives=512
--GENTLE_MICROWAVE: don't warmup
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512
-- ETHEREAL_TERRAIN: don't use sinkhorn -> too unstable
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
-- new_run: nnclr with negative sampling
-- SUMMER_DURIAN: update learnable cluster centroids, use additional SwAV loss. FORGOT to normalize protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
-- BRIGHT_MOUNTAIN: normalize protos -> better not to normalize the protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
-
-- new_run: take hidden layer from projection MLP for clustering
-"""
 import os
 
 import torch
@@ -72,7 +6,10 @@ import torch.nn.functional as F
 import torchvision
 import numpy as np
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
+from argparse import ArgumentParser
+from pytorch_lightning import seed_everything, Trainer
+from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
+from pytorch_lightning.callbacks import ModelCheckpoint
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 import lightly
@@ -82,8 +19,14 @@ from lightly.models.modules import NNMemoryBankModule
 from lightly.models.mynet import MyNet
 from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
-from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.callbacks import ModelCheckpoint
+
+
+from ssl_finetuner import SSLFineTuner
+from transforms import SwAVFinetuneTransform
+from dataset_normalizations import imagenet_normalization, stl10_normalization
+from imagenet_datamodule import ImagenetDataModule
+
+
 
 num_workers = 12
 memory_bank_size = 4096
@@ -127,8 +70,23 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
+data_dir = '../imagenette2-160'
 path_to_train = 'imagenette2-160/train/'
 path_to_test = 'imagenette2-160/val/'
+
+dm = ImagenetDataModule(data_dir=data_dir, batch_size=batch_sizes[0], num_workers=num_workers)
+
+dm.train_transforms = SwAVFinetuneTransform(
+    normalize=imagenet_normalization(), input_height=dm.size()[-1], eval_transform=False
+)
+dm.val_transforms = SwAVFinetuneTransform(
+    normalize=imagenet_normalization(), input_height=dm.size()[-1], eval_transform=True
+)
+
+dm.test_transforms = SwAVFinetuneTransform(
+    normalize=imagenet_normalization(), input_height=dm.size()[-1], eval_transform=True
+)
+
 
 # Use SimCLR augmentations
 collate_fn = lightly.data.SimCLRCollateFunction(
@@ -523,49 +481,95 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN"]
-models = [NNNModel]
+
+def cli_main():  # pragma: no cover
+    from pl_bolts.datamodules import ImagenetDataModule, STL10DataModule
+
+    seed_everything(1234)
+
+    parser = ArgumentParser()
+    parser.add_argument('--dataset', type=str, help='stl10, imagenet', default='stl10')
+    parser.add_argument('--ckpt_path', type=str, help='path to ckpt')
+    parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
+
+    parser.add_argument("--batch_size", default=64, type=int, help="batch size per gpu")
+    parser.add_argument("--num_workers", default=8, type=int, help="num of workers per GPU")
+    parser.add_argument("--gpus", default=4, type=int, help="number of GPUs")
+    parser.add_argument('--num_epochs', default=100, type=int, help="number of epochs")
+
+    # fine-tuner params
+    parser.add_argument('--in_features', type=int, default=2048)
+    parser.add_argument('--dropout', type=float, default=0.)
+    parser.add_argument('--learning_rate', type=float, default=0.3)
+    parser.add_argument('--weight_decay', type=float, default=1e-6)
+    parser.add_argument('--nesterov', type=bool, default=False)
+    parser.add_argument('--scheduler_type', type=str, default='cosine')
+    parser.add_argument('--gamma', type=float, default=0.1)
+    parser.add_argument('--final_lr', type=float, default=0.)
+
+    args = parser.parse_args()
 
 
-bench_results = []
-gpu_memory_usage = []
+    model_names = ["NNCLR_256"]
+    models = [NNCLRModel]
 
-# loop through configurations and train models
-for batch_size in batch_sizes:
-    for model_name, BenchmarkModel in zip(model_names, models):
-        runs = []
-        for seed in range(n_runs):
-            pl.seed_everything(seed)
-            dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
-            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
+    ckpt_path = 'epoch=799-step=28799.ckpt'
 
-            #logger = TensorBoardLogger('imagenette_runs', version=model_name)
-            logger = WandbLogger(project="ss_knn_validation")  
-            logger.log_hyperparams(params=params_dict)
+    bench_results = []
+    gpu_memory_usage = []
 
-            
-            trainer = pl.Trainer(max_epochs=max_epochs, 
-                                gpus=gpus,
-                                logger=logger,
-                                distributed_backend=distributed_backend,
-                                default_root_dir=logs_root_dir)
-            trainer.fit(
-                benchmark_model,
-                train_dataloader=dataloader_train_ssl,
-                val_dataloaders=dataloader_test
-            )
-            gpu_memory_usage.append(torch.cuda.max_memory_allocated())
-            torch.cuda.reset_peak_memory_stats()
-            runs.append(benchmark_model.max_accuracy)
+    # loop through configurations and train models
+    for batch_size in batch_sizes:
+        for model_name, BenchmarkModel in zip(model_names, models):
+            runs = []
+            for seed in range(n_runs):
+                pl.seed_everything(seed)
+                dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
+                benchmark_model = BenchmarkModel(dataloader_train_kNN, classes).loaded_optimizer_states_dict(ckpt_path, strict=False)
 
-            # delete model and trainer + free up cuda memory
-            del benchmark_model
-            del trainer
-            torch.cuda.empty_cache()
-        bench_results.append(runs)
+                logger = WandbLogger(project="ssl_linear_evaluation")  
+                logger.log_hyperparams(params=params_dict)
 
-for result, model, gpu_usage in zip(bench_results, model_names, gpu_memory_usage):
-    result_np = np.array(result)
-    mean = result_np.mean()
-    std = result_np.std()
-    print(f'{model}: {mean:.3f} +- {std:.3f}, GPU used: {gpu_usage / (1024.0**3):.1f} GByte', flush=True)
+                tuner = SSLFineTuner(
+                    benchmark_model.backbone,
+                    in_features=args.in_features,
+                    num_classes=dm.num_classes,
+                    epochs=args.num_epochs,
+                    hidden_dim=None,
+                    dropout=args.dropout,
+                    learning_rate=args.learning_rate,
+                    weight_decay=args.weight_decay,
+                    nesterov=args.nesterov,
+                    scheduler_type=args.scheduler_type,
+                    gamma=args.gamma,
+                    final_lr=args.final_lr
+                )
+
+                trainer = Trainer(
+                    gpus=args.gpus,
+                    num_nodes=1,
+                    precision=16,
+                    max_epochs=args.num_epochs,
+                    distributed_backend=distributed_backend,
+                    sync_batchnorm=True if args.gpus > 1 else False,
+                )
+
+                trainer.fit(tuner, dm)
+                trainer.test(datamodule=dm)
+
+
+                # delete model and trainer + free up cuda memory
+                del benchmark_model
+                del trainer
+                torch.cuda.empty_cache()
+            bench_results.append(runs)
+
+    for result, model, gpu_usage in zip(bench_results, model_names, gpu_memory_usage):
+        result_np = np.array(result)
+        mean = result_np.mean()
+        std = result_np.std()
+        print(f'{model}: {mean:.3f} +- {std:.3f}, GPU used: {gpu_usage / (1024.0**3):.1f} GByte', flush=True)
+
+
+if __name__ == '__main__':
+    cli_main()
