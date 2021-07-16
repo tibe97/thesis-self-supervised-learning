@@ -523,7 +523,7 @@ def cli_main():  # pragma: no cover
             runs = []
             for seed in range(n_runs):
                 pl.seed_everything(seed)
-                dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
+                _, dataloader_train_kNN, _ = get_data_loaders(batch_size)
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, strict=False)
 
                 logger = WandbLogger(project="ssl_linear_evaluation")  
