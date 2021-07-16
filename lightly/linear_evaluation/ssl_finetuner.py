@@ -1,6 +1,7 @@
 from lightly.linear_evaluation.evaluator import SSLEvaluator
 from typing import List, Optional
 
+import ipdb
 import torch
 from pytorch_lightning import LightningModule
 from torch.nn import functional as F
@@ -115,6 +116,7 @@ class SSLFineTuner(LightningModule):
         return loss
 
     def shared_step(self, batch):
+        ipdb.set_trace()
         x, y = batch
 
         with torch.no_grad():
