@@ -21,10 +21,10 @@ from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 
 
-from ssl_finetuner import SSLFineTuner
-from transforms import SwAVFinetuneTransform
-from dataset_normalizations import imagenet_normalization, stl10_normalization
-from imagenet_datamodule import ImagenetDataModule
+from lightly.linear_evaluation.ssl_finetuner import SSLFineTuner
+from lightly.linear_evaluation.transforms import SwAVFinetuneTransform
+from lightly.linear_evaluation.dataset_normalizations import imagenet_normalization, stl10_normalization
+from lightly.linear_evaluation.imagenet_datamodule import ImagenetDataModule
 
 
 
@@ -483,7 +483,6 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
 """
 
 def cli_main():  # pragma: no cover
-    from pl_bolts.datamodules import ImagenetDataModule, STL10DataModule
 
     seed_everything(1234)
 
