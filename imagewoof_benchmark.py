@@ -72,6 +72,7 @@ import torch.nn.functional as F
 import torchvision
 import numpy as np
 import copy
+import ipdb
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
@@ -188,6 +189,7 @@ valid_dataset.dataset.trasform = torchvision.transforms.Compose([
 ])
 dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset), transform=test_transforms)
 
+ipdb.set_trace()
 
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test

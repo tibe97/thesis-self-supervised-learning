@@ -77,6 +77,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 import lightly
+import ipdb
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
@@ -162,6 +163,7 @@ dataset_test = lightly.data.LightlyDataset(
     transform=test_transforms
 )
 
+ipdb.set_trace()
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
     Args:
