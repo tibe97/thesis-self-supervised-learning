@@ -169,7 +169,7 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
     img_dataset, (train_count, valid_count)
 )
 
-ssl_train_dataset = train_dataset.dataset
+ssl_train_dataset = copy.deepcopy(train_dataset.dataset)
 ssl_train_dataset.transform = torchvision.transforms.Compose([
     torchvision.transforms.ToPILImage()
 ])
