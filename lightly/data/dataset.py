@@ -195,7 +195,6 @@ class LightlyDataset:
             transform=transform,
             index_to_filename=index_to_filename
         )
-        self.transform = transform
         # populate it with the torch dataset
         dataset_obj.dataset = dataset
         return dataset_obj
