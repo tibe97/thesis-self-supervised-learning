@@ -138,6 +138,7 @@ collate_fn = lightly.data.SimCLRCollateFunction(
 )
 
 dataset_transforms = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor(),
     torchvision.transforms.Resize((input_size, input_size))
 ])
 
@@ -161,7 +162,7 @@ img_dataset = ImageFolder(path_to_dir, transform=dataset_transforms)
 total_count = len(img_dataset)
 
 train_count = int(0.8 * total_count)
-valid_count = int(0.2 * total_count)
+valid_count = total_count - train_count
 
 train_dataset, valid_dataset = torch.utils.data.random_split(
     img_dataset, (train_count, valid_count)
