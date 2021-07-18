@@ -160,9 +160,11 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
 
 dataset_train_ssl = copy.deepcopy(train_dataset)
 # we use test transformations for getting the feature for kNN on train data
-dataset_train_kNN = copy.deepcopy(train_dataset).map(test_transforms)
+dataset_train_kNN = copy.deepcopy(train_dataset)
+dataset_train_kNN.dataset.transform = test_transforms
 
-dataset_test = valid_dataset.map(test_transforms)
+dataset_test = valid_dataset
+dataset_test.dataset.transform = test_transforms
 
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
