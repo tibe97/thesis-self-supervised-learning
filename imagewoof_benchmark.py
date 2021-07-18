@@ -137,6 +137,10 @@ collate_fn = lightly.data.SimCLRCollateFunction(
     input_size=input_size,
 )
 
+train_transforms = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor()
+])
+
 # No additional augmentations for the test set
 test_transforms = torchvision.transforms.Compose([
     torchvision.transforms.Resize(input_size),
@@ -159,7 +163,7 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
 )
 
 train_dataset = train_dataset.dataset
-dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset))
+dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset), transform=train_transforms)
 # we use test transformations for getting the feature for kNN on train data
 dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset), transform=test_transforms)
 
