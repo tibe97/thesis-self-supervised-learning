@@ -122,7 +122,7 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [256]
+batch_sizes = [512]
 
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0
@@ -163,24 +163,17 @@ test_transforms = torchvision.transforms.Compose([
 #img_dataset = ImageFolder(path_to_dir, transform=dataset_transforms) # transform is immediately applied to dataset
 img_dataset = ImageFolder(path_to_dir)
 
-
 total_count = len(img_dataset)
-
 train_count = int(0.8 * total_count)
 valid_count = total_count - train_count
+
 
 train_dataset, valid_dataset = torch.utils.data.random_split(
     img_dataset, (train_count, valid_count)
 )
 
 ssl_train_dataset = copy.deepcopy(train_dataset.dataset)
-
-train_dataset_tensor = torchvision.transforms.Compose([
-    torchvision.transforms.ToPILImage()
-])
-
-
-dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dataset, transform=train_transforms)
+dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dataset)
 # we use test transformations for getting the feature for kNN on train data
 dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset.dataset), transform=test_transforms)
 dataset_train_kNN.test_mode = True
