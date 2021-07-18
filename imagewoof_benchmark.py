@@ -159,7 +159,7 @@ test_transforms = torchvision.transforms.Compose([
     )
 ])
 
-#img_dataset = ImageFolder(path_to_dir, transform=dataset_transforms)
+#img_dataset = ImageFolder(path_to_dir, transform=dataset_transforms) # transform is immediately applied to dataset
 img_dataset = ImageFolder(path_to_dir)
 
 
@@ -174,7 +174,7 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
 
 ssl_train_dataset = copy.deepcopy(train_dataset.dataset)
 
-ssl_train_transform = torchvision.transforms.Compose([
+train_dataset_tensor = torchvision.transforms.Compose([
     torchvision.transforms.ToPILImage()
 ])
 
@@ -183,6 +183,9 @@ dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dat
 # we use test transformations for getting the feature for kNN on train data
 dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset.dataset), transform=test_transforms)
 
+valid_dataset.trasform = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor()
+])
 dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
 
 
