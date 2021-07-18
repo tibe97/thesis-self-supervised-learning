@@ -143,7 +143,7 @@ dataset_transforms = torchvision.transforms.Compose([
 ])
 
 train_transforms = torchvision.transforms.Compose([
-    torchvision.transforms.ToTensor()
+    torchvision.transforms.ToPILImage()
 ])
 
 
