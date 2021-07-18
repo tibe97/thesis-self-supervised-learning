@@ -173,11 +173,11 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
 )
 
 ssl_train_dataset = copy.deepcopy(train_dataset.dataset)
-"""
-ssl_train_dataset.transform = torchvision.transforms.Compose([
+
+ssl_train_transform = torchvision.transforms.Compose([
     torchvision.transforms.ToPILImage()
 ])
-"""
+
 
 dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dataset, transform=train_transforms)
 # we use test transformations for getting the feature for kNN on train data
@@ -197,7 +197,8 @@ def get_data_loaders(batch_size: int):
         shuffle=True,
         collate_fn=collate_fn,
         drop_last=True,
-        num_workers=num_workers
+        num_workers=num_workers,
+        transform=ssl_train_transform
     )
 
     dataloader_train_kNN = torch.utils.data.DataLoader(
