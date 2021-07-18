@@ -161,7 +161,7 @@ test_transforms = torchvision.transforms.Compose([
 
 #img_dataset = ImageFolder(path_to_dir, transform=dataset_transforms)
 img_dataset = ImageFolder(path_to_dir)
-img_dataset.transform = transform=dataset_transforms
+
 
 total_count = len(img_dataset)
 
@@ -198,7 +198,6 @@ def get_data_loaders(batch_size: int):
         collate_fn=collate_fn,
         drop_last=True,
         num_workers=num_workers,
-        transform=ssl_train_transform
     )
 
     dataloader_train_kNN = torch.utils.data.DataLoader(
