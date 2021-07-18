@@ -331,4 +331,4 @@ class LightlyDataset:
         """Setter for the transform of the dataset.
 
         """
-        self.dataset.transform = t
+        self.added_transform = t

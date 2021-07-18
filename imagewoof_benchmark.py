@@ -183,12 +183,11 @@ train_dataset_tensor = torchvision.transforms.Compose([
 dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dataset, transform=train_transforms)
 # we use test transformations for getting the feature for kNN on train data
 dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset.dataset), transform=test_transforms)
-
+dataset_train_kNN.test_mode = True
 
 dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
-dataset_test.dataset.trasform = torchvision.transforms.Compose([
-    torchvision.transforms.ToTensor()
-])
+dataset_test.test_mode = True
+
 dataset_test.trasform = torchvision.transforms.Compose([
     torchvision.transforms.ToTensor()
 ])
