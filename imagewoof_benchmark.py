@@ -152,7 +152,7 @@ test_transforms = torchvision.transforms.Compose([
     )
 ])
 
-img_dataset = ImageFolder(path_to_dir)
+img_dataset = ImageFolder(path_to_dir, transform=torchvision.transforms.ToTensor())
 total_count = len(img_dataset)
 
 train_count = int(0.8 * total_count)
