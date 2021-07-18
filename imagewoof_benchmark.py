@@ -188,9 +188,7 @@ dataset_train_kNN.test_mode = True
 dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
 dataset_test.test_mode = True
 
-dataset_test.trasform = torchvision.transforms.Compose([
-    torchvision.transforms.ToTensor()
-])
+
 ipdb.set_trace()
 
 def get_data_loaders(batch_size: int):

@@ -214,7 +214,8 @@ class LightlyDataset:
         sample, target = self.dataset.__getitem__(index)
 
         if self.test_mode:
-            sample = transforms.ToTensor()(sample)
+            #sample = transforms.ToTensor()(sample)
+            sample = self.added_transform(sample)
         return sample, target, fname
 
     def __len__(self):
