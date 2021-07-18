@@ -71,6 +71,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 import numpy as np
+import copy
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
@@ -157,9 +158,9 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
     img_dataset, (train_count, valid_count)
 )
 
-dataset_train_ssl = train_dataset.copy()
+dataset_train_ssl = copy.deepcopy(train_dataset)
 # we use test transformations for getting the feature for kNN on train data
-dataset_train_kNN = train_dataset.copy().map(test_transforms)
+dataset_train_kNN = copy.deepcopy(train_dataset).map(test_transforms)
 
 dataset_test = valid_dataset.map(test_transforms)
 
