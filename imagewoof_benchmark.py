@@ -545,7 +545,7 @@ for batch_size in batch_sizes:
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
-            logger = WandbLogger(project="ss_knn_validation")  
+            logger = WandbLogger(project="ssl_imagewoof_validation")  
             logger.log_hyperparams(params=params_dict)
 
             
