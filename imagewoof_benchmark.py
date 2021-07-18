@@ -138,7 +138,7 @@ collate_fn = lightly.data.SimCLRCollateFunction(
 )
 
 train_transforms = torchvision.transforms.Compose([
-    torchvision.transforms.Resize(input_size),
+    torchvision.transforms.Resize((input_size, input_size)),
     torchvision.transforms.ToTensor()
 ])
 
