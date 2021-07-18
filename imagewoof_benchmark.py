@@ -189,6 +189,9 @@ dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(vali
 dataset_test.dataset.trasform = torchvision.transforms.Compose([
     torchvision.transforms.ToTensor()
 ])
+dataset_test.trasform = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor()
+])
 ipdb.set_trace()
 
 def get_data_loaders(batch_size: int):
