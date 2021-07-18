@@ -158,13 +158,13 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
     img_dataset, (train_count, valid_count)
 )
 
-dataset_train_ssl = copy.deepcopy(train_dataset)
+train_dataset = train_dataset.dataset
+dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset))
 # we use test transformations for getting the feature for kNN on train data
-dataset_train_kNN = copy.deepcopy(train_dataset)
-dataset_train_kNN.dataset.transform = test_transforms
+dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset), transform=test_transforms)
 
-dataset_test = valid_dataset
-dataset_test.dataset.transform = test_transforms
+dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
+
 
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
