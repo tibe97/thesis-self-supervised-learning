@@ -5,7 +5,6 @@
 
 import torch
 import torch.nn as nn
-import ipdb 
 
 from typing import List
 
@@ -68,7 +67,7 @@ class BaseCollateFunction(nn.Module):
 
         """
         batch_size = len(batch)
-        ipdb.set_trace()
+
         # list of transformed images
         transforms = [self.transform(batch[i % batch_size][0]).unsqueeze_(0)
                       for i in range(2 * batch_size)]
