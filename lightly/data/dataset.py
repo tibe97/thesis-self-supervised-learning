@@ -147,6 +147,7 @@ class LightlyDataset:
     def __init__(self,
                  input_dir: str,
                  transform: transforms.Compose = None,
+                 test_mode: bool = False,
                  index_to_filename: Callable[[datasets.VisionDataset, int], str] = None):
 
         # can pass input_dir=None to create an "empty" dataset
@@ -158,6 +159,8 @@ class LightlyDataset:
         self.index_to_filename = _get_filename_by_index
         if index_to_filename is not None:
             self.index_to_filename = index_to_filename
+        self.test_mode = test_mode
+        self.transform = transform
 
     @classmethod
     def from_torch_dataset(cls,
@@ -192,7 +195,7 @@ class LightlyDataset:
             transform=transform,
             index_to_filename=index_to_filename
         )
-
+        self.transform = transform
         # populate it with the torch dataset
         dataset_obj.dataset = dataset
         return dataset_obj
@@ -211,6 +214,8 @@ class LightlyDataset:
         fname = self.index_to_filename(self.dataset, index)
         sample, target = self.dataset.__getitem__(index)
 
+        if self.test_mode:
+            sample = transforms.ToTensor()(sample)
         return sample, target, fname
 
     def __len__(self):
@@ -327,4 +332,5 @@ class LightlyDataset:
         """Setter for the transform of the dataset.
 
         """
+        self.transform = t
         self.dataset.transform = t
