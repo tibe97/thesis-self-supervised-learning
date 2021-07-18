@@ -93,11 +93,11 @@ memory_bank_size = 4096
 
 my_nn_memory_bank_size = 1024
 temperature=0.1
-warmup_epochs=0
-nmb_prototypes=30
+warmup_epochs=50
+nmb_prototypes=400
 num_negatives=256
 use_sinkhorn = True
-add_swav_loss = True
+add_swav_loss = False
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -535,8 +535,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNCLR_256"]
-models = [NNCLRModel]
+model_names = ["NNN"]
+models = [NNNModel]
 
 
 bench_results = []
