@@ -128,7 +128,7 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
-path_to_dir = 'Images'
+path_to_dir = 'data/Images'
 
 
 # Use SimCLR augmentations
