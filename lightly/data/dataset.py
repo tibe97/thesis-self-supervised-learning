@@ -160,7 +160,7 @@ class LightlyDataset:
         if index_to_filename is not None:
             self.index_to_filename = index_to_filename
         self.test_mode = test_mode
-        self.transform = transform
+        self.added_transform = transform
 
     @classmethod
     def from_torch_dataset(cls,
@@ -331,5 +331,4 @@ class LightlyDataset:
         """Setter for the transform of the dataset.
 
         """
-        self.transform = t
         self.dataset.transform = t
