@@ -168,10 +168,13 @@ train_dataset, valid_dataset = torch.utils.data.random_split(
     img_dataset, (train_count, valid_count)
 )
 
-train_dataset = train_dataset.dataset
+ssl_train_dataset = train_dataset.dataset
+ssl_train_dataset.transform = torchvision.transforms.Compose([
+    torchvision.transforms.ToPILImage()
+])
 dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset), transform=train_transforms)
 # we use test transformations for getting the feature for kNN on train data
-dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset), transform=test_transforms)
+dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset.dataset), transform=test_transforms)
 
 dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
 
