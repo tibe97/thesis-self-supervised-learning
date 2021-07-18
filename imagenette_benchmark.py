@@ -163,7 +163,7 @@ dataset_test = lightly.data.LightlyDataset(
     transform=test_transforms
 )
 
-ipdb.set_trace()
+
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
     Args:

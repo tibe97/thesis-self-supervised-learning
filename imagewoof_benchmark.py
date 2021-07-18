@@ -115,7 +115,7 @@ logs_root_dir = ('imagenette_logs')
 max_epochs = 800
 knn_k = 200
 knn_t = 0.1
-classes = 10
+classes = 120
 input_size=128
 num_ftrs=512
 nn_size=2 ** 16
@@ -138,16 +138,6 @@ collate_fn = lightly.data.SimCLRCollateFunction(
     input_size=input_size,
 )
 
-dataset_transforms = torchvision.transforms.Compose([
-    torchvision.transforms.ToTensor(),
-    torchvision.transforms.Resize((input_size, input_size))
-])
-
-train_transforms = torchvision.transforms.Compose([
-    #torchvision.transforms.ToPILImage()
-    torchvision.transforms.ToTensor(),
-])
-
 
 # No additional augmentations for the test set
 test_transforms = torchvision.transforms.Compose([
@@ -160,7 +150,6 @@ test_transforms = torchvision.transforms.Compose([
     )
 ])
 
-#img_dataset = ImageFolder(path_to_dir, transform=dataset_transforms) # transform is immediately applied to dataset
 img_dataset = ImageFolder(path_to_dir)
 
 total_count = len(img_dataset)
