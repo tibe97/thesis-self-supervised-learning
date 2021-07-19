@@ -212,7 +212,7 @@ def cli_main():  # pragma: no cover
     args = parser.parse_args()
 
 
-    model_names = ["NNN"]
+    model_names = ["Mockup"]
     models = [MockupModel]
 
     ckpt_path = args.ckpt_path
@@ -231,7 +231,7 @@ def cli_main():  # pragma: no cover
                 benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
 
 
-                logger = WandbLogger(project="ssl_linear_evaluation")  
+                logger = WandbLogger(project="ssl_linear_evaluation_imagewoof")  
                 logger.log_hyperparams(params=params_dict)
 
                 tuner = SSLFineTuner(
