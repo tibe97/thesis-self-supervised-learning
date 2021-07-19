@@ -64,6 +64,8 @@ MY Runs: (we keep the optimizer fixed for now)
 
 - new_run: take hidden layer from projection MLP for clustering
 - new_run: run withou SimCLR collate fn
+- new_run: different_elevator but with longer warmup
+    temp=0.1, memory_bank_size=1024, warmup_epochs=200, nmb_prototypes=30, num_negatives=256
 """
 import os
 

@@ -6,11 +6,13 @@ import torchvision
 import numpy as np
 import pytorch_lightning as pl
 import lightly
+import copy
 from argparse import ArgumentParser
 from pytorch_lightning import seed_everything, Trainer
 from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from torchvision import transforms
+from torchvision.datasets import ImageFolder
 from torchvision.transforms.transforms import CenterCrop
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
@@ -54,7 +56,7 @@ logs_root_dir = ('imagenette_logs')
 max_epochs = 800
 knn_k = 200
 knn_t = 0.1
-classes = 10
+classes = 120
 input_size=128
 num_ftrs=512
 nn_size=2 ** 16
@@ -69,22 +71,10 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
-data_dir = 'imagenette2-160'
-path_to_train = 'imagenette2-160/train/'
-path_to_test = 'imagenette2-160/val/'
+path_to_dir = 'data/Images'
 
-dm = ImagenetDataModule(data_dir=data_dir, batch_size=batch_sizes[0], num_workers=num_workers)
+dm = ImagenetDataModule(data_dir=path_to_dir, batch_size=batch_sizes[0], num_workers=num_workers)
 
-dm.train_transforms = SwAVFinetuneTransform(
-    normalize=imagenet_normalization(), input_height=dm.size()[-1], eval_transform=False
-)
-dm.val_transforms = SwAVFinetuneTransform(
-    normalize=imagenet_normalization(), input_height=dm.size()[-1], eval_transform=True
-)
-
-dm.test_transforms = SwAVFinetuneTransform(
-    normalize=imagenet_normalization(), input_height=dm.size()[-1], eval_transform=True
-)
 
 
 # Use SimCLR augmentations
@@ -103,20 +93,25 @@ test_transforms = torchvision.transforms.Compose([
     )
 ])
 
-dataset_train_ssl = lightly.data.LightlyDataset(
-    input_dir=path_to_train
+img_dataset = ImageFolder(path_to_dir)
+
+total_count = len(img_dataset)
+train_count = int(0.8 * total_count)
+valid_count = total_count - train_count
+
+
+train_dataset, valid_dataset = torch.utils.data.random_split(
+    img_dataset, (train_count, valid_count)
 )
 
+ssl_train_dataset = copy.deepcopy(train_dataset.dataset)
+dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dataset)
 # we use test transformations for getting the feature for kNN on train data
-dataset_train_kNN = lightly.data.LightlyDataset(
-    input_dir=path_to_train,
-    transform=test_transforms
-)
+dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset.dataset), transform=test_transforms)
+dataset_train_kNN.test_mode = True
 
-dataset_test = lightly.data.LightlyDataset(
-    input_dir=path_to_test,
-    transform=test_transforms
-)
+dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
+dataset_test.test_mode = True
 
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
