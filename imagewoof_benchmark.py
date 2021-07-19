@@ -98,6 +98,7 @@ nmb_prototypes=400
 num_negatives=512
 use_sinkhorn = True
 add_swav_loss = False
+learning_rate = 6e-2
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -106,7 +107,8 @@ params_dict = dict({
     "nmb_prototypes": nmb_prototypes,
     "num_negatives": num_negatives,
     "use_sinkhorn": use_sinkhorn,
-    "add_swav_loss": add_swav_loss
+    "add_swav_loss": add_swav_loss,
+    "learning_rate": learning_rate
 })
 
 logs_root_dir = ('imagenette_logs')
@@ -312,7 +314,7 @@ class NNCLRModel(BenchmarkModule):
         return loss
 
     def configure_optimizers(self):
-        optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=6e-2,
+        optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=learning_rate,
                                 momentum=0.9, weight_decay=5e-4)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
