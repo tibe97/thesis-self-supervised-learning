@@ -68,9 +68,11 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
         #compute cluster assignments
         with torch.no_grad():
+            """
             w = self.model.prototypes_layer.weight.data.clone()
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
+            """
             cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
 
         q = torch.exp(cluster_scores / self.epsilon).t()

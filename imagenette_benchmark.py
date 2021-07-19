@@ -58,9 +58,9 @@ MY Runs: (we keep the optimizer fixed for now)
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
 - new_run: nnclr with negative sampling
 - SUMMER_DURIAN: update learnable cluster centroids, use additional SwAV loss. FORGOT to normalize protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=True, swav_loss=True
 - BRIGHT_MOUNTAIN: normalize protos -> better not to normalize the protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=True, swav_loss=True
 
 - new_run: take hidden layer from projection MLP for clustering
 - new_run: run withou SimCLR collate fn
