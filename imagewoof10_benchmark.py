@@ -58,11 +58,14 @@ MY Runs: (we keep the optimizer fixed for now)
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
 - new_run: nnclr with negative sampling
 - SUMMER_DURIAN: update learnable cluster centroids, use additional SwAV loss. FORGOT to normalize protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=True, swav_loss=True
 - BRIGHT_MOUNTAIN: normalize protos -> better not to normalize the protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
+    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=True, swav_loss=True
 
 - new_run: take hidden layer from projection MLP for clustering
+- new_run: run withou SimCLR collate fn
+- new_run: different_elevator but with longer warmup
+    temp=0.1, memory_bank_size=1024, warmup_epochs=200, nmb_prototypes=30, num_negatives=256
 """
 import os
 
@@ -71,14 +74,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 import numpy as np
-import copy
-import ipdb
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
-from torchvision.datasets import ImageFolder
 import lightly
+import ipdb
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
@@ -91,14 +92,13 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 2048
-temperature=0.5
+my_nn_memory_bank_size = 1024
+temperature=0.1
 warmup_epochs=0
-nmb_prototypes=400
-num_negatives=512
+nmb_prototypes=30
+num_negatives=256
 use_sinkhorn = True
-add_swav_loss = False
-learning_rate = 6e-2
+add_swav_loss = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -107,8 +107,7 @@ params_dict = dict({
     "nmb_prototypes": nmb_prototypes,
     "num_negatives": num_negatives,
     "use_sinkhorn": use_sinkhorn,
-    "add_swav_loss": add_swav_loss,
-    "learning_rate": learning_rate
+    "add_swav_loss": add_swav_loss
 })
 
 logs_root_dir = ('imagenette_logs')
@@ -117,14 +116,14 @@ logs_root_dir = ('imagenette_logs')
 max_epochs = 800
 knn_k = 200
 knn_t = 0.1
-classes = 120
+classes = 10
 input_size=128
 num_ftrs=512
 nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [512]
+batch_sizes = [256]
 
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0
@@ -132,14 +131,13 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
-path_to_dir = 'data/Images'
-
+path_to_train = 'imagewoof2-160/train/'
+path_to_test = 'imagewoof2-160/val/'
 
 # Use SimCLR augmentations
 collate_fn = lightly.data.SimCLRCollateFunction(
     input_size=input_size,
 )
-
 
 # No additional augmentations for the test set
 test_transforms = torchvision.transforms.Compose([
@@ -152,28 +150,21 @@ test_transforms = torchvision.transforms.Compose([
     )
 ])
 
-img_dataset = ImageFolder(path_to_dir)
-
-total_count = len(img_dataset)
-train_count = int(0.8 * total_count)
-valid_count = total_count - train_count
-
-
-train_dataset, valid_dataset = torch.utils.data.random_split(
-    img_dataset, (train_count, valid_count)
+dataset_train_ssl = lightly.data.LightlyDataset(
+    input_dir=path_to_train
 )
 
-ssl_train_dataset = copy.deepcopy(train_dataset.dataset)
-dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dataset)
 # we use test transformations for getting the feature for kNN on train data
-dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset.dataset), transform=test_transforms)
-dataset_train_kNN.test_mode = True
+dataset_train_kNN = lightly.data.LightlyDataset(
+    input_dir=path_to_train,
+    transform=test_transforms
+)
 
-dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
-dataset_test.test_mode = True
+dataset_test = lightly.data.LightlyDataset(
+    input_dir=path_to_test,
+    transform=test_transforms
+)
 
-
-#ipdb.set_trace()
 
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
@@ -186,7 +177,7 @@ def get_data_loaders(batch_size: int):
         shuffle=True,
         collate_fn=collate_fn,
         drop_last=True,
-        num_workers=num_workers,
+        num_workers=num_workers
     )
 
     dataloader_train_kNN = torch.utils.data.DataLoader(
@@ -314,7 +305,7 @@ class NNCLRModel(BenchmarkModule):
         return loss
 
     def configure_optimizers(self):
-        optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=learning_rate,
+        optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
@@ -537,8 +528,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN"]
-models = [NNNModel]
+model_names = ["SimCLRModel_256"]
+models = [SimCLRModel]
 
 
 bench_results = []
@@ -554,7 +545,7 @@ for batch_size in batch_sizes:
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
-            logger = WandbLogger(project="ssl_imagewoof_validation")  
+            logger = WandbLogger(project="ssl_imagewoof10_validation")  
             logger.log_hyperparams(params=params_dict)
 
             
