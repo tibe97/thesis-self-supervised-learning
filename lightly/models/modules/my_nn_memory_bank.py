@@ -305,7 +305,7 @@ class HardNegativeMemoryBankModule(MemoryBankModule):
 
         """
         #start_time = time.time()
-        output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
+        output, bank = super(HardNegativeMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
 
         output_normed = torch.nn.functional.normalize(output, dim=1)
