@@ -56,7 +56,9 @@ MY Runs: (we keep the optimizer fixed for now)
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512
 - ETHEREAL_TERRAIN: don't use sinkhorn -> too unstable
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
+
 - new_run: nnclr with negative sampling
+
 - SUMMER_DURIAN: update learnable cluster centroids, use additional SwAV loss. FORGOT to normalize protos
     temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=True, swav_loss=True
 - BRIGHT_MOUNTAIN: normalize protos -> better not to normalize the protos
@@ -84,7 +86,7 @@ from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
 from lightly.models.mynet import MyNet
-from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
+from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule, HardNegativeMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -123,8 +125,8 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-#batch_sizes = [256]
-batch_sizes = [64]
+batch_sizes = [256]
+
 
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0
@@ -355,6 +357,48 @@ class NNNModel(BenchmarkModule):
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
 
+class NNCLR_HardNegative(BenchmarkModule):
+    def __init__(self, dataloader_kNN, num_classes, warmup_epochs: int=warmup_epochs):
+        super().__init__(dataloader_kNN, num_classes)
+        # create a ResNet backbone and remove the classification head
+        resnet = torchvision.models.resnet18()
+        last_conv_channels = list(resnet.children())[-1].in_features
+        self.backbone = nn.Sequential(
+            *list(resnet.children())[:-1],
+            nn.Conv2d(last_conv_channels, num_ftrs, 1),
+        )
+        # create a simclr model based on ResNet
+        self.model = \
+            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
+        
+        self.nn_replacer = HardNegativeMemoryBankModule(self.model, size=my_nn_memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
+        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.warmup_epochs = warmup_epochs
+
+    def forward(self, x):
+        self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        # get the two image transformations
+        (x0, x1), _, _ = batch
+        # forward pass of the transformations
+        (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
+        # calculate loss for NNCLR
+        if self.current_epoch > self.warmup_epochs-1:
+            z0 = self.nn_replacer(z0.detach(), update=False)
+            z1 = self.nn_replacer(z1.detach(), update=True)
+
+        #loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
+        loss = 0.5 * (self.criterion(z0, p1, q0, q1) + self.criterion(z1, p0, q1, q0))
+        # log loss and return
+        self.log('train_loss_ssl', loss)
+        return loss
+
+    def configure_optimizers(self):
+        optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
+                                momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        return [optim], [scheduler]
 
 class SimSiamModel(BenchmarkModule):
     def __init__(self, dataloader_kNN, num_classes):
