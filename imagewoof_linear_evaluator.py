@@ -231,7 +231,7 @@ def cli_main():  # pragma: no cover
                 benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
 
 
-                logger = WandbLogger(project="ssl_linear_evaluation_imagewoof")  
+                logger = WandbLogger(project="ssl_linear_evaluation_imagewoof120")  
                 logger.log_hyperparams(params=params_dict)
 
                 tuner = SSLFineTuner(
