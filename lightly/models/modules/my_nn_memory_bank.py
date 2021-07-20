@@ -122,8 +122,8 @@ class MyNNMemoryBankModule(MemoryBankModule):
             row_neg = similarity_matrix_neg[i]
             p_cluster = positive_clusters[i]
             mask_indices = torch.where(negative_clusters==p_cluster)[0]
-            row_pos.scatter_(1, mask_indices, torch.cuda.Tensor(10), reduce='add')
-            row_neg.scatter_(1, mask_indices, torch.cuda.Tensor(-10), reduce='add')
+            row_pos.scatter_(1, mask_indices, torch.cuda.FloatTensor(10), reduce='add')
+            row_neg.scatter_(1, mask_indices, torch.cuda.FloatTensor(-10), reduce='add')
             sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
             sim_negatives.append(sim_nearest_neighbours)
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
