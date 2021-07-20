@@ -100,7 +100,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
         #end_time = time.time()
         #print("Time Forward: {}".format(end_time-start_time))
-        ipdb.set_trace()
+        
 
         return nearest_neighbours
 
@@ -165,7 +165,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             row = similarity_matrix[i]
             #mask out samples with the same cluster assignment by putting -1 as corresponding value
             p_cluster = positive_clusters[i]
-            mask_indices = np.where(negative_clusters.cpu()==p_cluster.cpu())[0]
+            mask_indices = torch.where(negative_clusters==p_cluster)[0]
             for idx in mask_indices:
                 row[idx] = -10 # to make sure we don't select them
             sim_nearest_neighbours = torch.topk(row, num_nn, dim=0).values # take the similarity score
