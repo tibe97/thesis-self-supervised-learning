@@ -99,7 +99,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)
 
         start_time = time.time()
-        
+        """
         for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
             row_pos = similarity_matrix_pos[i]
             row_neg = similarity_matrix_neg[i]
@@ -127,7 +127,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             sim_negatives.append(sim_nearest_neighbours)
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
-        """
+        
         end_time = time.time()
         print("Sample positives and negatives: {}".format(end_time-start_time))
 
