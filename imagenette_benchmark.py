@@ -325,7 +325,8 @@ class NNNModel(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=my_nn_memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
-        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.criterion = lightly.loss.NTXentLoss()
+        #self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
 
     def forward(self, x):
@@ -337,10 +338,12 @@ class NNNModel(BenchmarkModule):
         # forward pass of the transformations
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
-        if self.current_epoch < self.warmup_epochs:
+        if self.current_epoch > self.warmup_epochs:
             z0 = self.nn_replacer(z0.detach(), update=False)
             z1 = self.nn_replacer(z1.detach(), update=True)
-        loss = 0.5 * (self.criterion(z0, p1, q0, q1) + self.criterion(z1, p0, q1, q0))
+
+        loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
+        #loss = 0.5 * (self.criterion(z0, p1, q0, q1) + self.criterion(z1, p0, q1, q0))
         # log loss and return
         self.log('train_loss_ssl', loss)
         return loss
