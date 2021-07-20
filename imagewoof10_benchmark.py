@@ -528,8 +528,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN"]
-models = [NNNModel]
+model_names = ["NNN_256", "NNCLR_256", "BYOL_256"]
+models = [NNNModel, NNCLRModel, BYOLModel]
 
 
 bench_results = []
