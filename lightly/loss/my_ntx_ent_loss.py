@@ -128,7 +128,7 @@ class MyNTXentLoss(MemoryBankModule):
 
         else:
             # use other samples from batch as negatives
-            output = torch.cat((out0, out1), axis=0)
+            output = torch.cat((out0, out1), axis=0).to(device)
 
             # the logits are the similarity matrix divided by the temperature
             logits = torch.einsum('nc,mc->nm', output, output) / self.temperature
