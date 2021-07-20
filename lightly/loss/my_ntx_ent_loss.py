@@ -141,7 +141,7 @@ class MyNTXentLoss(MemoryBankModule):
         
 
         loss = self.cross_entropy(logits, labels)
-        if self.add_swav_loss and sim_negatives is not None:
+        if self.add_swav_loss: 
             p1 = self.softmax(q1 / self.temperature)
             loss = 0.5 * (loss - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))) 
 
