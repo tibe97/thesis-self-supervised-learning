@@ -49,13 +49,11 @@ class MyNTXentLoss(MemoryBankModule):
     """
 
     def __init__(self,
-                 nn_replacer: MyNNMemoryBankModule,
                  temperature: float = 0.2,
                  num_negatives: int = 256,
                  memory_bank_size: int = 0,
                  add_swav_loss: bool = False):
         super(MyNTXentLoss, self).__init__(size=memory_bank_size)
-        self.nn_replacer = nn_replacer
         self.temperature = temperature
         self.cross_entropy = torch.nn.CrossEntropyLoss(reduction="mean")
         self.eps = 1e-8
@@ -70,8 +68,9 @@ class MyNTXentLoss(MemoryBankModule):
     def forward(self,
                 out0: torch.Tensor,
                 out1: torch.Tensor,
-                q0_pos: torch.Tensor,
-                q1: torch.Tensor):
+                q0_assign: torch.Tensor,
+                q1: torch.Tensor,
+                sim_negatives: torch.Tensor):
         """Forward pass through Contrastive Cross-Entropy Loss.
 
         If used with a memory bank, the samples from the memory bank are used
@@ -85,6 +84,17 @@ class MyNTXentLoss(MemoryBankModule):
                 out1:
                     Output projections of the second set of transformed images.
                     Shape: (batch_size, embedding_size)
+                q0_assign: 
+                    Cluster assignments of the original samples used to compute nearest neighbors
+                    Used for SwAV loss (optional)
+                q1_assign:
+                    Predicted cluster assignement directly taken from the output of the prototype 
+                    layer of the network.
+                    Used for SwAV loss (optional)
+                sim_negatives: 
+                    Computed similarities between the nearest neighbors and the negatives
+                    sampled with hard negative mining. We just return the similarities because 
+                    it's all we need to compute the loss.
 
             Returns:
                 Contrastive Cross Entropy Loss value.
@@ -98,15 +108,6 @@ class MyNTXentLoss(MemoryBankModule):
         out0 = torch.nn.functional.normalize(out0, dim=1)
         out1 = torch.nn.functional.normalize(out1, dim=1)
 
-        # ask memory bank for negative samples and extend it with out1 if 
-        # out1 requires a gradient, otherwise keep the same vectors in the 
-        # memory bank (this allows for keeping the memory bank constant e.g.
-        # for evaluating the loss on the test set)
-        # out1: shape: (batch_size, embedding_size)
-        # negatives: shape: (embedding_size, memory_bank_size)
-
-        #out1, negatives = super(MyNTXentLoss, self).forward(out1, update=out0.requires_grad) #change here to sample hard negatives
-        out1, sim_negatives, q0_assign = self.nn_replacer.sample_negatives(out1, q0_pos, num_nn=self.num_negatives, update=out0.requires_grad)
 
         # We use the cosine similarity, which is a dot product (einsum) here,
         # as all vectors are already normalized to unit length.
@@ -119,7 +120,6 @@ class MyNTXentLoss(MemoryBankModule):
             # sim_pos is of shape (batch_size, 1) and sim_pos[i] denotes the similarity
             # of the i-th sample in the batch to its positive pair
             sim_pos = torch.einsum('nc,nc->n', out0, out1).unsqueeze(-1).to(device)
-
 
             # set the labels to the first "class", i.e. sim_pos,
             # so that it is maximized in relation to sim_neg
@@ -141,11 +141,12 @@ class MyNTXentLoss(MemoryBankModule):
         
 
         loss = self.cross_entropy(logits, labels)
-        if self.add_swav_loss:
+        if self.add_swav_loss and sim_negatives is not None:
             p1 = self.softmax(q1 / self.temperature)
             loss = 0.5 * (loss - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))) 
 
         return loss
+
 
 class MyNTXentLoss2(MemoryBankModule):
     """Implementation of the Contrastive Cross Entropy Loss.
@@ -235,12 +236,6 @@ class MyNTXentLoss2(MemoryBankModule):
         out0 = torch.nn.functional.normalize(out0, dim=1)
         out1 = torch.nn.functional.normalize(out1, dim=1)
 
-        # ask memory bank for negative samples and extend it with out1 if 
-        # out1 requires a gradient, otherwise keep the same vectors in the 
-        # memory bank (this allows for keeping the memory bank constant e.g.
-        # for evaluating the loss on the test set)
-        # out1: shape: (batch_size, embedding_size)
-        # negatives: shape: (embedding_size, memory_bank_size)
 
         #out1, negatives = super(MyNTXentLoss, self).forward(out1, update=out0.requires_grad) #change here to sample hard negatives
         out1, sim_negatives, q0_assign = self.nn_replacer.sample_negatives(out1, q0_pos, num_nn=self.num_negatives, update=out0.requires_grad)

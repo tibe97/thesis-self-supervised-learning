@@ -328,8 +328,8 @@ class NNNModel(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=my_nn_memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
-        self.criterion = lightly.loss.NTXentLoss()
-        #self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        #self.criterion = lightly.loss.NTXentLoss()
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
 
     def forward(self, x):
@@ -342,11 +342,16 @@ class NNNModel(BenchmarkModule):
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
         if self.current_epoch > self.warmup_epochs-1:
-            z0 = self.nn_replacer(z0.detach(), update=False)
-            z1 = self.nn_replacer(z1.detach(), update=True)
-
-        loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
-        #loss = 0.5 * (self.criterion(z0, p1, q0, q1) + self.criterion(z1, p0, q1, q0))
+            # sample neighbors, similarities with the sampled negatives and the cluster 
+            # assignements of the original Z
+            z0, sim_neg0, q0_assign = self.nn_replacer(z0.detach(), num_negatives, update=False) 
+            z1, sim_neg1, q1_assign = self.nn_replacer(z1.detach(), num_negatives, update=True)
+           
+            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, sim_neg1) + self.criterion(z1, p0, q1_assign, q0, sim_neg0))
+        else:
+            # warming up with classical instance discrimination of same augmented image
+            # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
+            loss = 0.5 * (self.criterion(z0, p1, q0, q1, None) + self.criterion(z1, p0, q1, q0, None))
         # log loss and return
         self.log('train_loss_ssl', loss)
         return loss
@@ -576,8 +581,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNCLR_HardNegative"]
-models = [NNCLR_HardNegative]
+model_names = ["NNNModel_256"]
+models = [NNNModel]
 
 
 bench_results = []
