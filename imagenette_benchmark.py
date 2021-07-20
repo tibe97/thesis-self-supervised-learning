@@ -125,7 +125,8 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [256]
+#batch_sizes = [256]
+batch_sizes = [128]
 
 
 # use a GPU if available
