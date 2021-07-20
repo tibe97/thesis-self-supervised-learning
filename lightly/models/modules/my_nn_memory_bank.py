@@ -99,7 +99,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)
 
         start_time = time.time()
-        
+        """
         for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
             row_pos = similarity_matrix_pos[i]
             row_neg = similarity_matrix_neg[i]
@@ -120,17 +120,13 @@ class MyNNMemoryBankModule(MemoryBankModule):
             row_neg = similarity_matrix_neg[i]
             p_cluster = positive_clusters[i]
             mask_indices = torch.where(negative_clusters==p_cluster)[0]
-            row_pos_mask = torch.zeros(row_pos.mask)
-            row_neg_mask = torch.zeros(row_neg.mask)
-
-            for idx in mask_indices:
-                row_pos[idx] += 10 # to make sure we select among the same cluster
-                row_neg[idx] -= 10 # to make sure we don't select from the same cluster
+            row_pos.scatter_(1, mask_indices, torch.Tensor(10), reduce='add')
+            row_neg.scatter_(1, mask_indices, torch.Tensor(-10), reduce='add')
             sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
             sim_negatives.append(sim_nearest_neighbours)
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
-        """
+        
         end_time = time.time()
         print("Sample positives and negatives: {}".format(end_time-start_time))
 
