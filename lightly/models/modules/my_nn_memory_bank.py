@@ -5,6 +5,7 @@
 
 import torch
 import time
+import ipdb
 import numpy as np
 from lightly.loss.memory_bank import MemoryBankModule
 
@@ -99,6 +100,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
         #end_time = time.time()
         #print("Time Forward: {}".format(end_time-start_time))
+        ipdb.set_trace()
 
         return nearest_neighbours
 
