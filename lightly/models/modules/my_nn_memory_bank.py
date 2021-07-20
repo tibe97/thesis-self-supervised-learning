@@ -62,18 +62,18 @@ class MyNNMemoryBankModule(MemoryBankModule):
             update: If `True` updated the memory bank by adding output to it
 
         """
-        start_time = time.time()
+        #start_time = time.time()
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
         device = output.device
         bank = bank.to(output.device).t()
-        end_time = time.time()
-        print("Retrieve bank and move to GPU: {}".format(end_time-start_time))
+        #end_time = time.time()
+        #print("Retrieve bank and move to GPU: {}".format(end_time-start_time))
 
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
 
         #compute cluster assignments
-        start_time = time.time()
+        #start_time = time.time()
         with torch.no_grad():
             """
             w = self.model.prototypes_layer.weight.data.clone()
@@ -91,15 +91,15 @@ class MyNNMemoryBankModule(MemoryBankModule):
             # transform soft assignment into hard assignments to get cluster
             positive_clusters = torch.argmax(q_positives, dim=1)
             negative_clusters = torch.argmax(q_negatives, dim=1)
-        end_time = time.time()
-        print("Compute cluster assignments: {}".format(end_time-start_time))
+        #end_time = time.time()
+        #print("Compute cluster assignments: {}".format(end_time-start_time))
 
 
         sim_negatives = []
         similarity_matrix_pos = torch.einsum("nd,md->nm", output_normed, bank_normed)
         similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)
 
-        start_time = time.time()
+        #start_time = time.time()
         """
         for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
             row_pos = similarity_matrix_pos[i]
@@ -122,8 +122,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
             row_neg = similarity_matrix_neg[i]
             p_cluster = positive_clusters[i]
             mask_indices = torch.where(negative_clusters==p_cluster)[0]
-            #row_pos.scatter_(0, mask_indices, torch.cuda.FloatTensor(10), reduce='add')
-            #row_neg.scatter_(0, mask_indices, torch.cuda.FloatTensor(-10), reduce='add')
             row_pos.scatter_(0, mask_indices, 10, reduce='add')
             row_neg.scatter_(0, mask_indices, -10, reduce='add')
             sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
@@ -131,9 +129,9 @@ class MyNNMemoryBankModule(MemoryBankModule):
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
         
-        end_time = time.time()
-        print("Sample positives and negatives: {}".format(end_time-start_time))
-        ipdb.set_trace()
+        #end_time = time.time()
+        #print("Sample positives and negatives: {}".format(end_time-start_time))
+        
         # stack all negative similarities for each positive along row dimension
         sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
         
