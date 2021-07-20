@@ -339,7 +339,7 @@ class NNNModel(BenchmarkModule):
         # forward pass of the transformations
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
-        if self.current_epoch > self.warmup_epochs:
+        if self.current_epoch > self.warmup_epochs-1:
             z0 = self.nn_replacer(z0.detach(), update=False)
             z1 = self.nn_replacer(z1.detach(), update=True)
 
