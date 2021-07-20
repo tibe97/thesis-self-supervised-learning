@@ -133,7 +133,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         
         end_time = time.time()
         print("Sample positives and negatives: {}".format(end_time-start_time))
-
+        ipdb.set_trace()
         # stack all negative similarities for each positive along row dimension
         sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
         
