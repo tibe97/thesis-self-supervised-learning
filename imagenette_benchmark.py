@@ -96,7 +96,7 @@ memory_bank_size = 4096
 
 my_nn_memory_bank_size = 1024
 temperature=0.1
-warmup_epochs=0
+warmup_epochs=400
 nmb_prototypes=30
 num_negatives=256
 use_sinkhorn = True
@@ -125,8 +125,8 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-#batch_sizes = [256]
-batch_sizes = [128]
+batch_sizes = [256]
+
 
 
 # use a GPU if available
