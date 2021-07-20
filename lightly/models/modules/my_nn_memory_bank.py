@@ -90,7 +90,8 @@ class MyNNMemoryBankModule(MemoryBankModule):
         for i in range(similarity_matrix.shape[0]): # for each positive sample
             row = similarity_matrix[i]
             p_cluster = positive_clusters[i]
-            mask_indices = np.where(negative_clusters.cpu()==p_cluster.cpu())[0]
+            #mask_indices = np.where(negative_clusters.cpu()==p_cluster.cpu())[0]
+            mask_indices = torch.where(negative_clusters.cpu()==p_cluster.cpu())[0]
             for idx in mask_indices:
                 row[idx] = +10 # to make sure we select among the same cluster
                 
