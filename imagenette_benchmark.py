@@ -94,7 +94,7 @@ memory_bank_size = 4096
 
 my_nn_memory_bank_size = 1024
 temperature=0.1
-warmup_epochs=0
+warmup_epochs=50
 nmb_prototypes=30
 num_negatives=256
 use_sinkhorn = True
