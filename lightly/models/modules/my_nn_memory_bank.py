@@ -95,6 +95,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             mask_indices = torch.where(negative_clusters==p_cluster)[0]
             for idx in mask_indices:
                 row[idx] = +10 # to make sure we select among the same cluster
+            ipdb.set_trace()
                 
         index_nearest_neighbours = torch.argmax(similarity_matrix, dim=1)
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
