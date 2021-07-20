@@ -87,7 +87,7 @@ from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
 from lightly.models.mynet import MyNet
 from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule, HardNegativeMemoryBankModule
-from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
+from lightly.loss.my_ntx_ent_loss import MyNTXentLoss, MyNTXentLoss2
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 
@@ -372,7 +372,7 @@ class NNCLR_HardNegative(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = HardNegativeMemoryBankModule(self.model, size=my_nn_memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
-        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.criterion = MyNTXentLoss2(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
 
     def forward(self, x):

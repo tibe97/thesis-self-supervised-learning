@@ -261,13 +261,12 @@ class HardNegativeMemoryBankModule(MemoryBankModule):
             update: If `True` updated the memory bank by adding output to it
 
         """
-
         output, bank = super(HardNegativeMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
-        self.bank = bank
 
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
+        self.bank = bank_normed
 
         similarity_matrix = torch.einsum("nd,md->nm", output_normed, bank_normed)
         index_nearest_neighbours = torch.argmax(similarity_matrix, dim=1)
