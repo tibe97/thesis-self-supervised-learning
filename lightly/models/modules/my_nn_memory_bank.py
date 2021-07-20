@@ -248,6 +248,7 @@ class HardNegativeMemoryBankModule(MemoryBankModule):
         self.sinkhorn_iterations = sinkhorn_iterations
         self.gpus = gpus
         self.use_sinkhorn = use_sinkhorn
+        self.bank = None
         
 
     def forward(self,
@@ -263,6 +264,7 @@ class HardNegativeMemoryBankModule(MemoryBankModule):
 
         output, bank = super(HardNegativeMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
+        self.bank = bank
 
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
@@ -304,9 +306,11 @@ class HardNegativeMemoryBankModule(MemoryBankModule):
             update: If `True` updated the memory bank by adding output to it
 
         """
-        #start_time = time.time()
-        output, bank = super(HardNegativeMemoryBankModule, self).forward(output, update=update)
-        bank = bank.to(output.device).t()
+        
+        #output, bank = super(HardNegativeMemoryBankModule, self).forward(output, update=update)
+        #bank = bank.to(output.device).t()
+        bank = self.bank
+        ipdb.set_trace()
 
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
