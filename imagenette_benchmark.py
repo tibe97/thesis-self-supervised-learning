@@ -364,6 +364,7 @@ class NNNModel(BenchmarkModule):
         return [optim], [scheduler]
 
 class NNCLR_HardNegative(BenchmarkModule):
+    # Sampling of positives, just NNCLR + negatives
     def __init__(self, dataloader_kNN, num_classes, warmup_epochs: int=warmup_epochs):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head

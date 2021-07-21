@@ -30,23 +30,7 @@ from lightly.linear_evaluation.imagenet_datamodule import ImagenetDataModule
 num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 1024
-temperature=0.1
-warmup_epochs=0
-nmb_prototypes=30
-num_negatives=256
-use_sinkhorn = True
-add_swav_loss = True
 
-params_dict = dict({
-    "memory_bank_size": my_nn_memory_bank_size,
-    "temperature": temperature,
-    "warmup_epochs": warmup_epochs,
-    "nmb_prototypes": nmb_prototypes,
-    "num_negatives": num_negatives,
-    "use_sinkhorn": use_sinkhorn,
-    "add_swav_loss": add_swav_loss
-})
 
 logs_root_dir = ('imagenette_logs')
 
@@ -67,11 +51,16 @@ batch_sizes = [256]
 gpus = -1 if torch.cuda.is_available() else 0
 distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
+dataset = 'imagewoof'
 # The dataset structure should be like this:
-
-data_dir = 'imagenette2-160'
-path_to_train = 'imagenette2-160/train/'
-path_to_test = 'imagenette2-160/val/'
+if dataset == 'imagenette':
+    data_dir = 'imagenette2-160'
+    path_to_train = 'imagenette2-160/train/'
+    path_to_test = 'imagenette2-160/val/'
+elif dataset == 'imagewoof':
+    data_dir = 'imagewoof2-160'
+    path_to_train = 'imagewoof2-160/train/'
+    path_to_test = 'imagewoof2-160/val/'    
 
 dm = ImagenetDataModule(data_dir=data_dir, batch_size=batch_sizes[0], num_workers=num_workers)
 
@@ -195,7 +184,7 @@ def cli_main():  # pragma: no cover
     seed_everything(1234)
 
     parser = ArgumentParser()
-    parser.add_argument('--dataset', type=str, help='stl10, imagenet', default='stl10')
+    parser.add_argument('--dataset', type=str, help='imagewoof, imagenette', default='imagenette')
     parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='lightly/linear_evaluation/epoch=799-step=28799.ckpt')
     parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
 
@@ -235,6 +224,10 @@ def cli_main():  # pragma: no cover
                 #benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, dataloader_train_kNN, dm.num_classes, strict=False)
                 benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
 
+                params_dict = dict({
+                    "ckpt_path": args.ckpt_path,
+                    "dataset": dataset
+                })
 
                 logger = WandbLogger(project="ssl_linear_evaluation")  
                 logger.log_hyperparams(params=params_dict)
