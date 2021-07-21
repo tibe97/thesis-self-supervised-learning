@@ -229,7 +229,10 @@ def cli_main():  # pragma: no cover
                     "dataset": dataset
                 })
 
-                logger = WandbLogger(project="ssl_linear_evaluation")  
+                project="ssl_linear_evaluation"
+                if dataset == 'imagewoof':
+                    project += "_imagewoof10"
+                logger = WandbLogger(project=project)  
                 logger.log_hyperparams(params=params_dict)
 
                 tuner = SSLFineTuner(
