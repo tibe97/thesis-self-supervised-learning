@@ -30,7 +30,7 @@ Code to reproduce the benchmark results:
 
 MY Runs: (we keep the optimizer fixed for now)
 - decent_lake (no warmup): temp=0.1, memory_bank_size=1024, warmup_epochs=0, nmb_prototypes=30, num_negatives=256
-- DIFFERENT_ELEVATOR: temp=0.1, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
+- DIFFERENT_ELEVATOR (NEG): temp=0.1, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
 - SWEPT_DELUGE: temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
 - WISE_DEW: try decreasing temp. In different_elevator loss decreases quicker probably thanks to lower temp.
   temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512

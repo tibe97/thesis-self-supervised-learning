@@ -51,7 +51,7 @@ batch_sizes = [256]
 gpus = -1 if torch.cuda.is_available() else 0
 distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
-dataset = 'imagenette'
+dataset = 'imagewoof'
 # The dataset structure should be like this:
 if dataset == 'imagenette':
     data_dir = 'imagenette2-160'
