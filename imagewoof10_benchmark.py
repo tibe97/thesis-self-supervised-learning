@@ -325,7 +325,7 @@ class NNNModel(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=my_nn_memory_bank_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
-        self.criterion = MyNTXentLoss(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
 
     def forward(self, x):

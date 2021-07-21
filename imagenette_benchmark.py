@@ -80,6 +80,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
+from argparse import ArgumentParser
 import lightly
 import ipdb
 from lightly.models.modules import my_nn_memory_bank
@@ -125,7 +126,7 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [256]
+
 
 
 
@@ -587,45 +588,69 @@ model_names = ["NNNModel_256"]
 models = [NNNModel]
 
 
-bench_results = []
-gpu_memory_usage = []
+def cli_main():  # pragma: no cover
 
-# loop through configurations and train models
-for batch_size in batch_sizes:
-    for model_name, BenchmarkModel in zip(model_names, models):
-        runs = []
-        for seed in range(n_runs):
-            pl.seed_everything(seed)
-            dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
-            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
+    parser = ArgumentParser()
+    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default=None)
 
-            #logger = TensorBoardLogger('imagenette_runs', version=model_name)
-            logger = WandbLogger(project="ss_knn_validation")  
-            logger.log_hyperparams(params=params_dict)
+    parser.add_argument("--batch_size", default=256, type=int, help="batch size per gpu")
+    parser.add_argument('--num_epochs', default=100, type=int, help="number of epochs")
+    parser.add_argument('--in_features', type=int, default=512)
+    parser.add_argument('--dropout', type=float, default=0.)
+    parser.add_argument('--learning_rate', type=float, default=0.3)
+    parser.add_argument('--weight_decay', type=float, default=1e-6)
+    parser.add_argument('--nesterov', type=bool, default=False)
+    parser.add_argument('--scheduler_type', type=str, default='cosine')
+    parser.add_argument('--gamma', type=float, default=0.1)
+    parser.add_argument('--final_lr', type=float, default=0.)
 
-            
-            trainer = pl.Trainer(max_epochs=max_epochs, 
-                                gpus=gpus,
-                                logger=logger,
-                                distributed_backend=distributed_backend,
-                                default_root_dir=logs_root_dir)
-            trainer.fit(
-                benchmark_model,
-                train_dataloader=dataloader_train_ssl,
-                val_dataloaders=dataloader_test
-            )
-            gpu_memory_usage.append(torch.cuda.max_memory_allocated())
-            torch.cuda.reset_peak_memory_stats()
-            runs.append(benchmark_model.max_accuracy)
+    args = parser.parse_args()
+    batch_sizes = [args.batch_size]
+    bench_results = []
+    gpu_memory_usage = []
 
-            # delete model and trainer + free up cuda memory
-            del benchmark_model
-            del trainer
-            torch.cuda.empty_cache()
-        bench_results.append(runs)
+    # loop through configurations and train models
+    for batch_size in batch_sizes:
+        for model_name, BenchmarkModel in zip(model_names, models):
+            runs = []
+            for seed in range(n_runs):
+                pl.seed_everything(seed)
+                dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
+                benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
+                if args.ckpt_path is not None:
+                    benchmark_model = BenchmarkModel().load_from_checkpoint(args.ckpt_path, strict=False)
 
-for result, model, gpu_usage in zip(bench_results, model_names, gpu_memory_usage):
-    result_np = np.array(result)
-    mean = result_np.mean()
-    std = result_np.std()
-    print(f'{model}: {mean:.3f} +- {std:.3f}, GPU used: {gpu_usage / (1024.0**3):.1f} GByte', flush=True)
+                #logger = TensorBoardLogger('imagenette_runs', version=model_name)
+                logger = WandbLogger(project="ss_knn_validation")  
+                logger.log_hyperparams(params=params_dict)
+
+                
+                trainer = pl.Trainer(max_epochs=max_epochs, 
+                                    gpus=gpus,
+                                    logger=logger,
+                                    distributed_backend=distributed_backend,
+                                    default_root_dir=logs_root_dir)
+                trainer.fit(
+                    benchmark_model,
+                    train_dataloader=dataloader_train_ssl,
+                    val_dataloaders=dataloader_test
+                )
+                gpu_memory_usage.append(torch.cuda.max_memory_allocated())
+                torch.cuda.reset_peak_memory_stats()
+                runs.append(benchmark_model.max_accuracy)
+
+                # delete model and trainer + free up cuda memory
+                del benchmark_model
+                del trainer
+                torch.cuda.empty_cache()
+            bench_results.append(runs)
+
+    for result, model, gpu_usage in zip(bench_results, model_names, gpu_memory_usage):
+        result_np = np.array(result)
+        mean = result_np.mean()
+        std = result_np.std()
+        print(f'{model}: {mean:.3f} +- {std:.3f}, GPU used: {gpu_usage / (1024.0**3):.1f} GByte', flush=True)
+
+
+if __name__ == '__main__':
+    cli_main()
