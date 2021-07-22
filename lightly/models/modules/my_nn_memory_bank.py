@@ -85,7 +85,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             q = torch.exp(cluster_scores / self.epsilon).t()
             q = self.get_assignments(q, self.sinkhorn_iterations)
             
-            # separate assignments for positives from negatives 
+            # separate assignments for positives and for negatives 
             q_positives = q[:output.shape[0]]
             q_negatives = q[output.shape[0]:]
             # transform soft assignment into hard assignments to get cluster
@@ -135,7 +135,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         # stack all negative similarities for each positive along row dimension
         sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
         
-
+        ipdb.set_trace()
         return nearest_neighbours, sim_negatives, q_positives
 
 
