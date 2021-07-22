@@ -135,7 +135,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
         # stack all negative similarities for each positive along row dimension
         sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
         
-        ipdb.set_trace()
         return nearest_neighbours, sim_negatives, q_positives
 
 
