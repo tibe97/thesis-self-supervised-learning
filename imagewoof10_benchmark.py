@@ -57,13 +57,13 @@ from benchmark_models import NNCLR_HardNegative, BYOLModel, NNCLRModel, NNNModel
 num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 2048
-temperature=0.1
+my_nn_memory_bank_size = 1024
+temperature=0.5
 warmup_epochs=0
 nmb_prototypes=30
 num_negatives=256
 use_sinkhorn = True
-add_swav_loss = False
+add_swav_loss = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -172,8 +172,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN", "NNCLR_256", "BYOL_256"]
-models = [NNNModel, NNCLRModel, BYOLModel]
+model_names = ["NNN"]
+models = [NNNModel]
 
 
 bench_results = []
