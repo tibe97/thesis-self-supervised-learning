@@ -171,7 +171,10 @@ class BenchmarkModule(pl.LightningModule):
         self.targets_bank = []
         with torch.no_grad():
             for data in self.dataloader_kNN:
-                img, target, _ = data
+                try:
+                    img, target, _ = data
+                except: # for example with STL10 dataset
+                    img, target = data
                 img = img.to(self.dummy_param.device)
                 target = target.to(self.dummy_param.device)
                 feature = self.backbone(img).squeeze()
