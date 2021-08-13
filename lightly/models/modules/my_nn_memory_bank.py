@@ -116,7 +116,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         
         
         """
-        # efficient implementation of the loops
+        # efficient implementation of the loops with scatter_() function
         for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
             row_pos = similarity_matrix_pos[i]
             row_neg = similarity_matrix_neg[i]
@@ -126,6 +126,8 @@ class MyNNMemoryBankModule(MemoryBankModule):
             row_neg.scatter_(0, mask_indices, -10, reduce='add')
             sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
             sim_negatives.append(sim_nearest_neighbours)
+
+        # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
         
