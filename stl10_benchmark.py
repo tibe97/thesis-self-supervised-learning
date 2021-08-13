@@ -135,7 +135,7 @@ dataset_train_ssl = lightly.data.LightlyDataset(
 )
 
 dataset_train_kNN = STL10('STL10/', split="train", download=False, transform=test_transforms)
-dataset_test = STL10('STL10/, split="test", download=False, transform=test_transforms)
+dataset_test = STL10('STL10/', split="test", download=False, transform=test_transforms)
 """
 # we use test transformations for getting the feature for kNN on train data
 dataset_train_kNN = lightly.data.LightlyDataset(
