@@ -217,7 +217,7 @@ for batch_size in batch_sizes:
                                                 add_swav_loss)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
-            logger = WandbLogger(project="imagewoof10_knn_validation")  
+            logger = WandbLogger(project="STL10_knn_validation")  
             logger.log_hyperparams(params=params_dict)
 
             
