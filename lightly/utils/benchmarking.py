@@ -190,7 +190,10 @@ class BenchmarkModule(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         # we can only do kNN predictions once we have a feature bank
         if hasattr(self, 'feature_bank') and hasattr(self, 'targets_bank'):
-            images, targets, _ = batch
+            try:
+                images, targets, _ = batch
+            except:
+                images, targets = batch
             feature = self.backbone(images).squeeze()
             feature = F.normalize(feature, dim=1)
             pred_labels = knn_predict(
