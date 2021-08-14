@@ -191,8 +191,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN"]
-models = [NNNModel]
+model_names = ["SimCLR_256"]
+models = [SimCLRModel]
 
 
 bench_results = []
