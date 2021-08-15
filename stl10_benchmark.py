@@ -66,7 +66,7 @@ from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
-from benchmark_models import NNCLR_HardNegative, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel
+from benchmark_models import MocoModel, NNCLR_HardNegative, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel
 
 num_workers = 12
 memory_bank_size = 4096
@@ -92,7 +92,7 @@ params_dict = dict({
 logs_root_dir = ('stl10_logs')
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
-max_epochs = 800
+max_epochs = 400
 knn_k = 200
 knn_t = 0.1
 classes = 10
@@ -191,8 +191,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["SimCLR_256"]
-models = [SimCLRModel]
+model_names = ["MoCo_256"]
+models = [MocoModel]
 
 
 bench_results = []
