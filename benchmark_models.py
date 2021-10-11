@@ -201,8 +201,10 @@ class NNNModel(BenchmarkModule):
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
 
-class NNCLR_HardNegative(BenchmarkModule):
-    # Sampling of positives, just NNCLR + negatives
+class NNNModel_Neg(BenchmarkModule):
+    """
+    NNN model without positive sampling of nearest neighbors. Just hard negative mining
+    """
     def __init__(self, dataloader_kNN, 
                 num_classes, 
                 warmup_epochs: int=0, 
@@ -224,9 +226,11 @@ class NNCLR_HardNegative(BenchmarkModule):
         self.model = \
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
-        self.nn_replacer = HardNegativeMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
-        self.criterion = MyNTXentLoss2(self.nn_replacer, temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
+        #self.criterion = lightly.loss.NTXentLoss()
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
+        self.num_negatives = num_negatives
 
     def forward(self, x):
         self.model(x)
@@ -238,11 +242,16 @@ class NNCLR_HardNegative(BenchmarkModule):
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
         if self.current_epoch > self.warmup_epochs-1:
-            z0 = self.nn_replacer(z0.detach(), update=False)
-            z1 = self.nn_replacer(z1.detach(), update=True)
-
-        #loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
-        loss = 0.5 * (self.criterion(z0, p1, q0, q1) + self.criterion(z1, p0, q1, q0))
+            # sample neighbors, similarities with the sampled negatives and the cluster 
+            # assignements of the original Z
+            _, sim_neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
+            _, sim_neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
+           
+            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, sim_neg1) + self.criterion(z1, p0, q1_assign, q0, sim_neg0))
+        else:
+            # warming up with classical instance discrimination of same augmented image
+            # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
+            loss = 0.5 * (self.criterion(z0, p1, q0, q1, None) + self.criterion(z1, p0, q1, q0, None))
         # log loss and return
         self.log('train_loss_ssl', loss)
         return loss
@@ -252,6 +261,70 @@ class NNCLR_HardNegative(BenchmarkModule):
                                 momentum=0.9, weight_decay=5e-4)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
+
+
+class NNNModel_Pos(BenchmarkModule):
+    """
+    Only positive sampling of nearest neighbors, while negatives are used as in NNCLR.
+    Different from NNCLR because the neighbors are checked to belong to same cluster.
+    """
+    def __init__(self, dataloader_kNN, 
+                num_classes, 
+                warmup_epochs: int=0, 
+                nmb_prototypes: int=30, 
+                mem_size: int=2048,
+                use_sinkhorn: bool=True,
+                temperature: float=0.1,
+                num_negatives: int=256,
+                add_swav_loss: bool=False):
+        super().__init__(dataloader_kNN, num_classes)
+        # create a ResNet backbone and remove the classification head
+        resnet = torchvision.models.resnet18()
+        last_conv_channels = list(resnet.children())[-1].in_features
+        self.backbone = nn.Sequential(
+            *list(resnet.children())[:-1],
+            nn.Conv2d(last_conv_channels, num_ftrs, 1),
+        )
+        # create a simclr model based on ResNet
+        self.model = \
+            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
+        
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
+        #self.criterion = lightly.loss.NTXentLoss()
+        self.criterion = self.criterion = lightly.loss.NTXentLoss()
+        self.warmup_epochs = warmup_epochs
+        self.num_negatives = num_negatives
+
+    def forward(self, x):
+        self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        # get the two image transformations
+        (x0, x1), _, _ = batch
+        # forward pass of the transformations
+        (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
+        # calculate loss for NNCLR
+        if self.current_epoch > self.warmup_epochs-1:
+            # sample neighbors, similarities with the sampled negatives and the cluster 
+            # assignements of the original Z
+            z0, _, _ = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
+            z1, _, _ = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
+           
+            loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
+        else:
+            # warming up with classical instance discrimination of same augmented image
+            # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
+            loss = 0.5 * (self.criterion(z0, p1, q0, q1, None) + self.criterion(z1, p0, q1, q0, None))
+        # log loss and return
+        self.log('train_loss_ssl', loss)
+        return loss
+
+    def configure_optimizers(self):
+        optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
+                                momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        return [optim], [scheduler]
+
 
 class SimSiamModel(BenchmarkModule):
     def __init__(self, dataloader_kNN, num_classes):
