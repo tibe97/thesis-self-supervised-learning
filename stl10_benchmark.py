@@ -76,7 +76,7 @@ temperature=0.5
 warmup_epochs=0
 nmb_prototypes=30
 num_negatives=256
-use_sinkhorn = True
+use_sinkhorn = False
 add_swav_loss = False
 
 params_dict = dict({
