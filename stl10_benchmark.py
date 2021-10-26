@@ -76,8 +76,8 @@ temperature=0.5
 warmup_epochs=0
 nmb_prototypes=30
 num_negatives=256
-use_sinkhorn = False
-add_swav_loss = False
+use_sinkhorn = True
+add_swav_loss = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -191,8 +191,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN_Neg"]
-models = [NNNModel_Neg]
+model_names = ["NNN_Pos"]
+models = [NNNModel_Pos]
 
 
 bench_results = []
