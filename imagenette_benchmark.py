@@ -92,10 +92,10 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel
 
-num_workers = 4
+num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 4096
+my_nn_memory_bank_size = 32
 temperature=0.1
 warmup_epochs=0
 nmb_prototypes=10
