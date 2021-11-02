@@ -56,7 +56,6 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 import lightly
-import ipdb
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
@@ -65,7 +64,7 @@ from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
-from benchmark_models import NNCLR_HardNegative, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel
+from benchmark_models import BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, NNBYOLModel
 
 num_workers = 12
 memory_bank_size = 4096
@@ -73,8 +72,8 @@ memory_bank_size = 4096
 my_nn_memory_bank_size = 1024
 temperature=0.5
 warmup_epochs=0
-nmb_prototypes=30
-num_negatives=256
+nmb_prototypes=10
+num_negatives=16
 use_sinkhorn = True
 add_swav_loss = True
 

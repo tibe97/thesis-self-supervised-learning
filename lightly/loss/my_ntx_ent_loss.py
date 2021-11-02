@@ -7,7 +7,7 @@ from numpy import add
 import torch
 from torch import nn
 from lightly.loss.memory_bank import MemoryBankModule
-from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule, HardNegativeMemoryBankModule
+from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 
 
 class MyNTXentLoss(MemoryBankModule):

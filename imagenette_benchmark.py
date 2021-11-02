@@ -82,25 +82,24 @@ from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 from argparse import ArgumentParser
 import lightly
-import ipdb
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
 from lightly.models.mynet import MyNet
-from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule, HardNegativeMemoryBankModule
-from lightly.loss.my_ntx_ent_loss import MyNTXentLoss, MyNTXentLoss2
+from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
+from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
-from benchmark_models import NNCLR_HardNegative, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel
+from benchmark_models import BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel
 
-num_workers = 12
+num_workers = 4
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 1024
+my_nn_memory_bank_size = 4096
 temperature=0.1
 warmup_epochs=0
-nmb_prototypes=30
-num_negatives=256
+nmb_prototypes=10
+num_negatives=16
 use_sinkhorn = True
 add_swav_loss = False
 
@@ -250,13 +249,13 @@ def cli_main():  # pragma: no cover
                     benchmark_model = BenchmarkModel().load_from_checkpoint(args.ckpt_path, strict=False)
 
                 #logger = TensorBoardLogger('imagenette_runs', version=model_name)
-                logger = WandbLogger(project="ss_knn_validation")  
-                logger.log_hyperparams(params=params_dict)
+                #logger = WandbLogger(project="ss_knn_validation")  
+                #logger.log_hyperparams(params=params_dict)
 
                 
                 trainer = pl.Trainer(max_epochs=max_epochs, 
                                     gpus=gpus,
-                                    logger=logger,
+                                    #logger=logger,
                                     distributed_backend=distributed_backend,
                                     default_root_dir=logs_root_dir)
                 trainer.fit(

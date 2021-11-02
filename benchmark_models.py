@@ -14,7 +14,7 @@ from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
 from lightly.models.mynet import MyNet
-from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule, HardNegativeMemoryBankModule
+from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
