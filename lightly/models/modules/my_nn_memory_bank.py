@@ -86,58 +86,47 @@ class MyNNMemoryBankModule(MemoryBankModule):
             q = self.get_assignments(q, self.sinkhorn_iterations)
             
             # separate assignments for positives and for negatives 
-            q_positives = q[:output.shape[0]]
-            q_negatives = q[output.shape[0]:]
+            q_batch = q[:output.shape[0]]
+            q_bank = q[output.shape[0]:]
             # transform soft assignment into hard assignments to get cluster
-            positive_clusters = torch.argmax(q_positives, dim=1)
-            negative_clusters = torch.argmax(q_negatives, dim=1)
+            clusters_batch = torch.argmax(q_batch, dim=1)
+            clusters_bank = torch.argmax(q_bank, dim=1)
         #end_time = time.time()
         #print("Compute cluster assignments: {}".format(end_time-start_time))
 
-        ipdb.set_trace()
-        sim_negatives = []
+        #sim_negatives = []
+        negatives = []
         similarity_matrix_pos = torch.einsum("nd,md->nm", output_normed, bank_normed)
         similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)
 
         #start_time = time.time()
-        """
-        for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
-            row_pos = similarity_matrix_pos[i]
-            row_neg = similarity_matrix_neg[i]
-            p_cluster = positive_clusters[i]
-            mask_indices = torch.where(negative_clusters==p_cluster)[0]
-            for idx in mask_indices:
-                row_pos[idx] += 10 # to make sure we select among the same cluster
-                row_neg[idx] -= 10 # to make sure we don't select from the same cluster
-            sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
-            sim_negatives.append(sim_nearest_neighbours)
-        index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
-        nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
-        
-        
-        """
+       
         # efficient implementation of the loops with scatter_() function
         for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
             row_pos = similarity_matrix_pos[i]
             row_neg = similarity_matrix_neg[i]
-            p_cluster = positive_clusters[i]
-            mask_indices = torch.where(negative_clusters==p_cluster)[0]
+            p_cluster = clusters_batch[i]
+            mask_indices = torch.where(clusters_bank==p_cluster)[0]
             row_pos.scatter_(0, mask_indices, 10, reduce='add')
             row_neg.scatter_(0, mask_indices, -10, reduce='add')
-            sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
-            sim_negatives.append(sim_nearest_neighbours)
+            # We take the indices of the most similar negatives
+            idx_negatives = torch.topk(row_neg, num_nn, dim=0).indices
+            negatives.append(torch.index_select(bank, dim=0, index=idx_negatives))
+            #sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
+            #sim_negatives.append(sim_nearest_neighbours)
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
         nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
         
         #end_time = time.time()
-        #print("Sample positives and negatives: {}".format(end_time-start_time))
+        #print("Sampling time of positives and negatives: {}".format(end_time-start_time))
         
         # stack all negative similarities for each positive along row dimension
-        sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
+        #sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
+        negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
-        return nearest_neighbours, sim_negatives, q_positives
+        return nearest_neighbours, negatives, q_batch
 
 
 

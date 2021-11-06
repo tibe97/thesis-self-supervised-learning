@@ -70,7 +70,7 @@ class MyNTXentLoss(MemoryBankModule):
                 out1: torch.Tensor,
                 q0_assign: torch.Tensor,
                 q1: torch.Tensor,
-                sim_negatives: torch.Tensor):
+                negatives: torch.Tensor):
         """Forward pass through Contrastive Cross-Entropy Loss.
 
         If used with a memory bank, the samples from the memory bank are used
@@ -113,17 +113,28 @@ class MyNTXentLoss(MemoryBankModule):
         # as all vectors are already normalized to unit length.
         # Notation in einsum: n = batch_size, c = embedding_size and k = memory_bank_size.
 
-        if sim_negatives is not None:
+        if negatives is not None:
             # use negatives from memory bank
-            sim_negatives = sim_negatives.to(device)
+            negatives = torch.transpose(negatives, 1, 2).to(device) # transpose to (batch_size, embedding_size, num_negatives)
 
             # sim_pos is of shape (batch_size, 1) and sim_pos[i] denotes the similarity
             # of the i-th sample in the batch to its positive pair
             sim_pos = torch.einsum('nc,nc->n', out0, out1).unsqueeze(-1).to(device)
 
+            #TODO: compute sim_neg with negatives. Problem: for each positive there are different negatives.
+            # We can't use the same einsum. We can use batch matrix multiplication einsum:
+            # torch.einsum('i1c,icm->i1m', [a, b])
+            # Each positive becomes a sample indexed along "i", while the negatives for the i-th positive
+            # are stacked in a matrix at the i-th index. At the end we have to reshape the result into a vector
+            # We also have to prepare the tensor of negatives accordingly
+            #sim_neg = torch.einsum('nc,ck->nk', out0, negatives)
+            # n1c, ncm -> n1m
+            sim_neg = torch.einsum('nzc,ncm->nzm', torch.traspose(torch.unsqueeze(out0, 0), 0, 1), negatives)
+            sim_neg = torch.squeeze(sim_neg, 1)
+
             # set the labels to the first "class", i.e. sim_pos,
             # so that it is maximized in relation to sim_neg
-            logits = torch.cat([sim_pos, sim_negatives], dim=1) / self.temperature
+            logits = torch.cat([sim_pos, sim_neg], dim=1) / self.temperature
             labels = torch.zeros(logits.shape[0], device=device, dtype=torch.long)
 
         else:
