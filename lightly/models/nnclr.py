@@ -141,7 +141,7 @@ class NNCLR(nn.Module):
             _projection_mlp(num_ftrs, proj_hidden_dim, out_dim, num_mlp_layers)
         
         self.prediction_mlp = \
-            _prediction_mlp(num_ftrs, pred_hidden_dim, out_dim)
+            _prediction_mlp(out_dim, pred_hidden_dim, out_dim)
 
     def forward(self,
                 x0: torch.Tensor,
@@ -186,7 +186,7 @@ class NNCLR(nn.Module):
         # forward pass of first input x0
         f0 = self.backbone(x0).flatten(start_dim=1)
         z0 = self.projection_mlp(f0)
-        p0 = self.prediction_mlp(f0)
+        p0 = self.prediction_mlp(z0)
 
         out0 = (z0, p0)
 
@@ -201,7 +201,7 @@ class NNCLR(nn.Module):
         # forward pass of second input x1
         f1 = self.backbone(x1).flatten(start_dim=1)
         z1 = self.projection_mlp(f1)
-        p1 = self.prediction_mlp(f1)
+        p1 = self.prediction_mlp(z1)
 
         out1 = (z1, p1)
 

@@ -183,10 +183,10 @@ class NNNModel(BenchmarkModule):
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
-            z0, sim_neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
-            z1, sim_neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
+            z0, neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
+            z1, neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
            
-            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, sim_neg1) + self.criterion(z1, p0, q1_assign, q0, sim_neg0))
+            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
         else:
             # warming up with classical instance discrimination of same augmented image
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
@@ -244,10 +244,10 @@ class NNNModel_Neg(BenchmarkModule):
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
-            _, sim_neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
-            _, sim_neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
+            _, neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
+            _, neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
            
-            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, sim_neg1) + self.criterion(z1, p0, q1_assign, q0, sim_neg0))
+            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
         else:
             # warming up with classical instance discrimination of same augmented image
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task

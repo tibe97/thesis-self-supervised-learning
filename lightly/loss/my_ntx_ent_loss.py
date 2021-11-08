@@ -87,7 +87,7 @@ class MyNTXentLoss(MemoryBankModule):
                 q0_assign: 
                     Cluster assignments of the original samples used to compute nearest neighbors
                     Used for SwAV loss (optional)
-                q1_assign:
+                q1:
                     Predicted cluster assignement directly taken from the output of the prototype 
                     layer of the network.
                     Used for SwAV loss (optional)

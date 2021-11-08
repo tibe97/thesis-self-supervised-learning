@@ -109,11 +109,10 @@ class MyNNMemoryBankModule(MemoryBankModule):
             mask_indices = torch.where(clusters_bank==p_cluster)[0]
             row_pos.scatter_(0, mask_indices, 10, reduce='add')
             row_neg.scatter_(0, mask_indices, -10, reduce='add')
-            # We take the indices of the most similar negatives
+            # We take the indices of the most similar negatives. Try with random negatives
             idx_negatives = torch.topk(row_neg, num_nn, dim=0).indices
             negatives.append(torch.index_select(bank, dim=0, index=idx_negatives))
-            #sim_nearest_neighbours = torch.topk(row_neg, num_nn, dim=0).values # take the similarity score
-            #sim_negatives.append(sim_nearest_neighbours)
+            
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
@@ -123,7 +122,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #print("Sampling time of positives and negatives: {}".format(end_time-start_time))
         
         # stack all negative similarities for each positive along row dimension
-        #sim_negatives = torch.stack(sim_negatives) # (num_positives, num_negatives)
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
         return nearest_neighbours, negatives, q_batch
