@@ -157,7 +157,7 @@ def get_data_loaders(batch_size: int):
         dataset_train_ssl,
         batch_size=batch_size,
         shuffle=True,
-        #collate_fn=collate_fn,
+        collate_fn=collate_fn,
         drop_last=True,
         num_workers=num_workers
     )
