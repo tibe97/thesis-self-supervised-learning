@@ -129,7 +129,7 @@ class MyNTXentLoss(MemoryBankModule):
             # We also have to prepare the tensor of negatives accordingly
             #sim_neg = torch.einsum('nc,ck->nk', out0, negatives)
             # n1c, ncm -> n1m
-            sim_neg = torch.einsum('nzc,ncm->nzm', torch.traspose(torch.unsqueeze(out0, 0), 0, 1), negatives)
+            sim_neg = torch.einsum('nzc,ncm->nzm', torch.transpose(torch.unsqueeze(out0, 0), 0, 1), negatives)
             sim_neg = torch.squeeze(sim_neg, 1)
 
             # set the labels to the first "class", i.e. sim_pos,
