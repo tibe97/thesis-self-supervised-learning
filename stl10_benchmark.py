@@ -56,7 +56,6 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 import lightly
-import ipdb
 from torchvision.datasets import STL10
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
@@ -71,7 +70,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 1024
+my_nn_memory_bank_size = 4096
 temperature=0.5
 warmup_epochs=0
 nmb_prototypes=30
@@ -191,8 +190,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN_Pos"]
-models = [NNNModel_Pos]
+model_names = ["NNN_Neg"]
+models = [NNNModel_Neg]
 
 
 bench_results = []
