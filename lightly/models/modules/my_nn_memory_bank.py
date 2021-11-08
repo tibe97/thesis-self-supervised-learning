@@ -110,8 +110,10 @@ class MyNNMemoryBankModule(MemoryBankModule):
             row_pos.scatter_(0, mask_indices, 10, reduce='add')
             row_neg.scatter_(0, mask_indices, -10, reduce='add')
             # We take the indices of the most similar negatives. Try with random negatives
-            idx_negatives = torch.topk(row_neg, num_nn, dim=0).indices
+            idx_negatives = torch.topk(row_neg, num_nn, dim=0, largest=False).indices
             negatives.append(torch.index_select(bank, dim=0, index=idx_negatives))
+            # random sampling of negatives (after removing false negatives)
+            
             
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
