@@ -132,7 +132,6 @@ class MyNTXentLoss(MemoryBankModule):
             sim_neg = torch.einsum('nzc,ncm->nzm', torch.transpose(torch.unsqueeze(out0, 0), 0, 1), negatives)
             sim_neg = torch.squeeze(sim_neg, 1)
 
-            ipdb.set_trace()
             # set the labels to the first "class", i.e. sim_pos,
             # so that it is maximized in relation to sim_neg
             logits = torch.cat([sim_pos, sim_neg], dim=1) / self.temperature

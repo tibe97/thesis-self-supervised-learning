@@ -6,7 +6,7 @@
 import torch
 import time
 import copy
-#import ipdb
+import ipdb
 import numpy as np
 from lightly.loss.memory_bank import MemoryBankModule
 
@@ -114,7 +114,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             negatives.append(torch.index_select(bank, dim=0, index=idx_negatives))
             # random sampling of negatives (after removing false negatives)
             
-            
+        ipdb.set_trace()
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
