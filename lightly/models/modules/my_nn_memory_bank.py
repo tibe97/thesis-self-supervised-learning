@@ -64,7 +64,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
         """
         #start_time = time.time()
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
-        device = output.device
         bank = bank.to(output.device).t()
         #end_time = time.time()
         #print("Retrieve bank and move to GPU: {}".format(end_time-start_time))
@@ -114,7 +113,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
             negatives.append(torch.index_select(bank, dim=0, index=idx_negatives))
             # random sampling of negatives (after removing false negatives)
             
-        ipdb.set_trace()
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
