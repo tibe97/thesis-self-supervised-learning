@@ -76,7 +76,7 @@ warmup_epochs=0
 nmb_prototypes=30
 num_negatives=256
 use_sinkhorn = True
-add_swav_loss = True
+add_swav_loss = False
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
