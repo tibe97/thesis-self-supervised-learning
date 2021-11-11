@@ -181,10 +181,10 @@ class NNNModel(BenchmarkModule):
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
         with torch.no_grad():
-            torch.autograd.set_detect_anomaly(True)
             w = self.model.prototypes_layer.weight.data.clone()
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
+            torch.autograd.set_detect_anomaly(True)
 
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
@@ -192,7 +192,8 @@ class NNNModel(BenchmarkModule):
             z0, neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
             z1, neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
            
-            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
+            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
+            loss = self.criterion(z0, p1, q0_assign, q1, neg1)
         else:
             # warming up with classical instance discrimination of same augmented image
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
