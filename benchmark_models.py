@@ -184,7 +184,6 @@ class NNNModel(BenchmarkModule):
             torch.autograd.set_detect_anomaly(True)
         
 
-
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
