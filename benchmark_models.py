@@ -181,6 +181,7 @@ class NNNModel(BenchmarkModule):
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
         with torch.no_grad():
+            torch.autograd.set_detect_anomaly(True)
             w = self.model.prototypes_layer.weight.data.clone()
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
