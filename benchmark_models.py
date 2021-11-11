@@ -175,19 +175,22 @@ class NNNModel(BenchmarkModule):
         self.model(x)
 
     def training_step(self, batch, batch_idx):
-        # get the two image transformations
-        (x0, x1), _, _ = batch
-        # forward pass of the transformations
-        (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
-        # calculate loss for NNCLR
         '''
+        # Trying to place it before passing the inputs through the model
         with torch.no_grad():
             w = self.model.prototypes_layer.weight.data.clone()
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
             torch.autograd.set_detect_anomaly(True)
         '''
-        
+
+
+        # get the two image transformations
+        (x0, x1), _, _ = batch
+        # forward pass of the transformations
+        (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
+        # calculate loss for NNCLR
+
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
