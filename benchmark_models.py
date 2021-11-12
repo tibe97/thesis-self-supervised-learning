@@ -301,7 +301,7 @@ class NNNModel_Pos(BenchmarkModule):
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
         #self.criterion = lightly.loss.NTXentLoss()
-        self.criterion = self.criterion = lightly.loss.NTXentLoss()
+        self.criterion = self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
 
@@ -317,10 +317,10 @@ class NNNModel_Pos(BenchmarkModule):
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
-            z0, _, _ = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
-            z1, _, _ = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
+            z0, _, q0_pred = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
+            z1, _, q1_pred = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
            
-            loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
+            loss = 0.5 * (self.criterion(z0, p1, q0_pred, q1, None) + self.criterion(z1, p0, q1_pred, q0, None))
         else:
             # warming up with classical instance discrimination of same augmented image
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
