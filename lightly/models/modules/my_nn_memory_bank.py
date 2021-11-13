@@ -62,11 +62,9 @@ class MyNNMemoryBankModule(MemoryBankModule):
             update: If `True` updated the memory bank by adding output to it
 
         """
-        #start_time = time.time()
+        
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
-        #end_time = time.time()
-        #print("Retrieve bank and move to GPU: {}".format(end_time-start_time))
 
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
@@ -88,7 +86,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #end_time = time.time()
         #print("Compute cluster assignments: {}".format(end_time-start_time))
 
-        #sim_negatives = []
         negatives = []
         similarity_matrix_pos = torch.einsum("nd,md->nm", output_normed, bank_normed)
         similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)
