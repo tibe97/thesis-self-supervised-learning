@@ -73,10 +73,10 @@ memory_bank_size = 4096
 my_nn_memory_bank_size = 2048
 temperature=0.5
 warmup_epochs=0
-nmb_prototypes=30
+nmb_prototypes=10
 num_negatives=256
 use_sinkhorn = True
-add_swav_loss = False
+add_swav_loss = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
