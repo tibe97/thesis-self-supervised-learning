@@ -40,7 +40,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
     """
     def __init__(self, model, size: int = 2 ** 16, epsilon: float = 0.05, sinkhorn_iterations: int = 3, gpus: int = 0, 
-                use_sinkhorn: bool = False):
+                use_sinkhorn: bool = False, false_neg_remove: bool = False):
         super(MyNNMemoryBankModule, self).__init__(size)
         self.model = model
         self.epsilon = epsilon #division coefficient for cluster assignemnt computation
@@ -48,6 +48,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         self.sinkhorn_iterations = sinkhorn_iterations
         self.gpus = gpus
         self.use_sinkhorn = use_sinkhorn
+        self.false_neg_remove = false_neg_remove
         
 
     def forward(self,
@@ -102,13 +103,27 @@ class MyNNMemoryBankModule(MemoryBankModule):
             row_neg.scatter_(0, mask_indices, -10, reduce='add')
             # We take the indices of the most similar negatives. Try with random negatives
             idx_negatives = torch.topk(row_neg, num_nn, dim=0, largest=True).indices
-            negatives.append(torch.index_select(bank, dim=0, index=idx_negatives))
-            # random sampling of negatives (after removing false negatives)
-            
+
+            if not self.false_neg_remove:
+                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))
+            else:
+                # False Negatives removal from batch
+                # remove false negatives from batch (i.e. positives) and replace them with samples
+                # from memory bank
+                mask_positives = torch.where(clusters_batch==p_cluster)[0]
+                num_false_negatives = mask_positives.shape[0]
+                neg = output_normed
+                if num_false_negatives > 0:
+                    idx_positives = torch.Tensor(list(set(range(output.shape[0])) - set(mask_positives))) # removes indexes of false negatives 
+                    neg = torch.index_select(output_normed, dim=0, index=idx_positives)
+                    # replace removed samples from batch
+                    neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
+                negatives.append(neg)
+
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
-        nearest_neighbours = torch.index_select(bank, dim=0, index=index_nearest_neighbours)
+        nearest_neighbours = torch.index_select(bank_normed, dim=0, index=index_nearest_neighbours)
         
         #end_time = time.time()
         #print("Sampling time of positives and negatives: {}".format(end_time-start_time))

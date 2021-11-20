@@ -115,13 +115,14 @@ class MyNTXentLoss(MemoryBankModule):
 
         if negatives is not None:
             # use negatives from memory bank
+            negatives = torch.nn.functional.normalize(negatives, dim=1)
             negatives = torch.transpose(negatives, 1, 2).to(device) # transpose to (batch_size, embedding_size, num_negatives)
 
             # sim_pos is of shape (batch_size, 1) and sim_pos[i] denotes the similarity
             # of the i-th sample in the batch to its positive pair
             sim_pos = torch.einsum('nc,nc->n', out0, out1).unsqueeze(-1).to(device)
 
-            #TODO: compute sim_neg with negatives. Problem: for each positive there are different negatives.
+            # Compute sim_neg with negatives. Problem: for each positive there are different negatives.
             # We can't use the same einsum. We can use batch matrix multiplication einsum:
             # torch.einsum('i1c,icm->i1m', [a, b])
             # Each positive becomes a sample indexed along "i", while the negatives for the i-th positive
