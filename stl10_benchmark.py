@@ -73,10 +73,11 @@ memory_bank_size = 4096
 my_nn_memory_bank_size = 2048
 temperature=0.5
 warmup_epochs=0
-nmb_prototypes=60
+nmb_prototypes=100
 num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
+false_negative_remove = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -85,7 +86,8 @@ params_dict = dict({
     "nmb_prototypes": nmb_prototypes,
     "num_negatives": num_negatives,
     "use_sinkhorn": use_sinkhorn,
-    "add_swav_loss": add_swav_loss
+    "add_swav_loss": add_swav_loss,
+    "false_negative_remove": false_negative_remove
 })
 
 logs_root_dir = ('stl10_logs')
@@ -190,8 +192,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN_Pos"]
-models = [NNNModel_Pos]
+model_names = ["NNN"]
+models = [NNNModel]
 
 
 bench_results = []
@@ -213,7 +215,8 @@ for batch_size in batch_sizes:
                                                 use_sinkhorn, 
                                                 temperature, 
                                                 num_negatives, 
-                                                add_swav_loss)
+                                                add_swav_loss,
+                                                false_negative_remove)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="STL10_knn_validation")  
