@@ -114,7 +114,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
                 num_false_negatives = mask_positives.shape[0]
                 neg = output_normed
                 if num_false_negatives > 0:
-                    idx_positives = torch.Tensor(list(set(range(output.shape[0])) - set(mask_positives))).to(output.device) # removes indexes of false negatives 
+                    idx_positives = torch.Tensor(list(set(range(output.shape[0])) - set(mask_positives))).to(torch.int).to(output.device) # removes indexes of false negatives 
                     #ipdb.set_trace()
                     neg = torch.index_select(output_normed, dim=0, index=idx_positives)
                     # replace removed samples from batch
