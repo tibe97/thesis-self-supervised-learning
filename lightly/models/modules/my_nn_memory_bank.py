@@ -120,7 +120,8 @@ class MyNNMemoryBankModule(MemoryBankModule):
                     # replace removed samples from batch
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
                 negatives.append(neg)
-
+        if self.false_neg_remove:
+            negatives = negatives.t()
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
@@ -129,7 +130,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #end_time = time.time()
         #print("Sampling time of positives and negatives: {}".format(end_time-start_time))
         
-        # stack all negative similarities for each positive along row dimension
+        # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
         return nearest_neighbours, negatives, q_batch
