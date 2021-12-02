@@ -222,7 +222,8 @@ class NNNModel_Neg(BenchmarkModule):
                 use_sinkhorn: bool=True,
                 temperature: float=0.1,
                 num_negatives: int=256,
-                add_swav_loss: bool=False):
+                add_swav_loss: bool=False,
+                false_negative_remove: bool=False):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -235,7 +236,7 @@ class NNNModel_Neg(BenchmarkModule):
         self.model = \
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
-        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=false_negative_remove)
         #self.criterion = lightly.loss.NTXentLoss()
         self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
@@ -293,7 +294,8 @@ class NNNModel_Pos(BenchmarkModule):
                 use_sinkhorn: bool=True,
                 temperature: float=0.1,
                 num_negatives: int=256,
-                add_swav_loss: bool=False):
+                add_swav_loss: bool=False,
+                false_negative_remove: bool=False):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -306,7 +308,7 @@ class NNNModel_Pos(BenchmarkModule):
         self.model = \
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
         
-        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn)
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=false_negative_remove)
         #self.criterion = lightly.loss.NTXentLoss()
         self.criterion = self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
