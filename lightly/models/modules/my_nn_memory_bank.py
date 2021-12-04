@@ -74,6 +74,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #start_time = time.time()
         with torch.no_grad():
             cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
+            # TODO: check norm of prototype weights and matrices dimensions
 
             q = torch.exp(cluster_scores / self.epsilon).t()
             q = self.get_assignments(q, self.sinkhorn_iterations)
@@ -87,6 +88,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #end_time = time.time()
         #print("Compute cluster assignments: {}".format(end_time-start_time))
 
+        # TODO: 1. pick random negatives; 2. batch + hard negatives as negatives
         negatives = []
         similarity_matrix_pos = torch.einsum("nd,md->nm", output_normed, bank_normed)
         similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)

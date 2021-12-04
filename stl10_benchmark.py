@@ -77,7 +77,7 @@ nmb_prototypes=100
 num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
-false_negative_remove = True
+false_negative_remove = False
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -192,8 +192,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN"]
-models = [NNNModel]
+model_names = ["NNN_Neg"]
+models = [NNNModel_Neg]
 
 
 bench_results = []
