@@ -75,7 +75,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         with torch.no_grad():
             cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
             # TODO: check norm of prototype weights and matrices dimensions
-            ipdb.set_trace()
+            #ipdb.set_trace()
             q = torch.exp(cluster_scores / self.epsilon).t()
             q = self.get_assignments(q, self.sinkhorn_iterations)
             
