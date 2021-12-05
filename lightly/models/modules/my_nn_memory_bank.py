@@ -66,7 +66,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
-
+        ipdb.set_trace()
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
 
@@ -74,8 +74,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #start_time = time.time()
         with torch.no_grad():
             cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
-            # TODO: check norm of prototype weights and matrices dimensions
-            #ipdb.set_trace()
             q = torch.exp(cluster_scores / self.epsilon).t()
             q = self.get_assignments(q, self.sinkhorn_iterations)
             

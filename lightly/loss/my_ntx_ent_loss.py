@@ -115,7 +115,7 @@ class MyNTXentLoss(MemoryBankModule):
 
         if negatives is not None:
             # use negatives from memory bank
-            negatives = torch.nn.functional.normalize(negatives, dim=1)
+            #negatives = torch.nn.functional.normalize(negatives, dim=1)
             negatives = torch.transpose(negatives, 1, 2).to(device) # transpose to (batch_size, embedding_size, num_negatives)
 
             # sim_pos is of shape (batch_size, 1) and sim_pos[i] denotes the similarity
