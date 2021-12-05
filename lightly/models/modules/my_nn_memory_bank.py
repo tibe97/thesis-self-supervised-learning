@@ -66,7 +66,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
-        ipdb.set_trace()
+        #ipdb.set_trace()
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
 
