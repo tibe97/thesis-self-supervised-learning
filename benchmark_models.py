@@ -234,7 +234,7 @@ class NNNModel_Neg(BenchmarkModule):
         )
         # create a simclr model based on ResNet
         self.model = \
-            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
+            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=false_negative_remove)
         #self.criterion = lightly.loss.NTXentLoss()
@@ -266,8 +266,8 @@ class NNNModel_Neg(BenchmarkModule):
             _, neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
             _, neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
            
-            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
-            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
+            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
+            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
 
         else:
             # warming up with classical instance discrimination of same augmented image
