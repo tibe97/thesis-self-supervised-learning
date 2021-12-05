@@ -247,14 +247,14 @@ class NNNModel_Neg(BenchmarkModule):
 
     def training_step(self, batch, batch_idx):
 
-        
+        """
         # Trying to place it before passing the inputs through the model
         with torch.no_grad():
             w = self.model.prototypes_layer.weight.data.clone()
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
             torch.autograd.set_detect_anomaly(True)
-        
+        """
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
@@ -266,7 +266,9 @@ class NNNModel_Neg(BenchmarkModule):
             _, neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
             _, neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
            
-            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
+            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
+            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
+
         else:
             # warming up with classical instance discrimination of same augmented image
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
