@@ -77,7 +77,7 @@ nmb_prototypes=100
 num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
-false_negative_remove = True
+false_negative_remove = False
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -103,7 +103,7 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [512]
+batch_sizes = [256]
 
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0
