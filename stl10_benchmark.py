@@ -28,21 +28,6 @@ Code to reproduce the benchmark results:
 | swept_deluge|  800   | 256        | 0.83          |                |
 
 
-MY Runs: (we keep the optimizer fixed for now)
-    - NNN_0:    my_nn_memory_bank_size = 2048
-                temperature=0.1
-                warmup_epochs=0
-                nmb_prototypes=30
-                num_negatives=256
-                use_sinkhorn = True
-                add_swav_loss = False
-    - NNN_1:    my_nn_memory_bank_size = 1024
-                temperature=0.5
-                warmup_epochs=0
-                nmb_prototypes=30
-                num_negatives=256
-                use_sinkhorn = True
-                add_swav_loss = True
 """
 import os
 
@@ -70,8 +55,8 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 2048
-temperature=0.5
+my_nn_memory_bank_size = 4096
+temperature=0.1
 warmup_epochs=0
 nmb_prototypes=100
 num_negatives=256
@@ -192,8 +177,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN_Neg"]
-models = [NNNModel_Neg]
+model_names = ["NNN"]
+models = [NNNModel]
 
 
 bench_results = []
