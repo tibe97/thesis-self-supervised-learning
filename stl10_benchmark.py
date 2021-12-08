@@ -212,7 +212,8 @@ for batch_size in batch_sizes:
                                 gpus=gpus,
                                 logger=logger,
                                 distributed_backend=distributed_backend,
-                                default_root_dir=logs_root_dir)
+                                #default_root_dir=logs_root_dir
+                                )
             trainer.fit(
                 benchmark_model,
                 train_dataloader=dataloader_train_ssl,

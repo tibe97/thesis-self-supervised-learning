@@ -87,18 +87,19 @@ from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
-from benchmark_models import NNCLR_HardNegative, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel,MocoModel
+from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos
 
 num_workers = 12
 memory_bank_size = 4096
 
 my_nn_memory_bank_size = 2048
-temperature=0.9
+temperature=0.5
 warmup_epochs=0
 nmb_prototypes=300
-num_negatives=512
+num_negatives=256
 use_sinkhorn = True
-add_swav_loss = False
+add_swav_loss = True
+false_negative_remove = False
 
 
 params_dict = dict({
@@ -108,7 +109,8 @@ params_dict = dict({
     "nmb_prototypes": nmb_prototypes,
     "num_negatives": num_negatives,
     "use_sinkhorn": use_sinkhorn,
-    "add_swav_loss": add_swav_loss
+    "add_swav_loss": add_swav_loss,
+    "false_negative_remove": false_negative_remove
 })
 
 logs_root_dir = ('imagenette_logs')
@@ -217,8 +219,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN"]
-models = [NNNModel]
+model_names = ["NNN_Neg"]
+models = [NNNModel_Neg]
 
 
 bench_results = []
@@ -232,7 +234,7 @@ for batch_size in batch_sizes:
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
-            if model_name == "NNN":
+            if model_name in ["NNN", "NNN_Pos", "NNN_Neg"]:
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
                                                 nmb_prototypes, 
@@ -240,7 +242,8 @@ for batch_size in batch_sizes:
                                                 use_sinkhorn, 
                                                 temperature, 
                                                 num_negatives, 
-                                                add_swav_loss)
+                                                add_swav_loss,
+                                                false_negative_remove)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_validation")  
@@ -251,7 +254,8 @@ for batch_size in batch_sizes:
                                 gpus=gpus,
                                 logger=logger,
                                 distributed_backend=distributed_backend,
-                                default_root_dir=logs_root_dir)
+                                #default_root_dir=logs_root_dir
+                                )
             trainer.fit(
                 benchmark_model,
                 train_dataloader=dataloader_train_ssl,
