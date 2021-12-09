@@ -98,7 +98,7 @@ warmup_epochs=0
 nmb_prototypes=300
 num_negatives=512
 use_sinkhorn = True
-add_swav_loss = False
+add_swav_loss = True
 false_negative_remove = True
 
 

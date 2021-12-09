@@ -154,12 +154,12 @@ class MyNTXentLoss(MemoryBankModule):
         
 
         loss = self.cross_entropy(logits, labels)
-        ipdb.set_trace()
-        if self.add_swav_loss: 
+        #ipdb.set_trace()
+        if self.add_swav_loss and negatives is not None: 
             p1 = self.softmax(q1 / self.temperature)
             #ipdb.set_trace()
             loss = (loss - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))) 
-        ipdb.set_trace()
+        #ipdb.set_trace()
         return loss
 
 
