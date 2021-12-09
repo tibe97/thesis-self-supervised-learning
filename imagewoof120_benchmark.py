@@ -96,10 +96,10 @@ my_nn_memory_bank_size = 2048
 temperature=0.5
 warmup_epochs=0
 nmb_prototypes=300
-num_negatives=256
+num_negatives=512
 use_sinkhorn = True
 add_swav_loss = True
-false_negative_remove = False
+false_negative_remove = True
 
 
 params_dict = dict({
