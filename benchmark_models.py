@@ -22,7 +22,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 num_workers = 12
 memory_bank_size = 4096
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
-max_epochs = 800
+max_epochs = 400
 knn_k = 200
 knn_t = 0.1
 classes = 10
@@ -265,10 +265,13 @@ class NNNModel_Neg(BenchmarkModule):
             # assignements of the original Z
             _, neg0, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
             _, neg1, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
-           
-            loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
-            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
 
+            loss0, swav_loss0 = self.criterion(z0, p1, q0_assign, q1, neg1) # return swav_loss for the plots
+            loss1, swav_loss1 = self.criterion(z1, p0, q1_assign, q0, neg0)
+            loss = 0.5 * (loss0 + loss1)
+            # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
+            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
+            self.log('train_swav_loss', swav_loss0 + swav_loss1)
         else:
             # warming up with classical instance discrimination of same augmented image
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task

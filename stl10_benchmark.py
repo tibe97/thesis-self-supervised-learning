@@ -30,6 +30,7 @@ Code to reproduce the benchmark results:
 
 """
 import os
+from pytorch_lightning import callbacks
 
 import torch
 import torch.nn as nn
@@ -49,7 +50,7 @@ from lightly.models.mynet import MyNet
 from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos
 
 num_workers = 12
@@ -207,11 +208,13 @@ for batch_size in batch_sizes:
             logger = WandbLogger(project="STL10_knn_validation")  
             logger.log_hyperparams(params=params_dict)
 
+            lr_monitor = LearningRateMonitor(logging_interval='epoch')
             
             trainer = pl.Trainer(max_epochs=max_epochs, 
                                 gpus=gpus,
                                 logger=logger,
                                 distributed_backend=distributed_backend,
+                                callbacks=[lr_monitor]
                                 #default_root_dir=logs_root_dir
                                 )
             trainer.fit(
