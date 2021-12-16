@@ -107,6 +107,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
             if not self.false_neg_remove:
                 negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))
+                
             elif self.soft_neg: # Hard negatives + batch without false negatives
                 negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))
                 mask_positives = torch.where(clusters_batch==p_cluster)[0]
