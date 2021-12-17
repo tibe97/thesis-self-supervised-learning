@@ -208,13 +208,13 @@ for batch_size in batch_sizes:
             logger = WandbLogger(project="STL10_knn_validation")  
             logger.log_hyperparams(params=params_dict)
 
-            #lr_monitor = LearningRateMonitor(logging_interval='epoch')
+            lr_monitor = LearningRateMonitor(logging_interval='epoch')
             
             trainer = pl.Trainer(max_epochs=max_epochs, 
                                 gpus=gpus,
                                 logger=logger,
                                 distributed_backend=distributed_backend,
-                                #callbacks=[lr_monitor]
+                                callbacks=[lr_monitor]
                                 #default_root_dir=logs_root_dir
                                 )
             trainer.fit(
