@@ -281,7 +281,9 @@ class NNNModel_Neg(BenchmarkModule):
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
             loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
             loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, None)
-            loss = 0.5 * (swav_loss0 + swav_loss1)
+            loss = 0.5 * (loss0 + loss1)
+            self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
+            self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         # log loss and return
         self.log('train_loss_ssl', loss)
         return loss
