@@ -271,7 +271,8 @@ class NNNModel_Neg(BenchmarkModule):
             loss = 0.5 * (loss0 + loss1)
             # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
             #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
-            self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
+            if swav_loss1 is not None:
+                self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
             self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         else:
             # warming up with classical instance discrimination of same augmented image
