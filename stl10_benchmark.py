@@ -62,7 +62,7 @@ warmup_epochs=0
 nmb_prototypes=100
 num_negatives=256
 use_sinkhorn = True
-add_swav_loss = True
+add_swav_loss = False
 false_negative_remove = False
 
 params_dict = dict({
