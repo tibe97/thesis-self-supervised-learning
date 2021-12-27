@@ -230,8 +230,8 @@ class MyNet(nn.Module):
         if self.l2norm:
             z0 = nn.functional.normalize(z0, dim=1, p=2)
             p0 = nn.functional.normalize(p0, dim=1, p=2)
-        z0_swav = z0.clone().detach()
-        q0 = self.prototypes_layer(z0_swav)
+        #z0_swav = z0.clone().detach()
+        q0 = self.prototypes_layer(z0)
 
         out0 = (z0, p0, q0)
 
@@ -252,8 +252,8 @@ class MyNet(nn.Module):
             z1 = nn.functional.normalize(z1, dim=1, p=2)
             p1 = nn.functional.normalize(p1, dim=1, p=2)
         
-        z1_swav = z1.clone().detach()
-        q1 = self.prototypes_layer(z1_swav)
+        #z1_swav = z1.clone().detach()
+        q1 = self.prototypes_layer(z1)
 
         out1 = (z1, p1, q1)
 
