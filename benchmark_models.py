@@ -247,14 +247,14 @@ class NNNModel_Neg(BenchmarkModule):
 
     def training_step(self, batch, batch_idx):
 
-        """
+        
         # Trying to place it before passing the inputs through the model
         with torch.no_grad():
             w = self.model.prototypes_layer.weight.data.clone()
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
             torch.autograd.set_detect_anomaly(True)
-        """
+        
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
