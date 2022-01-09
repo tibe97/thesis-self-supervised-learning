@@ -67,12 +67,10 @@ class MyNNMemoryBankModule(MemoryBankModule):
         
         output, bank = super(MyNNMemoryBankModule, self).forward(output, update=update)
         bank = bank.to(output.device).t()
-        #ipdb.set_trace()
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
 
         #compute cluster assignments
-        #start_time = time.time()
         with torch.no_grad():
             cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
             q = torch.exp(cluster_scores / self.epsilon).t()
@@ -84,15 +82,13 @@ class MyNNMemoryBankModule(MemoryBankModule):
             # transform soft assignment into hard assignments to get cluster
             clusters_batch = torch.argmax(q_batch, dim=1)
             clusters_bank = torch.argmax(q_bank, dim=1)
-        #end_time = time.time()
-        #print("Compute cluster assignments: {}".format(end_time-start_time))
+       
 
         # TODO: 1. pick random negatives; 2. batch + hard negatives as negatives
         negatives = []
         similarity_matrix_pos = torch.einsum("nd,md->nm", output_normed, bank_normed)
         similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)
 
-        #start_time = time.time()
        
         # efficient implementation of the loops with scatter_() function
         for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
@@ -141,11 +137,8 @@ class MyNNMemoryBankModule(MemoryBankModule):
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
         nearest_neighbours = torch.index_select(bank_normed, dim=0, index=index_nearest_neighbours)
         
-        #end_time = time.time()
-        #print("Sampling time of positives and negatives: {}".format(end_time-start_time))
         
         # stack all negative samples for each positive along row dimension
-        
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
         return nearest_neighbours, negatives, q_batch

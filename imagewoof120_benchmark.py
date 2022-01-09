@@ -100,6 +100,7 @@ num_negatives=512
 use_sinkhorn = True
 add_swav_loss = True
 false_negative_remove = True
+soft_neg = True
 
 
 params_dict = dict({
@@ -110,8 +111,10 @@ params_dict = dict({
     "num_negatives": num_negatives,
     "use_sinkhorn": use_sinkhorn,
     "add_swav_loss": add_swav_loss,
-    "false_negative_remove": false_negative_remove
+    "false_negative_remove": false_negative_remove,
+    "soft_neg": soft_neg
 })
+
 
 logs_root_dir = ('imagenette_logs')
 
@@ -243,7 +246,8 @@ for batch_size in batch_sizes:
                                                 temperature, 
                                                 num_negatives, 
                                                 add_swav_loss,
-                                                false_negative_remove)
+                                                false_negative_remove,
+                                                soft_neg=soft_neg)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_validation")  
