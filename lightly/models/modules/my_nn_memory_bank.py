@@ -120,6 +120,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
                     # replace removed samples from batch
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
                 negatives.append(neg)
+                ipdb.set_trace()
             else:
                 # False Negatives removal from batch
                 # remove false negatives from batch (i.e. positives) and replace them with samples
@@ -144,6 +145,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         #print("Sampling time of positives and negatives: {}".format(end_time-start_time))
         
         # stack all negative samples for each positive along row dimension
+        ipdb.set_trace()
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
         return nearest_neighbours, negatives, q_batch
