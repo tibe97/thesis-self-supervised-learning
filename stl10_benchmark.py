@@ -63,7 +63,8 @@ nmb_prototypes=100
 num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
-false_negative_remove = False
+false_negative_remove = True
+soft_neg = True
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -73,7 +74,8 @@ params_dict = dict({
     "num_negatives": num_negatives,
     "use_sinkhorn": use_sinkhorn,
     "add_swav_loss": add_swav_loss,
-    "false_negative_remove": false_negative_remove
+    "false_negative_remove": false_negative_remove,
+    "soft_neg": soft_neg
 })
 
 logs_root_dir = ('stl10_logs')
@@ -202,7 +204,8 @@ for batch_size in batch_sizes:
                                                 temperature, 
                                                 num_negatives, 
                                                 add_swav_loss,
-                                                false_negative_remove)
+                                                false_negative_remove,
+                                                soft_neg=soft_neg)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="STL10_knn_validation")  
