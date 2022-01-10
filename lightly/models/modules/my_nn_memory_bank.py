@@ -110,18 +110,16 @@ class MyNNMemoryBankModule(MemoryBankModule):
             elif self.soft_neg: # Hard negatives + batch without false negatives: progressively add more hard negatives
                 num_hard_negs = (epoch//max_epochs) * num_nn
                 hard_negs = torch.index_select(bank_normed, dim=0, index=idx_negatives)
-                ipdb.set_trace()
-                hard_negs = random.sample(hard_negs, num_hard_negs)
+                hard_negs = hard_negs[torch.randperm(len(hard_negs))[:num_hard_negs]] # randomly sample from hard negatives 
                 mask_positives = torch.where(clusters_batch==p_cluster)[0]
                 num_false_negatives = mask_positives.shape[0]
                 neg = output_normed
                 if num_false_negatives > 0:
                     idx_positives = torch.Tensor(list(set(range(output.shape[0])) - set(mask_positives.tolist()))).to(torch.int).to(output.device) # removes indexes of false negatives 
-                    #ipdb.set_trace()
                     neg = torch.index_select(output_normed, dim=0, index=idx_positives)
                     # replace removed samples from batch
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
-                neg = random.sample(neg, num_nn - num_hard_negs)
+                neg = neg[torch.randperm(len(neg))[:num_nn - num_hard_negs]] # randomly sample from batch without false negatives
                 negatives.append(hard_negs + neg)
                 
             else:
