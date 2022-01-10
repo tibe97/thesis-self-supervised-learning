@@ -8,6 +8,7 @@ import time
 import copy
 import ipdb
 import numpy as np
+import random
 from lightly.loss.memory_bank import MemoryBankModule
 
 
@@ -55,6 +56,8 @@ class MyNNMemoryBankModule(MemoryBankModule):
     def forward(self,
                 output: torch.Tensor,
                 num_nn: int,
+                epoch: int = None,
+                max_epochs: int = 400,
                 update: bool = False):
         """Returns nearest neighbour of output tensor from memory bank which belongs to the same cluster
         as the reference
@@ -104,8 +107,10 @@ class MyNNMemoryBankModule(MemoryBankModule):
             if not self.false_neg_remove:
                 negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))
                 
-            elif self.soft_neg: # Hard negatives + batch without false negatives
+            elif self.soft_neg: # Hard negatives + batch without false negatives: progressively add more hard negatives
+                num_hard_negs = (epoch//max_epochs) * num_nn
                 hard_negs = torch.index_select(bank_normed, dim=0, index=idx_negatives)
+                hard_negs = random.sample(hard_negs, num_hard_negs)
                 mask_positives = torch.where(clusters_batch==p_cluster)[0]
                 num_false_negatives = mask_positives.shape[0]
                 neg = output_normed
@@ -115,6 +120,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
                     neg = torch.index_select(output_normed, dim=0, index=idx_positives)
                     # replace removed samples from batch
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
+                neg = random.sample(neg, num_nn - num_hard_negs)
                 negatives.append(hard_negs + neg)
                 
             else:
