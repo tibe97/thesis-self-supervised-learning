@@ -110,6 +110,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             elif self.soft_neg: # Hard negatives + batch without false negatives: progressively add more hard negatives
                 num_hard_negs = (epoch//max_epochs) * num_nn
                 hard_negs = torch.index_select(bank_normed, dim=0, index=idx_negatives)
+                ipdb.set_trace()
                 hard_negs = random.sample(hard_negs, num_hard_negs)
                 mask_positives = torch.where(clusters_batch==p_cluster)[0]
                 num_false_negatives = mask_positives.shape[0]
