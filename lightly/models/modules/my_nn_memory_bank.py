@@ -120,6 +120,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
                     # replace removed samples from batch
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
                 neg = neg[torch.randperm(len(neg))[:num_nn - num_hard_negs]] # randomly sample from batch without false negatives
+                ipdb.set_trace()
                 negatives.append(hard_negs + neg)
                 
             else:
