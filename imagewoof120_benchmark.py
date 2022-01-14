@@ -87,7 +87,7 @@ from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
-from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos
+from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
 
 num_workers = 12
 memory_bank_size = 4096
@@ -100,7 +100,7 @@ num_negatives=512
 use_sinkhorn = True
 add_swav_loss = True
 false_negative_remove = True
-soft_neg = True
+soft_neg = False
 
 
 params_dict = dict({
@@ -222,8 +222,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN_Neg"]
-models = [NNNModel_Neg]
+model_names = ["FalseNegRemove"]
+models = [FalseNegRemove_TrueLabels]
 
 
 bench_results = []
@@ -237,7 +237,7 @@ for batch_size in batch_sizes:
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
-            if model_name in ["NNN", "NNN_Pos", "NNN_Neg"]:
+            if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove"]:
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
                                                 nmb_prototypes, 
