@@ -135,8 +135,8 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
-path_to_train = 'imagenette2-160/train/'
-path_to_test = 'imagenette2-160/val/'
+path_to_train = 'data/imagenette2-160/train/'
+path_to_test = 'data/imagenette2-160/val/'
 
 # Use SimCLR augmentations
 collate_fn = lightly.data.SimCLRCollateFunction(
