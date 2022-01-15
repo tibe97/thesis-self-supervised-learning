@@ -439,16 +439,15 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
-            _, neg0, q0_assign = self.nn_replacer(z0.detach(), y0, self.num_negatives, epoch=self.current_epoch, update=False) 
-            _, neg1, q1_assign = self.nn_replacer(z1.detach(), y1, self.num_negatives, epoch=self.current_epoch, update=True)
+            _, neg0 = self.nn_replacer(z0.detach(), y0, self.num_negatives, epoch=self.current_epoch, update=False) 
+            _, neg1 = self.nn_replacer(z1.detach(), y1, self.num_negatives, epoch=self.current_epoch, update=True)
 
-            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, neg1) # return swav_loss for the plots
-            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, neg0)
+            loss0, _, _ = self.criterion(z0, p1, q0_assign, q1, neg1) # return swav_loss for the plots
+            loss1, _, _ = self.criterion(z1, p0, q1_assign, q0, neg0)
             loss = 0.5 * (loss0 + loss1)
             # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
             #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
-            if swav_loss1 is not None:
-                self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
+            
             self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         else:
             # warming up with classical instance discrimination of same augmented image

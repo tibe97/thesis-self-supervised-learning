@@ -69,70 +69,30 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
         """
         
-        output, bank = super(GTNNMemoryBankModule, self).forward(output, update=update)
+        output, bank, y_bank = super(GTNNMemoryBankModule, self).forward(output, y, update=update)
         bank = bank.to(output.device).t()
-        ipdb.set_trace() # inspect y tensor
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
 
-        #compute cluster assignments
-        with torch.no_grad():
-            cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
-            q = torch.exp(cluster_scores / self.epsilon).t()
-            q = self.get_assignments(q, self.sinkhorn_iterations)
-            
-            # separate assignments for positives and for negatives 
-            q_batch = q[:output.shape[0]]
-            q_bank = q[output.shape[0]:]
-            # transform soft assignment into hard assignments to get cluster
-            clusters_batch = torch.argmax(q_batch, dim=1)
-            clusters_bank = torch.argmax(q_bank, dim=1)
+       
        
 
         # TODO: 1. pick random negatives; 2. batch + hard negatives as negatives
         negatives = []
-        similarity_matrix_pos = torch.einsum("nd,md->nm", output_normed, bank_normed)
-        similarity_matrix_neg = copy.deepcopy(similarity_matrix_pos)
-
+        
        
         # efficient implementation of the loops with scatter_() function
-        for i in range(similarity_matrix_pos.shape[0]): # for each positive sample
-            row_pos = similarity_matrix_pos[i]
-            row_neg = similarity_matrix_neg[i]
-            p_cluster = clusters_batch[i]
-            mask_indices = torch.where(clusters_bank==p_cluster)[0]
-            row_pos.scatter_(0, mask_indices, 10, reduce='add')
-            row_neg.scatter_(0, mask_indices, -10, reduce='add')
-            # We take the indices of the most similar negatives. Try with random negatives
-            idx_negatives = torch.topk(row_neg, num_nn, dim=0, largest=True).indices
-
+        for i in range(output_normed.shape[0]): # for each positive sample
+            p_class = y[i] # class of the positive being considered
+            idx_bank_negatives = torch.where(y_bank!=p_class)[0]
+            
             if not self.false_neg_remove:
-                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))
-                
-            elif self.soft_neg: # Hard negatives + batch without false negatives: progressively add more hard negatives
-                num_hard_negs = (epoch//max_epochs) * num_nn
-                hard_negs = torch.index_select(bank_normed, dim=0, index=idx_negatives)
-                hard_negs = hard_negs[torch.randperm(len(hard_negs))[:num_hard_negs]] # randomly sample from hard negatives 
-                mask_positives = torch.where(clusters_batch==p_cluster)[0]
-                num_false_negatives = mask_positives.shape[0]
-                neg = output_normed
-                if num_false_negatives > 0:
-                    idx_positives = torch.Tensor(list(set(range(output.shape[0])) - set(mask_positives.tolist()))).to(torch.int).to(output.device) # removes indexes of false negatives 
-                    neg = torch.index_select(output_normed, dim=0, index=idx_positives)
-                    # replace removed samples from batch
-                    neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
-                neg = neg[torch.randperm(len(neg))[:num_nn - num_hard_negs]] # randomly sample from batch without false negatives
-                
-                if len(hard_negs) > 0:
-                    negatives.append(hard_negs + neg)
-                else:
-                    negatives.append(neg)
-                
+                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))            
             else:
                 # False Negatives removal from batch
                 # remove false negatives from batch (i.e. positives) and replace them with samples
                 # from memory bank
-                mask_positives = torch.where(clusters_batch==p_cluster)[0]
+                mask_positives = torch.where(y==p_class)[0]
                 num_false_negatives = mask_positives.shape[0]
                 neg = output_normed
                 if num_false_negatives > 0:
@@ -140,19 +100,19 @@ class GTNNMemoryBankModule(MemoryBankModule):
                     #ipdb.set_trace()
                     neg = torch.index_select(output_normed, dim=0, index=idx_positives)
                     # replace removed samples from batch
-                    neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_negatives[:num_false_negatives])), dim=0)
+                    neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_negatives))[:num_false_negatives]])), dim=0)
                 negatives.append(neg)
 
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
-        index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
-        nearest_neighbours = torch.index_select(bank_normed, dim=0, index=index_nearest_neighbours)
+        #index_nearest_neighbours = 
+        #nearest_neighbours = torch.index_select(bank_normed, dim=0, index=index_nearest_neighbours)
         
-        
+        ipdb.set_trace()
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
-        return nearest_neighbours, negatives, q_batch
+        return negatives, negatives
 
 
 

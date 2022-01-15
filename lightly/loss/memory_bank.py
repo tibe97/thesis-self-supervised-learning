@@ -49,6 +49,7 @@ class MemoryBankModule(torch.nn.Module):
 
         self.bank = None
         self.bank_ptr = None
+        self.labels = None
     
     @torch.no_grad()
     def _init_memory_bank(self, dim: int):
@@ -65,10 +66,11 @@ class MemoryBankModule(torch.nn.Module):
         # want to pollute our checkpoints
         self.bank = torch.randn(dim, self.size)
         self.bank = torch.nn.functional.normalize(self.bank, dim=0)
+        self.labels = torch.randn(dim, self.size)
         self.bank_ptr = torch.LongTensor([0])
 
     @torch.no_grad()
-    def _dequeue_and_enqueue(self, batch: torch.Tensor):
+    def _dequeue_and_enqueue(self, batch: torch.Tensor, labels: torch.Tensor=None):
         """Dequeue the oldest batch and add the latest one
 
         Args:
@@ -81,9 +83,13 @@ class MemoryBankModule(torch.nn.Module):
 
         if ptr + batch_size >= self.size:
             self.bank[:, ptr:] = batch[:self.size - ptr].T.detach()
+            if labels:
+                self.labels[:, ptr:] = labels[:self.size - ptr].T.detach()
             self.bank_ptr[0] = 0
         else:
             self.bank[:, ptr:ptr + batch_size] = batch.T.detach()
+            if labels:
+                self.labels[:, ptr:ptr + batch_size] = labels.T.detach()
             self.bank_ptr[0] = ptr + batch_size
 
     def forward(self,
@@ -116,9 +122,14 @@ class MemoryBankModule(torch.nn.Module):
 
         # query and update memory bank
         bank = self.bank.clone().detach()
+        bank_labels = None
+        if labels:
+            bank_labels = self.labels.clone().detach()
 
         # only update memory bank if we later do backward pass (gradient)
         if update:
-            self._dequeue_and_enqueue(output)
-
+            self._dequeue_and_enqueue(output, labels)
+        if labels:
+            return output, bank, bank_labels
+        
         return output, bank
