@@ -434,6 +434,7 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
 
         # get the two image transformations
         (x0, x1), y0, y1 = batch
+        ipdb.set_trace()
         # forward pass of the transformations
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
