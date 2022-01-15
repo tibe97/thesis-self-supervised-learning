@@ -10,6 +10,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 import lightly
+import ipdb
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
@@ -434,6 +435,7 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
         # get the two image transformations
         (x0, x1), y0, y1 = batch
         # forward pass of the transformations
+        ipdb.set_trace()
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
         if self.current_epoch > self.warmup_epochs-1:
