@@ -85,12 +85,12 @@ class MemoryBankModule(torch.nn.Module):
         if ptr + batch_size >= self.size:
             self.bank[:, ptr:] = batch[:self.size - ptr].T.detach()
             if labels is not None:
-                self.labels[:, ptr:] = labels[:self.size - ptr].detach()
+                self.labels[:, ptr:] = labels[:self.size - ptr]
             self.bank_ptr[0] = 0
         else:
             self.bank[:, ptr:ptr + batch_size] = batch.T.detach()
             if labels is not None:
-                self.labels[:, ptr:ptr + batch_size] = labels.detach()
+                self.labels[:, ptr:ptr + batch_size] = labels
             self.bank_ptr[0] = ptr + batch_size
 
     def forward(self,
@@ -125,7 +125,7 @@ class MemoryBankModule(torch.nn.Module):
         bank = self.bank.clone().detach()
         bank_labels = None
         if labels is not None:
-            bank_labels = self.labels.clone().detach()
+            bank_labels = self.labels.clone()
 
         # only update memory bank if we later do backward pass (gradient)
         if update:
