@@ -90,7 +90,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
 
 #num_workers = 12
-num_workers = 2
+num_workers = 6
 memory_bank_size = 4096
 
 my_nn_memory_bank_size = 2048
