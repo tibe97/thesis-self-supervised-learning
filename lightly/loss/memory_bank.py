@@ -125,7 +125,7 @@ class MemoryBankModule(torch.nn.Module):
         bank = self.bank.clone().detach()
         bank_labels = None
         if labels is not None:
-            bank_labels = self.labels.clone()
+            bank_labels = self.labels.copy()
 
         # only update memory bank if we later do backward pass (gradient)
         if update:
