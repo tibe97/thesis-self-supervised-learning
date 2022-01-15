@@ -13,3 +13,4 @@ setuptools >= 21.0.0
 urllib3 >= 1.15.1
 lightly_utils==0.0.1
 ipdb>=0.13.9
+wandb
