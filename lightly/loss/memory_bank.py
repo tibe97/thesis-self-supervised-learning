@@ -67,7 +67,8 @@ class MemoryBankModule(torch.nn.Module):
         # want to pollute our checkpoints
         self.bank = torch.randn(dim, self.size)
         self.bank = torch.nn.functional.normalize(self.bank, dim=0)
-        self.labels = [None] * dim
+        #self.labels = [None] * dim
+        self.labels = torch.randn(dim, self.size)
         self.bank_ptr = torch.LongTensor([0])
 
     @torch.no_grad()
@@ -85,12 +86,14 @@ class MemoryBankModule(torch.nn.Module):
         if ptr + batch_size >= self.size:
             self.bank[:, ptr:] = batch[:self.size - ptr].T.detach()
             if labels is not None:
-                self.labels[:, ptr:] = labels[:self.size - ptr]
+                #self.labels[:, ptr:] = labels[:self.size - ptr]
+                self.labels[:, ptr:] = labels[:self.size - ptr].detach()
             self.bank_ptr[0] = 0
         else:
             self.bank[:, ptr:ptr + batch_size] = batch.T.detach()
             if labels is not None:
-                self.labels[:, ptr:ptr + batch_size] = labels
+                #self.labels[:, ptr:ptr + batch_size] = labels
+                self.labels[:, ptr:ptr + batch_size] = labels.detach()
             self.bank_ptr[0] = ptr + batch_size
 
     def forward(self,
@@ -125,7 +128,8 @@ class MemoryBankModule(torch.nn.Module):
         bank = self.bank.clone().detach()
         bank_labels = None
         if labels is not None:
-            bank_labels = self.labels.copy()
+            #bank_labels = self.labels.copy()
+            bank_labels = self.labels.clone().detach()
 
         # only update memory bank if we later do backward pass (gradient)
         if update:

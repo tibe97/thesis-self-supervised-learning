@@ -435,7 +435,6 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
         # get the two image transformations
         (x0, x1), y0, y1 = batch
         # forward pass of the transformations
-        ipdb.set_trace()
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
         if self.current_epoch > self.warmup_epochs-1:
@@ -444,8 +443,8 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
             _, neg0 = self.nn_replacer(z0.detach(), y0, self.num_negatives, epoch=self.current_epoch, update=False) 
             _, neg1 = self.nn_replacer(z1.detach(), y1, self.num_negatives, epoch=self.current_epoch, update=True)
 
-            loss0, _, _ = self.criterion(z0, p1, q0_assign, q1, neg1) # return swav_loss for the plots
-            loss1, _, _ = self.criterion(z1, p0, q1_assign, q0, neg0)
+            loss0, _, _ = self.criterion(z0, p1, q0, q1, neg1) # return swav_loss for the plots
+            loss1, _, _ = self.criterion(z1, p0, q1, q0, neg0)
             loss = 0.5 * (loss0 + loss1)
             # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
             #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
