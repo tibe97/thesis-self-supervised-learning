@@ -433,7 +433,7 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
         """
 
         # get the two image transformations
-        (x0, x1), y0, y1 = batch
+        (x0, x1), y, _ = batch
         ipdb.set_trace()
         # forward pass of the transformations
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
@@ -441,8 +441,8 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
-            _, neg0 = self.nn_replacer(z0.detach(), y0, self.num_negatives, epoch=self.current_epoch, update=False) 
-            _, neg1 = self.nn_replacer(z1.detach(), y1, self.num_negatives, epoch=self.current_epoch, update=True)
+            _, neg0 = self.nn_replacer(z0.detach(), y, self.num_negatives, epoch=self.current_epoch, update=False) 
+            _, neg1 = self.nn_replacer(z1.detach(), y, self.num_negatives, epoch=self.current_epoch, update=True)
 
             loss0, _, _ = self.criterion(z0, p1, q0, q1, neg1) # return swav_loss for the plots
             loss1, _, _ = self.criterion(z1, p0, q1, q0, neg0)
