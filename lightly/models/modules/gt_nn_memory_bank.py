@@ -71,6 +71,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
         
         output, bank, y_bank = super(GTNNMemoryBankModule, self).forward(output, y, update=update)
         bank = bank.to(output.device).t()
+        y_bank = y_bank.to(output.device).t()
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
 
@@ -87,7 +88,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
             idx_bank_negatives = torch.where(y_bank!=p_class)[0]
             
             if not self.false_neg_remove:
-                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))            
+                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives))            
             else:
                 # False Negatives removal from batch
                 # remove false negatives from batch (i.e. positives) and replace them with samples
