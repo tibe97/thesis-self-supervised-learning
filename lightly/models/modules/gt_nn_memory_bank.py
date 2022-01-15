@@ -98,7 +98,6 @@ class GTNNMemoryBankModule(MemoryBankModule):
                 neg = output_normed
                 if num_false_negatives > 0:
                     idx_positives = torch.Tensor(list(set(range(output.shape[0])) - set(mask_positives.tolist()))).to(torch.int).to(output.device) # removes indexes of false negatives 
-                    #ipdb.set_trace()
                     neg = torch.index_select(output_normed, dim=0, index=idx_positives)
                     # replace removed samples from batch
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_negatives))[:num_false_negatives]])), dim=0)
@@ -109,7 +108,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
         #index_nearest_neighbours = 
         #nearest_neighbours = torch.index_select(bank_normed, dim=0, index=index_nearest_neighbours)
         
-        ipdb.set_trace()
+        
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
