@@ -93,6 +93,7 @@ class MemoryBankModule(torch.nn.Module):
             self.bank[:, ptr:ptr + batch_size] = batch.T.detach()
             if labels is not None:
                 #self.labels[:, ptr:ptr + batch_size] = labels
+                ipdb.set_trace()
                 self.labels[:, ptr:ptr + batch_size] = labels.detach()
             self.bank_ptr[0] = ptr + batch_size
 
