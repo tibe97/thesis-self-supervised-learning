@@ -3,6 +3,7 @@
 # Copyright (c) 2020. Lightly AG and its affiliates.
 # All Rights Reserved
 
+from tkinter import NONE
 import torch
 import functools
 
@@ -83,12 +84,12 @@ class MemoryBankModule(torch.nn.Module):
 
         if ptr + batch_size >= self.size:
             self.bank[:, ptr:] = batch[:self.size - ptr].T.detach()
-            if labels:
+            if labels is not None:
                 self.labels[:, ptr:] = labels[:self.size - ptr].T.detach()
             self.bank_ptr[0] = 0
         else:
             self.bank[:, ptr:ptr + batch_size] = batch.T.detach()
-            if labels:
+            if labels is not None:
                 self.labels[:, ptr:ptr + batch_size] = labels.T.detach()
             self.bank_ptr[0] = ptr + batch_size
 
@@ -123,13 +124,13 @@ class MemoryBankModule(torch.nn.Module):
         # query and update memory bank
         bank = self.bank.clone().detach()
         bank_labels = None
-        if labels:
+        if labels is not None:
             bank_labels = self.labels.clone().detach()
 
         # only update memory bank if we later do backward pass (gradient)
         if update:
             self._dequeue_and_enqueue(output, labels)
-        if labels:
+        if labels is not None:
             return output, bank, bank_labels
         
         return output, bank
