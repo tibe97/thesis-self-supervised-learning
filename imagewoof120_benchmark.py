@@ -90,7 +90,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
 
 #num_workers = 12
-num_workers = 6
+num_workers = 12
 memory_bank_size = 4096
 
 my_nn_memory_bank_size = 2048
@@ -130,7 +130,7 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [256]
+batch_sizes = [512]
 
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0
