@@ -175,9 +175,9 @@ for batch_size in batch_sizes:
         for seed in range(n_runs):
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
-            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
+            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes).l
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove"]:
-                benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=checkpoint_path)
+                benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=checkpoint_path, dataloader_kNN=dataloader_train_kNN, num_classes=classes)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_visualize_debug")  
