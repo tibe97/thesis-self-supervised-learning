@@ -181,7 +181,7 @@ for batch_size in batch_sizes:
                     dataloader_kNN=dataloader_train_kNN, 
                     num_classes=classes,
                     nmb_prototypes=nmb_prototypes, use_sinkhorn=use_sinkhorn)
-
+            benchmark_model.model.eval()
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_visualize_debug")  
             logger.log_hyperparams(params=params_dict)
