@@ -8,6 +8,7 @@ import torchvision
 import numpy as np
 import copy
 import ipdb
+import wandb
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
@@ -185,6 +186,12 @@ for batch_size in batch_sizes:
             batch = next(iter(dataloader_test))
             embeddings = benchmark_model(batch)
             ipdb.set_trace()
+
+            logger.log({
+                "embeddings": wandb.Table(
+                    data = embeddings
+                )
+            })
 
             gpu_memory_usage.append(torch.cuda.max_memory_allocated())
             torch.cuda.reset_peak_memory_stats()
