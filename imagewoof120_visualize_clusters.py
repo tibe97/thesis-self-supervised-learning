@@ -27,8 +27,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 
 
 checkpoint_path = "checkpoint/Soft_NEG/epoch=799-step=31999.ckpt"
-#num_workers = 12
-num_workers = 6
+num_workers = 2
 memory_bank_size = 4096
 
 my_nn_memory_bank_size = 2048
@@ -187,11 +186,11 @@ for batch_size in batch_sizes:
             logger.log_hyperparams(params=params_dict)
 
             x, y, _ = next(iter(dataloader_test))
-            #ipdb.set_trace()
+            ipdb.set_trace()
             embeddings = benchmark_model(x)
             ipdb.set_trace()
 
-            logger.log({
+            wandb.log({
                 "embeddings": wandb.Table(
                     data = embeddings
                 )
