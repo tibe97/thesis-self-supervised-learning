@@ -192,7 +192,7 @@ for batch_size in batch_sizes:
 
             wandb.log({
                 "embeddings": wandb.Table(
-                    data = embeddings
+                    data = embeddings.toList()
                 )
             })
 
