@@ -186,9 +186,9 @@ for batch_size in batch_sizes:
             logger = WandbLogger(project="ssl_imagewoof120_visualize_debug")  
             logger.log_hyperparams(params=params_dict)
 
-            batch = next(iter(dataloader_test))
-            ipdb.set_trace()
-            embeddings = benchmark_model(batch)
+            x, y, _ = next(iter(dataloader_test))
+            #ipdb.set_trace()
+            embeddings = benchmark_model(x)
             ipdb.set_trace()
 
             logger.log({
