@@ -26,7 +26,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
 
 
-checkpoint_path = "checkpoint/NEG/epoch=399-step=155999.ckpt"
+checkpoint_path = "checkpoint/soft_NEG/epoch=799-step=31999.ckpt"
 #num_workers = 12
 num_workers = 6
 memory_bank_size = 4096
@@ -177,7 +177,10 @@ for batch_size in batch_sizes:
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove"]:
-                benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=checkpoint_path, dataloader_kNN=dataloader_train_kNN, num_classes=classes)
+                benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=checkpoint_path, 
+                    dataloader_kNN=dataloader_train_kNN, 
+                    num_classes=classes,
+                    nmb_prototypes=nmb_prototypes, use_sinkhorn=use_sinkhorn)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_visualize_debug")  
