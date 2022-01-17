@@ -26,7 +26,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
 
 
-checkpoint_path = "checkpoint/soft_NEG/epoch=799-step=31999.ckpt"
+checkpoint_path = "checkpoint/Soft_NEG/epoch=799-step=31999.ckpt"
 #num_workers = 12
 num_workers = 6
 memory_bank_size = 4096
