@@ -187,6 +187,7 @@ for batch_size in batch_sizes:
             logger.log_hyperparams(params=params_dict)
 
             batch = next(iter(dataloader_test))
+            ipdb.set_trace()
             embeddings = benchmark_model(batch)
             ipdb.set_trace()
 
