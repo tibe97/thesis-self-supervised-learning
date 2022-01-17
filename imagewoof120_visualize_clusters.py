@@ -192,6 +192,7 @@ for batch_size in batch_sizes:
 
             wandb.log({
                 "embeddings": wandb.Table(
+                    columns = list(range(embeddings.shape[1])),
                     data = embeddings.tolist()
                 )
             })
