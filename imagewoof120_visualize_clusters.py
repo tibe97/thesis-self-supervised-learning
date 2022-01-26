@@ -187,9 +187,9 @@ for batch_size in batch_sizes:
 
             x, y, _ = next(iter(dataloader_test))
            
-            """
-            embeddings, _, _ = benchmark_model.model(x)
             
+            embeddings, _, _ = benchmark_model.model(x)
+            """
 
             wandb.log({
                 "embeddings": wandb.Table(
@@ -207,9 +207,12 @@ for batch_size in batch_sizes:
                 )
             })
             """
-            prototypes_var = tf.Variable(prototypes.tolist(), name='prototypes')
+            prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
             checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
             checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
+
+            with open(f'{logs_dir}/embeddings/metadata.tsv', 'w') as file: 
+                file.write(y.tolist())
 
             # Set up config.
             config = projector.ProjectorConfig()
