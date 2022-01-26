@@ -215,7 +215,7 @@ for batch_size in batch_sizes:
             
 
             with open(f'{logs_dir}/metadata.tsv', 'w') as file: 
-                file.write(y.tolist())
+                file.write(str(y.tolist()))
 
             # Set up config.
             config = projector.ProjectorConfig()
