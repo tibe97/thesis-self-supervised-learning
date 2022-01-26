@@ -55,6 +55,8 @@ params_dict = dict({
 })
 
 logs_dir = ('tb_logs/imagewoof120')
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 max_epochs = 800
@@ -210,9 +212,9 @@ for batch_size in batch_sizes:
             prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
             checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
             checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
-            ipdb.set_trace()
+            
 
-            with open(f'{logs_dir}/embeddings/metadata.tsv', 'w') as file: 
+            with open(f'{logs_dir}/metadata.tsv', 'w') as file: 
                 file.write(y.tolist())
 
             # Set up config.
@@ -220,7 +222,7 @@ for batch_size in batch_sizes:
             embedding = config.embeddings.add()
             # The name of the tensor will be suffixed by `/.ATTRIBUTES/VARIABLE_VALUE`.
             embedding.tensor_name = prototypes_var.name
-            #embedding.metadata_path = 'metadata.tsv'
+            embedding.metadata_path = 'metadata.tsv'
             projector.visualize_embeddings(logs_dir, config)
 
             gpu_memory_usage.append(torch.cuda.max_memory_allocated())
