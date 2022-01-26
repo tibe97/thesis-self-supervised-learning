@@ -24,7 +24,8 @@ from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
-
+import tensorflow as tf
+from tensorboard.plugins import projector
 
 checkpoint_path = "checkpoint/Soft_NEG/epoch=799-step=31999.ckpt"
 num_workers = 2
@@ -53,8 +54,7 @@ params_dict = dict({
     "soft_neg": soft_neg
 })
 
-
-logs_root_dir = ('imagenette_logs')
+logs_dir = ('tb_logs/imagewoof120')
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 max_epochs = 800
@@ -199,12 +199,25 @@ for batch_size in batch_sizes:
             })
             """
             prototypes = benchmark_model.model.prototypes_layer.weight
+            """
             wandb.log({
                 "embeddings": wandb.Table(
                     columns = list(range(prototypes.shape[1])),
                     data = prototypes.tolist()
                 )
             })
+            """
+            prototypes_var = tf.Variable(prototypes, name='prototypes')
+            checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
+            checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
+
+            # Set up config.
+            config = projector.ProjectorConfig()
+            embedding = config.embeddings.add()
+            # The name of the tensor will be suffixed by `/.ATTRIBUTES/VARIABLE_VALUE`.
+            embedding.tensor_name = prototypes_var.name
+            #embedding.metadata_path = 'metadata.tsv'
+            projector.visualize_embeddings(logs_dir, config)
 
             gpu_memory_usage.append(torch.cuda.max_memory_allocated())
             torch.cuda.reset_peak_memory_stats()
