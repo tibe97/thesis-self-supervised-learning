@@ -207,7 +207,7 @@ for batch_size in batch_sizes:
                 )
             })
             """
-            prototypes_var = tf.Variable(prototypes, name='prototypes')
+            prototypes_var = tf.Variable(prototypes.tolist(), name='prototypes')
             checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
             checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
 
