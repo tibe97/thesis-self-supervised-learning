@@ -163,9 +163,10 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
         #compute cluster assignments
         with torch.no_grad():
+            ipdb.set_trace()
             cluster_scores = torch.mm(output_normed, self.model.prototypes_layer.weight.t())
             q = torch.exp(cluster_scores / self.epsilon).t()
-            ipdb.set_trace()
+            
             q_batch = self.get_assignments(q, self.sinkhorn_iterations)
             
             # transform soft assignment into hard assignments to get cluster
