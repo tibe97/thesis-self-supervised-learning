@@ -54,7 +54,9 @@ params_dict = dict({
     "soft_neg": soft_neg
 })
 
-logs_dir = ('tb_logs/imagewoof120')
+logs_dir = ('tb_logs/stl10')
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 max_epochs = 800
@@ -75,14 +77,14 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
-path_to_dir = 'data/Images'
-
+path_to_train = 'data/STL10/unlabeled_images/'
+path_to_train_kNN = 'data/STL10/train_images/'
+path_to_test = 'data/STL10/test_images/'
 
 # Use SimCLR augmentations
 collate_fn = lightly.data.SimCLRCollateFunction(
     input_size=input_size,
 )
-
 
 # No additional augmentations for the test set
 test_transforms = torchvision.transforms.Compose([
@@ -95,28 +97,12 @@ test_transforms = torchvision.transforms.Compose([
     )
 ])
 
-img_dataset = ImageFolder(path_to_dir)
-
-total_count = len(img_dataset)
-train_count = int(0.8 * total_count)
-valid_count = total_count - train_count
-
-
-train_dataset, valid_dataset = torch.utils.data.random_split(
-    img_dataset, (train_count, valid_count)
+dataset_train_ssl = lightly.data.LightlyDataset(
+    input_dir=path_to_train
 )
 
-ssl_train_dataset = copy.deepcopy(train_dataset.dataset)
-dataset_train_ssl = lightly.data.LightlyDataset.from_torch_dataset(ssl_train_dataset)
-# we use test transformations for getting the feature for kNN on train data
-dataset_train_kNN = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(train_dataset.dataset), transform=test_transforms)
-dataset_train_kNN.test_mode = True
-
-dataset_test = lightly.data.LightlyDataset.from_torch_dataset(copy.deepcopy(valid_dataset.dataset), transform=test_transforms)
-dataset_test.test_mode = True
-
-
-#ipdb.set_trace()
+dataset_train_kNN = STL10('STL10/', split="train", download=False, transform=test_transforms)
+dataset_test = STL10('STL10/', split="test", download=False, transform=test_transforms)
 
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
@@ -199,25 +185,16 @@ for batch_size in batch_sizes:
             })
             """
             prototypes = benchmark_model.model.prototypes_layer.weight
-            """
+            _, _, _, cluster_similarities = benchmark_model.nn_replacer(x, 256)
+            ipdb.set_trace()
             wandb.log({
                 "embeddings": wandb.Table(
                     columns = list(range(prototypes.shape[1])),
                     data = prototypes.tolist()
                 )
             })
-            """
-            prototypes_var = tf.Variable(prototypes.tolist(), name='prototypes')
-            checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
-            checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
-
-            # Set up config.
-            config = projector.ProjectorConfig()
-            embedding = config.embeddings.add()
-            # The name of the tensor will be suffixed by `/.ATTRIBUTES/VARIABLE_VALUE`.
-            embedding.tensor_name = prototypes_var.name
-            #embedding.metadata_path = 'metadata.tsv'
-            projector.visualize_embeddings(logs_dir, config)
+            
+            
 
             gpu_memory_usage.append(torch.cuda.max_memory_allocated())
             torch.cuda.reset_peak_memory_stats()
