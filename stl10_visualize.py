@@ -68,7 +68,7 @@ num_ftrs=512
 nn_size=2 ** 16
 
 # benchmark
-n_runs = 1 # optional, increase to create multiple runs and report mean + std
+n_runs = 10 # optional, increase to create multiple runs and report mean + std
 batch_sizes = [512]
 
 # use a GPU if available
@@ -168,15 +168,13 @@ for batch_size in batch_sizes:
                     nmb_prototypes=nmb_prototypes, use_sinkhorn=use_sinkhorn)
             benchmark_model.model.eval()
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
-            logger = WandbLogger(project="ssl_imagewoof120_visualize_debug")  
+            logger = WandbLogger(project="ssl_stl10_visualize_debug")  
             logger.log_hyperparams(params=params_dict)
 
             x, y, _ = next(iter(dataloader_test))
            
-            """
             embeddings, _, _ = benchmark_model.model(x)
-            
-
+            """
             wandb.log({
                 "embeddings": wandb.Table(
                     columns = list(range(embeddings.shape[1])),
@@ -185,20 +183,25 @@ for batch_size in batch_sizes:
             })
             """
             prototypes = benchmark_model.model.prototypes_layer.weight
-            _, _, _, cluster_similarities = benchmark_model.nn_replacer(x, 256)
-            ipdb.set_trace()
+            batch_similarities  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
+           
             wandb.log({
                 "embeddings": wandb.Table(
                     columns = list(range(prototypes.shape[1])),
                     data = prototypes.tolist()
                 )
             })
+
+            data = [[y, x] for (y, x) in zip(batch_similarities.indices, batch_similarities.values)]
+            table = wandb.Table(data=data, columns = ["cluster", "similarity"])
+            wandb.log({"batch similarities" : wandb.plot.scatter(table, "cluster", "similarity",
+                                            title="Similarities of batch vs clusters")})
+
+
             
             
 
-            gpu_memory_usage.append(torch.cuda.max_memory_allocated())
-            torch.cuda.reset_peak_memory_stats()
-            runs.append(benchmark_model.max_accuracy)
+            
 
             # delete model and trainer + free up cuda memory
             del benchmark_model
