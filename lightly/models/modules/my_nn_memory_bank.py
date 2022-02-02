@@ -155,6 +155,30 @@ class MyNNMemoryBankModule(MemoryBankModule):
         
         return nearest_neighbours, negatives, q_batch, batch_similarities
 
+    def compute_assignments_batch(self, output: torch.Tensor):
+                
+        output, bank = super(MyNNMemoryBankModule, self).forward(output, update=False)
+        bank = bank.to(output.device).t()
+        output_normed = torch.nn.functional.normalize(output, dim=1)
+        bank_normed = torch.nn.functional.normalize(bank, dim=1)
+
+        #compute cluster assignments
+        with torch.no_grad():
+            cluster_scores = torch.mm(torch.cat((output_normed, bank_normed)), self.model.prototypes_layer.weight.t())
+            q = torch.exp(cluster_scores / self.epsilon).t()
+            q = self.get_assignments(q, self.sinkhorn_iterations)
+            
+            # separate assignments for positives (batch) and for negatives (bank)
+            q_batch = q[:output.shape[0]]
+            q_bank = q[output.shape[0]:]
+            # transform soft assignment into hard assignments to get cluster
+            clusters_batch = torch.argmax(q_batch, dim=1)
+            clusters_bank = torch.argmax(q_bank, dim=1)
+
+            # for visualization and debug
+            batch_similarities = torch.max(q_batch, dim=1)
+        
+        return batch_similarities
 
 
     def sinkhorn(self, Q, nmb_iters):
