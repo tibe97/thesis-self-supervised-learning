@@ -201,7 +201,7 @@ for batch_size in batch_sizes:
             })
             """
             prototypes = benchmark_model.model.prototypes_layer.weight
-            _, _, _, cluster_similarities = benchmark_model.nn_replacer(x, 256)
+            _, _, _  = benchmark_model.nn_replacer(x, 256)
             ipdb.set_trace()
             wandb.log({
                 "embeddings": wandb.Table(
