@@ -201,7 +201,8 @@ for batch_size in batch_sizes:
             })
             """
             prototypes = benchmark_model.model.prototypes_layer.weight
-            """
+            _, _, _, cluster_similarities = benchmark_model.nn_replacer(x, 256)
+            ipdb.set_trace()
             wandb.log({
                 "embeddings": wandb.Table(
                     columns = list(range(prototypes.shape[1])),
@@ -224,7 +225,7 @@ for batch_size in batch_sizes:
             embedding.tensor_name = prototypes_var.name
             embedding.metadata_path = 'metadata.tsv'
             projector.visualize_embeddings(logs_dir, config)
-
+            """
             gpu_memory_usage.append(torch.cuda.max_memory_allocated())
             torch.cuda.reset_peak_memory_stats()
             runs.append(benchmark_model.max_accuracy)
