@@ -202,13 +202,20 @@ for batch_size in batch_sizes:
             """
             prototypes = benchmark_model.model.prototypes_layer.weight
             batch_similarities  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
-            ipdb.set_trace()
+           
             wandb.log({
                 "embeddings": wandb.Table(
                     columns = list(range(prototypes.shape[1])),
                     data = prototypes.tolist()
                 )
             })
+
+            data = [[x, y] for (x, y) in zip(batch_similarities.values, batch_similarities.indices)]
+            table = wandb.Table(data=data, columns = ["x", "y"])
+            wandb.log({"batch similarities" : wandb.plot.scatter(table, "x", "y",
+                                            title="Custom Y vs X Scatter Plot")})
+
+
             """
             prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
             checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
