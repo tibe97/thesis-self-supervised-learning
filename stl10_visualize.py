@@ -13,7 +13,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
-from torchvision.datasets import ImageFolder
+from torchvision.datasets import ImageFolder, STL10
 import lightly
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
