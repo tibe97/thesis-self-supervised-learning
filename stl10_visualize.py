@@ -27,7 +27,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 import tensorflow as tf
 from tensorboard.plugins import projector
 
-checkpoint_path = "checkpoint/STL10/NEG_SoftNegatives.ckpt"
+checkpoint_path = "checkpoint/STL10/NoSwavLoss.ckpt"
 num_workers = 2
 memory_bank_size = 4096
 
@@ -182,19 +182,19 @@ for batch_size in batch_sizes:
             x, y, _ = next(iter(dataloader_test))
            
             embeddings, _, _ = benchmark_model.model(x)
-            """
+            
             wandb.log({
                 "embeddings": wandb.Table(
                     columns = list(range(embeddings.shape[1])),
                     data = embeddings.tolist()
                 )
             })
-            """
+            
             prototypes = benchmark_model.model.prototypes_layer.weight
             batch_similarities  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
            
             wandb.log({
-                "embeddings": wandb.Table(
+                "prototypes": wandb.Table(
                     columns = list(range(prototypes.shape[1])),
                     data = prototypes.tolist()
                 )
