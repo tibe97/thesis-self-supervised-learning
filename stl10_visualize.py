@@ -101,10 +101,12 @@ dataset_train_ssl = lightly.data.LightlyDataset(
     input_dir=path_to_train
 )
 dataset_train_kNN = lightly.data.LightlyDataset(
-    input_dir=path_to_train_kNN
+    input_dir=path_to_train_kNN,
+    transform=test_transforms
 )
 dataset_test = lightly.data.LightlyDataset(
-    input_dir=path_to_test
+    input_dir=path_to_test,
+    transform=test_transforms
 )
 """
 dataset_train_kNN = STL10('STL10/', split="train", download=False, transform=test_transforms)
