@@ -100,10 +100,16 @@ test_transforms = torchvision.transforms.Compose([
 dataset_train_ssl = lightly.data.LightlyDataset(
     input_dir=path_to_train
 )
-
+dataset_train_kNN = lightly.data.LightlyDataset(
+    input_dir=path_to_train_kNN
+)
+dataset_test = lightly.data.LightlyDataset(
+    input_dir=path_to_test
+)
+"""
 dataset_train_kNN = STL10('STL10/', split="train", download=False, transform=test_transforms)
 dataset_test = STL10('STL10/', split="test", download=False, transform=test_transforms)
-
+"""
 def get_data_loaders(batch_size: int):
     """Helper method to create dataloaders for ssl, kNN train and kNN test
     Args:

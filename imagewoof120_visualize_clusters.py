@@ -191,15 +191,6 @@ for batch_size in batch_sizes:
            
             
             embeddings, _, _ = benchmark_model.model(x)
-            """
-
-            wandb.log({
-                "embeddings": wandb.Table(
-                    columns = list(range(embeddings.shape[1])),
-                    data = embeddings.tolist()
-                )
-            })
-            """
             prototypes = benchmark_model.model.prototypes_layer.weight
             batch_similarities  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
            
