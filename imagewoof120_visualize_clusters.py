@@ -27,7 +27,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 import tensorflow as tf
 from tensorboard.plugins import projector
 
-checkpoint_path = "checkpoint/NEG/epoch=399-step=155999.ckpt"
+checkpoint_path = "checkpoint/Soft_NEG/epoch=799-step=31999.ckpt"
 num_workers = 2
 memory_bank_size = 4096
 
