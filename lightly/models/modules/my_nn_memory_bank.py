@@ -163,7 +163,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
         #compute cluster assignments
         with torch.no_grad():
-            ipdb.set_trace()
+            #ipdb.set_trace()
             cluster_scores = torch.mm(output_normed, self.model.prototypes_layer.weight.t())
             q = torch.exp(cluster_scores / self.epsilon).t()
             
