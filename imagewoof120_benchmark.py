@@ -258,8 +258,8 @@ for batch_size in batch_sizes:
             trainer = pl.Trainer(max_epochs=max_epochs, 
                                 gpus=gpus,
                                 logger=logger,
-                                strategy=distributed_backend,
-                                #distributed_backend=distributed_backend,
+                                #strategy=distributed_backend,
+                                distributed_backend=distributed_backend,
                                 #default_root_dir=logs_root_dir
                                 )
             trainer.fit(
