@@ -72,7 +72,7 @@ n_runs = 10 # optional, increase to create multiple runs and report mean + std
 batch_sizes = [512]
 
 # use a GPU if available
-gpus = -1 if torch.cuda.is_available() else 0
+gpus = 0
 distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
