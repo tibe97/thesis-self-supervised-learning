@@ -77,9 +77,9 @@ distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
 
-path_to_train = 'data/STL10/unlabeled_images/'
-path_to_train_kNN = 'data/STL10/train_images/'
-path_to_test = 'data/STL10/test_images/'
+path_to_train = 'STL10/unlabeled_images/'
+path_to_train_kNN = 'STL10/train_images/'
+path_to_test = 'STL10/test_images/'
 
 # Use SimCLR augmentations
 collate_fn = lightly.data.SimCLRCollateFunction(
