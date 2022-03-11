@@ -24,7 +24,7 @@ from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
-import tensorflow as tf
+#import tensorflow as tf
 from tensorboard.plugins import projector
 
 checkpoint_path = "checkpoints/STL10/epoch=399-step=155999.ckpt"
