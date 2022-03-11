@@ -73,7 +73,7 @@ batch_sizes = [512]
 
 # use a GPU if available
 gpus = 0
-distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
+distributed_backend = None
 
 # The dataset structure should be like this:
 
