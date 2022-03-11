@@ -27,7 +27,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 #import tensorflow as tf
 from tensorboard.plugins import projector
 
-checkpoint_path = "checkpoints/STL10/epoch=399-step=155999.ckpt"
+checkpoint_path = "../epoch=399-step=155999.ckpt"
 num_workers = 2
 memory_bank_size = 4096
 
@@ -72,8 +72,9 @@ n_runs = 10 # optional, increase to create multiple runs and report mean + std
 batch_sizes = [512]
 
 # use a GPU if available
-gpus = 0
-distributed_backend = None
+gpus = -1 if torch.cuda.is_available() else 0
+distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
+
 
 # The dataset structure should be like this:
 
