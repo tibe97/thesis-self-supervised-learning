@@ -231,7 +231,7 @@ class MyNet(nn.Module):
             z0 = nn.functional.normalize(z0, dim=1, p=2)
             p0 = nn.functional.normalize(p0, dim=1, p=2)
         # don't update features layer with SwAV Loss
-        z0 = z0.clone().detach()
+        #z0 = z0.clone().detach()
         q0 = self.prototypes_layer(z0)
 
         out0 = (z0, p0, q0)
@@ -253,7 +253,7 @@ class MyNet(nn.Module):
             z1 = nn.functional.normalize(z1, dim=1, p=2)
             p1 = nn.functional.normalize(p1, dim=1, p=2)
         # don't update features layer with SwAV Loss
-        z1 = z1.clone().detach()
+        #z1 = z1.clone().detach()
         q1 = self.prototypes_layer(z1)
 
         out1 = (z1, p1, q1)

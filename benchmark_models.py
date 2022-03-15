@@ -307,7 +307,7 @@ class NNNModel_Neg(BenchmarkModule):
         return loss
 
     def configure_optimizers(self):
-        optim = torch.optim.SGD(self.model.parameters(), lr=9e-1,
+        optim = torch.optim.SGD(self.model.parameters(), lr=1e-3,
                                 momentum=0.9, weight_decay=5e-4)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]

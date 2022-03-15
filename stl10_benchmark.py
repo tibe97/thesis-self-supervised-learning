@@ -63,7 +63,7 @@ nmb_prototypes=100
 num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
-false_negative_remove = True
+false_negative_remove = False
 soft_neg = True
 
 params_dict = dict({
