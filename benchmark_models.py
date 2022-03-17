@@ -24,7 +24,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 num_workers = 12
 memory_bank_size = 4096
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
-max_epochs = 400
+max_epochs = 800
 knn_k = 200
 knn_t = 0.1
 classes = 10
@@ -371,8 +371,8 @@ class NNNModel_Pos(BenchmarkModule):
             z0, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
             z1, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=True)
 
-            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, _) # return swav_loss for the plots
-            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, _)
+            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
+            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, None)
             loss = 0.5 * (loss0 + loss1)
             # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
             #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
