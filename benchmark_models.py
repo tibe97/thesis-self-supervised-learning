@@ -307,7 +307,7 @@ class NNNModel_Neg(BenchmarkModule):
         return loss
 
     def configure_optimizers(self):
-        optim = torch.optim.SGD(self.model.parameters(), lr=1e-3,
+        optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
         return [optim], [scheduler]
@@ -315,8 +315,7 @@ class NNNModel_Neg(BenchmarkModule):
 
 class NNNModel_Pos(BenchmarkModule):
     """
-    Only positive sampling of nearest neighbors, while negatives are used as in NNCLR.
-    Different from NNCLR because the neighbors are checked to belong to same cluster.
+    NNN model without positive sampling of nearest neighbors. Just hard negative mining
     """
     def __init__(self, dataloader_kNN, 
                 num_classes, 
@@ -327,7 +326,8 @@ class NNNModel_Pos(BenchmarkModule):
                 temperature: float=0.1,
                 num_negatives: int=256,
                 add_swav_loss: bool=False,
-                false_negative_remove: bool=False):
+                false_negative_remove: bool=False,
+                soft_neg: bool=False):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -338,11 +338,11 @@ class NNNModel_Pos(BenchmarkModule):
         )
         # create a simclr model based on ResNet
         self.model = \
-            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2)
+            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
         
-        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=false_negative_remove)
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=false_negative_remove, soft_neg=soft_neg)
         #self.criterion = lightly.loss.NTXentLoss()
-        self.criterion = self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
 
@@ -350,14 +350,16 @@ class NNNModel_Pos(BenchmarkModule):
         self.model(x)
 
     def training_step(self, batch, batch_idx):
+        """
+        
         # Trying to place it before passing the inputs through the model
-        '''
         with torch.no_grad():
             w = self.model.prototypes_layer.weight.data.clone()
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
             torch.autograd.set_detect_anomaly(True)
-        '''
+        """
+
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
@@ -366,14 +368,28 @@ class NNNModel_Pos(BenchmarkModule):
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
-            z0, _, q0_pred = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
-            z1, _, q1_pred = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
-           
-            loss = 0.5 * (self.criterion(z0, p1, q0_pred, q1, None) + self.criterion(z1, p0, q1_pred, q0, None))
+            z0, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
+            z1, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=True)
+
+            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, _) # return swav_loss for the plots
+            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, _)
+            loss = 0.5 * (loss0 + loss1)
+            # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
+            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
+            if swav_loss1 is not None:
+                self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
+            self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         else:
             # warming up with classical instance discrimination of same augmented image
+            _, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
+            _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, update=False)
+
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
-            loss = 0.5 * (self.criterion(z0, p1, q0, q1, None) + self.criterion(z1, p0, q1, q0, None))
+            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
+            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, None)
+            loss = 0.5 * (loss0 + loss1)
+            self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
+            self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         # log loss and return
         self.log('train_loss_ssl', loss)
         return loss

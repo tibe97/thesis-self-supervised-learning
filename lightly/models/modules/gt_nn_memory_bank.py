@@ -77,7 +77,6 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
        
        
-
         # TODO: 1. pick random negatives; 2. batch + hard negatives as negatives
         negatives = []
         
@@ -88,7 +87,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
             idx_bank_negatives = torch.where(y_bank!=p_class)[0]
             
             if not self.false_neg_remove:
-                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives))            
+                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[:num_false_negatives]))            
             else:
                 # False Negatives removal from batch
                 # remove false negatives from batch (i.e. positives) and replace them with samples

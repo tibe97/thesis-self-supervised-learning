@@ -99,8 +99,8 @@ warmup_epochs=0
 nmb_prototypes=120
 num_negatives=512
 use_sinkhorn = True
-add_swav_loss = False
-false_negative_remove = True
+add_swav_loss = True
+false_negative_remove = False
 soft_neg = False
 
 
@@ -117,7 +117,6 @@ params_dict = dict({
 })
 
 
-logs_root_dir = ('imagenette_logs')
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 max_epochs = 800
@@ -223,8 +222,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["FalseNegRemove"]
-models = [FalseNegRemove_TrueLabels]
+model_names = ["NNN_Pos"]
+models = [NNNModel_Pos]
 
 
 bench_results = []
@@ -238,7 +237,7 @@ for batch_size in batch_sizes:
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
-            if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove"]:
+            if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove", "FalseNegRemove_TrueLabels"]:
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
                                                 nmb_prototypes, 
