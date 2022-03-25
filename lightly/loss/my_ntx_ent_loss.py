@@ -153,6 +153,7 @@ class MyNTXentLoss(MemoryBankModule):
             labels = torch.cat([labels + batch_size - 1, labels])
         
 
+        ipdb.set_trace()
         contrastive_loss = self.cross_entropy(logits, labels)
         # labels = 0 if class of batch element==prototype, 1 otherwise
         # logits = 
