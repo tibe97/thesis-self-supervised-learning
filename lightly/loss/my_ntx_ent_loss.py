@@ -211,7 +211,7 @@ class SupervisedNTXentLoss(MemoryBankModule):
                  num_negatives: int = 256,
                  memory_bank_size: int = 0,
                  add_swav_loss: bool = False):
-        super(MyNTXentLoss, self).__init__(size=memory_bank_size)
+        super(SupervisedNTXentLoss, self).__init__(size=memory_bank_size)
         self.temperature = temperature
         self.cross_entropy = torch.nn.CrossEntropyLoss(reduction="mean")
         self.eps = 1e-8
