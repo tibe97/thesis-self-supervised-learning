@@ -74,7 +74,7 @@ class MocoModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_moco.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 
@@ -107,7 +107,7 @@ class SimCLRModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 class NNCLRModel(BenchmarkModule):
@@ -142,7 +142,7 @@ class NNCLRModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 class NNNModel(BenchmarkModule):
@@ -224,7 +224,7 @@ class NNNModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 class NNNModel_Neg(BenchmarkModule):
@@ -313,7 +313,7 @@ class NNNModel_Neg(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 
@@ -403,7 +403,7 @@ class NNNModel_Pos(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 
@@ -489,7 +489,7 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 
@@ -572,7 +572,7 @@ class SwAVModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 
@@ -583,6 +583,7 @@ class SupervisedClustering(BenchmarkModule):
     def __init__(self, dataloader_kNN, 
                 num_classes, 
                 warmup_epochs: int=0, 
+                max_epochs: int=400,
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
@@ -608,6 +609,7 @@ class SupervisedClustering(BenchmarkModule):
         self.criterion = SupervisedNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.model(x)
@@ -645,12 +647,12 @@ class SupervisedClustering(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 
 class SimSiamModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -663,6 +665,7 @@ class SimSiamModel(BenchmarkModule):
         self.resnet_simsiam = \
             lightly.models.SimSiam(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
         self.criterion = lightly.loss.SymNegCosineSimilarityLoss()
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.resnet_simsiam(x)
@@ -677,11 +680,11 @@ class SimSiamModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_simsiam.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 class NNSimSiamModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -696,6 +699,7 @@ class NNSimSiamModel(BenchmarkModule):
         self.criterion = lightly.loss.SymNegCosineSimilarityLoss()
 
         self.nn_replacer = NNMemoryBankModule(size=nn_size)
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.resnet_simsiam(x)
@@ -712,12 +716,12 @@ class NNSimSiamModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_simsiam.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 
 class BarlowTwinsModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -736,6 +740,7 @@ class BarlowTwinsModel(BenchmarkModule):
                 num_mlp_layers=2
                 )
         self.criterion = lightly.loss.BarlowTwinsLoss()
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.resnet_barlowtwins(x)
@@ -750,11 +755,11 @@ class BarlowTwinsModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_barlowtwins.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 class BYOLModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -767,6 +772,7 @@ class BYOLModel(BenchmarkModule):
         self.resnet_byol = \
             lightly.models.BYOL(self.backbone, num_ftrs=num_ftrs)
         self.criterion = lightly.loss.SymNegCosineSimilarityLoss()
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.resnet_byol(x)
@@ -781,11 +787,11 @@ class BYOLModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_byol.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
 class NNBYOLModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -800,6 +806,7 @@ class NNBYOLModel(BenchmarkModule):
         self.criterion = lightly.loss.SymNegCosineSimilarityLoss()
 
         self.nn_replacer = NNMemoryBankModule(size=nn_size)
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.resnet_byol(x)
@@ -816,5 +823,5 @@ class NNBYOLModel(BenchmarkModule):
     def configure_optimizers(self):
         optim = torch.optim.SGD(self.resnet_byol.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
