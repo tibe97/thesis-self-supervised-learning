@@ -107,7 +107,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             # We take the indices of the most similar negatives. Try with random negatives
             idx_negatives = torch.topk(row_neg, num_nn, dim=0, largest=True).indices
 
-            if not self.false_neg_remove:
+            if not self.false_neg_remove: # Hard Negatives
                 negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))
                 
             elif self.soft_neg: # Hard negatives + batch without false negatives: progressively add more hard negatives
@@ -129,8 +129,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
                 else:
                     negatives.append(neg)
                 
-            else:
-                # False Negatives removal from batch
+            else: # False Negatives removal from batch
                 # remove false negatives from batch (i.e. positives) and replace them with samples
                 # from memory bank
                 mask_positives = torch.where(clusters_batch==p_cluster)[0]
@@ -146,9 +145,9 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
+        # Positive Mining
         index_nearest_neighbours = torch.argmax(similarity_matrix_pos, dim=1)
         nearest_neighbours = torch.index_select(bank_normed, dim=0, index=index_nearest_neighbours)
-        
         
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
