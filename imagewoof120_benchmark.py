@@ -241,6 +241,7 @@ for batch_size in batch_sizes:
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove", "SupervisedClustering"]:
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
+                                                max_epochs,
                                                 nmb_prototypes, 
                                                 my_nn_memory_bank_size, 
                                                 use_sinkhorn, 
@@ -249,6 +250,8 @@ for batch_size in batch_sizes:
                                                 add_swav_loss,
                                                 false_negative_remove,
                                                 soft_neg=soft_neg)
+            else:
+                benchmark_model = BenchmarkModel(max_epochs=max_epochs)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_validation")  

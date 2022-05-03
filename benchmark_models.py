@@ -24,7 +24,6 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 num_workers = 12
 memory_bank_size = 4096
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
-max_epochs = 400
 knn_k = 200
 knn_t = 0.1
 classes = 10
@@ -35,7 +34,7 @@ nn_size=2 ** 16
 gpus = -1 if torch.cuda.is_available() else 0
 
 class MocoModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         #resnet = lightly.models.ResNetGenerator('resnet-18', num_splits=8)
@@ -43,7 +42,7 @@ class MocoModel(BenchmarkModule):
         #    *list(resnet.children())[:-1],
         #    nn.AdaptiveAvgPool2d(1),
         #)
-
+        self.max_epochs = max_epochs
         resnet = torchvision.models.resnet18()
         last_conv_channels = list(resnet.children())[-1].in_features
         self.backbone = nn.Sequential(
@@ -80,7 +79,7 @@ class MocoModel(BenchmarkModule):
 
 
 class SimCLRModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -93,6 +92,7 @@ class SimCLRModel(BenchmarkModule):
         self.resnet_simclr = \
             lightly.models.SimCLR(self.backbone, num_ftrs=num_ftrs)
         self.criterion = lightly.loss.NTXentLoss()
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.resnet_simclr(x)
@@ -149,6 +149,7 @@ class NNNModel(BenchmarkModule):
     def __init__(self, dataloader_kNN, 
                 num_classes, 
                 warmup_epochs: int=0, 
+                max_epochs: int=400, 
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
@@ -172,6 +173,7 @@ class NNNModel(BenchmarkModule):
         self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.model(x)
@@ -232,6 +234,7 @@ class NNNModel_Neg(BenchmarkModule):
     def __init__(self, dataloader_kNN, 
                 num_classes, 
                 warmup_epochs: int=0, 
+                max_epochs: int=400, 
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
@@ -257,6 +260,7 @@ class NNNModel_Neg(BenchmarkModule):
         self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.model(x)
@@ -320,6 +324,7 @@ class NNNModel_Pos(BenchmarkModule):
     def __init__(self, dataloader_kNN, 
                 num_classes, 
                 warmup_epochs: int=0, 
+                max_epochs: int=400, 
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
@@ -345,6 +350,7 @@ class NNNModel_Pos(BenchmarkModule):
         self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.model(x)
@@ -408,6 +414,7 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
     def __init__(self, dataloader_kNN, 
                 num_classes, 
                 warmup_epochs: int=0, 
+                max_epochs: int=400, 
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
@@ -433,6 +440,7 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
         self.criterion = SupervisedNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.model(x)
@@ -492,7 +500,8 @@ class SwAVModel(BenchmarkModule):
     """
     def __init__(self, dataloader_kNN, 
                 num_classes, 
-                warmup_epochs: int=0, 
+                warmup_epochs: int=0,
+                max_epochs: int=400, 
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
@@ -516,6 +525,7 @@ class SwAVModel(BenchmarkModule):
         self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=True)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
+        self.max_epochs = max_epochs
 
     def forward(self, x):
         self.model(x)
