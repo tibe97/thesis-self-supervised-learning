@@ -237,7 +237,7 @@ for batch_size in batch_sizes:
         for seed in range(n_runs):
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
-            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes)
+            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes, max_epochs=max_epochs)
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove", "SupervisedClustering"]:
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
@@ -250,8 +250,7 @@ for batch_size in batch_sizes:
                                                 add_swav_loss,
                                                 false_negative_remove,
                                                 soft_neg=soft_neg)
-            else:
-                benchmark_model = BenchmarkModel(max_epochs=max_epochs)
+           
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_validation")  
