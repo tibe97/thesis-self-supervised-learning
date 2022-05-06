@@ -522,7 +522,7 @@ class PosMining_TrueLabels(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
         
         self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=True, soft_neg=False)
-        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.criterion = lightly.loss.NTXentLoss()
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
         self.max_epochs = max_epochs
@@ -552,11 +552,81 @@ class PosMining_TrueLabels(BenchmarkModule):
             z0, _ = self.nn_replacer(z0.detach(), y, self.num_negatives, epoch=self.current_epoch, update=False) 
             z1, _ = self.nn_replacer(z1.detach(), y, self.num_negatives, epoch=self.current_epoch, update=True)
 
-            _, _, c_loss0 = self.criterion(z0, p1, _, _, None) # return swav_loss for the plots
-            _, _, c_loss1 = self.criterion(z1, p0, _, _, None)
+            loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
+            
+        # log loss and return
+        self.log('train_loss_ssl', loss)
+        return loss
+
+    def configure_optimizers(self):
+        optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
+                                momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
+        return [optim], [scheduler]
+
+class NegMining_TrueLabels(BenchmarkModule):
+    """
+    SimCLR with removal of false negatives in the batch, using true labels. 
+    """
+    def __init__(self, dataloader_kNN, 
+                num_classes, 
+                warmup_epochs: int=0, 
+                max_epochs: int=400, 
+                nmb_prototypes: int=30, 
+                mem_size: int=2048,
+                use_sinkhorn: bool=True,
+                temperature: float=0.1,
+                num_negatives: int=256,
+                add_swav_loss: bool=False,
+                false_negative_remove: bool=True,
+                soft_neg: bool=False):
+        super().__init__(dataloader_kNN, num_classes)
+        # create a ResNet backbone and remove the classification head
+        resnet = torchvision.models.resnet18()
+        last_conv_channels = list(resnet.children())[-1].in_features
+        self.backbone = nn.Sequential(
+            *list(resnet.children())[:-1],
+            nn.Conv2d(last_conv_channels, num_ftrs, 1),
+        )
+        # create a simclr model based on ResNet
+        self.model = \
+            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
+        
+        self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=True, soft_neg=False)
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.warmup_epochs = warmup_epochs
+        self.num_negatives = num_negatives
+        self.max_epochs = max_epochs
+
+    def forward(self, x):
+        self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        """
+        
+        # Trying to place it before passing the inputs through the model
+        with torch.no_grad():
+            w = self.model.prototypes_layer.weight.data.clone()
+            w = torch.nn.functional.normalize(w, dim=1, p=2)
+            self.model.prototypes_layer.weight.copy_(w)
+            torch.autograd.set_detect_anomaly(True)
+        """
+
+        # get the two image transformations
+        (x0, x1), y, _ = batch
+        # forward pass of the transformations
+        (z0, p0, _), (z1, p1, _) = self.model(x0, x1)
+        # calculate loss for NNCLR
+        if self.current_epoch > self.warmup_epochs-1:
+            # sample neighbors, similarities with the sampled negatives and the cluster 
+            # assignements of the original Z
+            _, neg0 = self.nn_replacer(z0.detach(), y, self.num_negatives, epoch=self.current_epoch, update=False) 
+            _, neg1 = self.nn_replacer(z1.detach(), y, self.num_negatives, epoch=self.current_epoch, update=True)
+
+            _, _, c_loss0 = self.criterion(z0, p1, _, _, neg0) # return swav_loss for the plots
+            _, _, c_loss1 = self.criterion(z1, p0, _, _, neg1)
             loss = 0.5 * (c_loss0 + c_loss1)
-            # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
-            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
+            
         else:
             # warming up with classical instance discrimination of same augmented image
             _, _ = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
@@ -576,6 +646,7 @@ class PosMining_TrueLabels(BenchmarkModule):
                                 momentum=0.9, weight_decay=5e-4)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
+
 
 
 class SwAVModel(BenchmarkModule):
