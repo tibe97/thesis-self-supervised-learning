@@ -70,12 +70,13 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
         """
         
-        output, bank, y_bank = super(GTNNMemoryBankModule, self).forward(output, y, update=update)
+        output, bank, _ = super(GTNNMemoryBankModule, self).forward(output, y, update=update)
         bank = bank.to(output.device).t()
-        y_bank = y_bank.to(output.device).t()
+        #y_bank = y_bank.to(output.device).t()
+        y_bank = y.detach()
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
-
+        ipdb.set_trace()
        
        
         # TODO: 1. pick random negatives; 2. batch + hard negatives as negatives
