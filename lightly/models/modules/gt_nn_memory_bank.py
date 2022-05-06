@@ -76,7 +76,6 @@ class GTNNMemoryBankModule(MemoryBankModule):
         y_bank = y.detach()
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
-        ipdb.set_trace()
        
        
         # TODO: 1. pick random negatives; 2. batch + hard negatives as negatives
@@ -93,7 +92,6 @@ class GTNNMemoryBankModule(MemoryBankModule):
             # Mine a true positive from the bank using the label, if not present, use current example 
             if idx_bank_positives.shape[0] > 0:
                 positive = torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_positives))[:1]])
-                ipdb.set_trace() # check that only one positive is selected
                 positives.append(positive)
             else:
                 positives.append(output_normed[i])
