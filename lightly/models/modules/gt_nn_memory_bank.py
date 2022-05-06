@@ -3,6 +3,7 @@
 # Copyright (c) 2021. Lightly AG and its affiliates.
 # All Rights Reserved
 
+from turtle import pos
 import torch
 import time
 import copy
@@ -78,14 +79,25 @@ class GTNNMemoryBankModule(MemoryBankModule):
        
        
         # TODO: 1. pick random negatives; 2. batch + hard negatives as negatives
+        positives = []
         negatives = []
         
        
         # efficient implementation of the loops with scatter_() function
         for i in range(output_normed.shape[0]): # for each positive sample
             p_class = y[i] # class of the positive being considered
+            idx_bank_positives = torch.where(y_bank==p_class)[0]
             idx_bank_negatives = torch.where(y_bank!=p_class)[0]
+
+            # Mine a true positive from the bank using the label, if not present, use current example 
+            if idx_bank_positives.shape[0] > 0:
+                positive = torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_positives))[:1]])
+                ipdb.set_trace() # check that only one positive is selected
+                positives.append(positive)
+            else:
+                positives.append(output_normed[i])
             
+            # Mine negatives using groundtruth labels
             if not self.false_neg_remove:
                 negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[:num_false_negatives]))            
             else:
@@ -104,14 +116,13 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
-        #index_nearest_neighbours = 
-        #nearest_neighbours = torch.index_select(bank_normed, dim=0, index=index_nearest_neighbours)
-        
+        nearest_neighbours = torch.stack(positives)
+        ipdb.set_trace() #check size
         
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
         
-        return negatives, negatives
+        return nearest_neighbours, negatives
 
 
 

@@ -109,7 +109,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
             if not self.false_neg_remove: # Hard Negatives
                 negatives.append(torch.index_select(bank_normed, dim=0, index=idx_negatives))
-                
             elif self.soft_neg: # Hard negatives + batch without false negatives: progressively add more hard negatives
                 num_hard_negs = (epoch//max_epochs) * num_nn
                 hard_negs = torch.index_select(bank_normed, dim=0, index=idx_negatives)

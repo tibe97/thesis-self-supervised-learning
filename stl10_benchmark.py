@@ -5,29 +5,8 @@ a system with multiple GPUs make sure that you kill all the processes when
 killing the application. Due to the way we setup this benchmark the distributed
 processes might continue the benchmark if one of the nodes is killed.
 If you know how to fix this don't hesitate to create an issue or PR :)
-You can download the ImageNette dataset from here: https://github.com/fastai/imagenette
-
-
-Code to reproduce the benchmark results:
-
-| Model       | Epochs | Batch Size | Test Accuracy | Peak GPU usage |
-|-------------|--------|------------|---------------|----------------|
-| MoCo        |  800   | 256        | 0.83          | 4.4 GBytes     |
-| SimCLR      |  800   | 256        | 0.85          | 4.4 GBytes     |
-| SimSiam     |  800   | 256        | 0.84          | 4.5 GBytes     |
-| BarlowTwins |  200   | 256        | 0.80          | 4.5 GBytes     |
-| BYOL        |  200   | 256        | 0.85          | 4.6 GBytes     |
-| NNCLR       |  200   | 256        | 0.83          | 4.5 GBytes     |
-| NNSimSiam   |  800   | 256        | 0.82          | 4.9 GBytes     |
-| NNBYOL      |  800   | 256        | 0.85          | 4.6 GBytes     |
-
-
-| My runs     | Epochs | Batch Size | Test Accuracy | Peak GPU usage |
-|-------------|--------|------------|---------------|----------------|
-| diff_elevat.|  800   | 256        | 0.82          |                |
-| swept_deluge|  800   | 256        | 0.83          |                |
-
-
+You can download the ImageNette dataset from here: https://cs.stanford.edu/~acoates/stl10/
+Results here: https://wandb.ai/tibe/STL10_knn_validation
 """
 import os
 from pytorch_lightning import callbacks

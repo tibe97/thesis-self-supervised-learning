@@ -5,64 +5,8 @@ a system with multiple GPUs make sure that you kill all the processes when
 killing the application. Due to the way we setup this benchmark the distributed
 processes might continue the benchmark if one of the nodes is killed.
 If you know how to fix this don't hesitate to create an issue or PR :)
-You can download the ImageNette dataset from here: https://github.com/fastai/imagenette
-
-
-Code to reproduce the benchmark results:
-
-| Model       | Epochs | Batch Size | Test Accuracy | Peak GPU usage |
-|-------------|--------|------------|---------------|----------------|
-| MoCo        |  800   | 256        | 0.83          | 4.4 GBytes     |
-| SimCLR      |  800   | 256        | 0.85          | 4.4 GBytes     |
-| SimSiam     |  800   | 256        | 0.84          | 4.5 GBytes     |
-| BarlowTwins |  200   | 256        | 0.80          | 4.5 GBytes     |
-| BYOL        |  200   | 256        | 0.85          | 4.6 GBytes     |
-| NNCLR       |  200   | 256        | 0.83          | 4.5 GBytes     |
-| NNSimSiam   |  800   | 256        | 0.82          | 4.9 GBytes     |
-| NNBYOL      |  800   | 256        | 0.85          | 4.6 GBytes     |
-
-
-| My runs     | Epochs | Batch Size | Test Accuracy | Peak GPU usage |
-|-------------|--------|------------|---------------|----------------|
-| diff_elevat.|  800   | 256        | 0.82          |                |
-| swept_deluge|  800   | 256        | 0.83          |                |
-
-
-MY Runs: (we keep the optimizer fixed for now)
-- decent_lake (no warmup): temp=0.1, memory_bank_size=1024, warmup_epochs=0, nmb_prototypes=30, num_negatives=256
-- DIFFERENT_ELEVATOR: temp=0.1, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
-- SWEPT_DELUGE: temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-- WISE_DEW: try decreasing temp. In different_elevator loss decreases quicker probably thanks to lower temp.
-  temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-  Similar results to different_elevator in term of knn-accuracy convergence.
-- POLAR_GALAXY: same as different_elevator, but with temp=0.5 
-  temp=0.5, memory_bank_size=1024, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
-  Seems to achieve same performance as different_elevator. In this setting temperature param doesn't affect.
-- LYRIC_MORNING: increasing memory_bank_size
-    temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=256
-- HARDY_PAPER: increase num_negatives (same as WISE_DEW, obtained similar results)
-    temp=0.1, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=30, num_negatives=512
-- NEW_RUN: different_elevator but without warmup   
-    temp=0.1, memory_bank_size=1024, warmup_epochs=0, nmb_prototypes=30, num_negatives=256
-
-------all these previous changes for faster convergence------
-- FANCIFUL_MONKEY: decrease num_clusters to match true num classes
-    temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=10, num_negatives=512
-- FAITHFUL_SURF: increase num_clusters to 100
-    temp=0.5, memory_bank_size=2048, warmup_epochs=50, nmb_prototypes=100, num_negatives=512
-- SMART_SPONGE: increase warmup_epochs -> Bad results
-    temp=0.5, memory_bank_size=2048, warmup_epochs=200, nmb_prototypes=30, num_negatives=512
--GENTLE_MICROWAVE: don't warmup
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512
-- ETHEREAL_TERRAIN: don't use sinkhorn -> too unstable
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False
-- new_run: nnclr with negative sampling
-- SUMMER_DURIAN: update learnable cluster centroids, use additional SwAV loss. FORGOT to normalize protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
-- BRIGHT_MOUNTAIN: normalize protos -> better not to normalize the protos
-    temp=0.5, memory_bank_size=2048, warmup_epochs=0, nmb_prototypes=30, num_negatives=512, sinkhorn=False, swav_loss=True
-
-- new_run: take hidden layer from projection MLP for clustering
+You can download the ImageNette dataset from here: http://vision.stanford.edu/aditya86/ImageNetDogs/
+Results here: https://wandb.ai/tibe/ssl_imagewoof120_validation?workspace=user-tibe
 """
 import os
 
