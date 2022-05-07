@@ -73,7 +73,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
         output, bank, _ = super(GTNNMemoryBankModule, self).forward(output, y, update=update)
         bank = bank.to(output.device).t()
         #y_bank = y_bank.to(output.device).t()
-        y_bank = y.detach()
+        y_bank = y
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
        

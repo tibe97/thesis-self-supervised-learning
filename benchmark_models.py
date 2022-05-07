@@ -519,7 +519,7 @@ class PosMining_TrueLabels(BenchmarkModule):
         )
         # create a simclr model based on ResNet
         self.model = \
-            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
+            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=True, soft_neg=False)
         self.criterion = lightly.loss.NTXentLoss()
@@ -544,7 +544,7 @@ class PosMining_TrueLabels(BenchmarkModule):
         # get the two image transformations
         (x0, x1), y, _ = batch
         # forward pass of the transformations
-        (z0, p0, _), (z1, p1, _) = self.model(x0, x1)
+        (z0, p0), (z1, p1) = self.model(x0, x1)
         # calculate loss for NNCLR
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 

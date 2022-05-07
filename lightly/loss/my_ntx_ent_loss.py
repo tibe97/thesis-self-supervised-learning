@@ -156,8 +156,6 @@ class MyNTXentLoss(MemoryBankModule):
         
         
         contrastive_loss = self.cross_entropy(logits, labels)
-        # labels = 0 if class of batch element==prototype, 1 otherwise
-        # logits = distance between 
         loss = contrastive_loss
         swav_loss = None
         
