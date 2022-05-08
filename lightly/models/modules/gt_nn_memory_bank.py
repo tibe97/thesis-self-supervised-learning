@@ -70,10 +70,9 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
         """
         
-        output, bank, _ = super(GTNNMemoryBankModule, self).forward(output, y, update=update)
+        output, bank, y_bank = super(GTNNMemoryBankModule, self).forward(output, y, update=update)
         bank = bank.to(output.device).t()
-        #y_bank = y_bank.to(output.device).t()
-        y_bank = y
+        y_bank = y_bank.to(output.device).t()
         output_normed = torch.nn.functional.normalize(output, dim=1)
         bank_normed = torch.nn.functional.normalize(bank, dim=1)
        
@@ -88,13 +87,14 @@ class GTNNMemoryBankModule(MemoryBankModule):
             p_class = y[i] # class of the positive being considered
             idx_bank_positives = torch.where(y_bank==p_class)[0]
             idx_bank_negatives = torch.where(y_bank!=p_class)[0]
-
+            ipdb.set_trace()
             # Mine a true positive from the bank using the label, if not present, use current example 
             if idx_bank_positives.shape[0] > 0:
                 positive = torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_positives))[:1]])
                 positives.append(positive)
             else:
                 positives.append(output_normed[i])
+                ipdb.set_trace()
             
             # Mine negatives using groundtruth labels
             if not self.false_neg_remove:

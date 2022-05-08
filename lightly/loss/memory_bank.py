@@ -69,7 +69,7 @@ class MemoryBankModule(torch.nn.Module):
         self.bank = torch.randn(dim, self.size)
         self.bank = torch.nn.functional.normalize(self.bank, dim=0)
         #self.labels = [None] * dim
-        self.labels = torch.randn(dim, self.size)
+        self.labels = torch.ones(self.size) * -1
         self.bank_ptr = torch.LongTensor([0])
 
     @torch.no_grad()
@@ -138,4 +138,4 @@ class MemoryBankModule(torch.nn.Module):
         if labels is not None:
             return output, bank, bank_labels
         
-        return output, bank
+        return output, bank, bank_labels
