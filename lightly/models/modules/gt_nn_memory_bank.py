@@ -118,8 +118,8 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
-        nearest_neighbours = torch.cat(positives)
-        ipdb.set_trace() #check size
+        nearest_neighbours = torch.stack(positives)
+        
         
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
