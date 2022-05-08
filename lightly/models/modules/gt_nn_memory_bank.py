@@ -92,10 +92,11 @@ class GTNNMemoryBankModule(MemoryBankModule):
             if idx_bank_positives.shape[0] > 0:
                 positive = torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_positives))[:1]]).squeeze()
                 positives.append(positive)
+                ipdb.set_trace()
             else:
                 positives.append(output_normed[i])
 
-            ipdb.set_trace()
+            
             
             # Mine negatives using groundtruth labels
             if not self.false_neg_remove:
