@@ -90,9 +90,9 @@ class GTNNMemoryBankModule(MemoryBankModule):
             
             # Mine a true positive from the bank using the label, if not present, use current example 
             if idx_bank_positives.shape[0] > 0:
-                positive = torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_positives))[:1]]).squeeze()
+                positive = torch.index_select(bank_normed, dim=0, index=idx_bank_positives[torch.randperm(len(idx_bank_positives))[:1]]).squeeze()
                 positives.append(positive)
-                ipdb.set_trace()
+                
             else:
                 positives.append(output_normed[i])
 
