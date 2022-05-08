@@ -87,6 +87,8 @@ class GTNNMemoryBankModule(MemoryBankModule):
             p_class = y[i] # class of the positive being considered
             idx_bank_positives = torch.where(y_bank==p_class)[0]
             idx_bank_negatives = torch.where(y_bank!=p_class)[0]
+
+            ipdb.set_trace()
             
             # Mine a true positive from the bank using the label, if not present, use current example 
             if idx_bank_positives.shape[0] > 0:
@@ -94,6 +96,8 @@ class GTNNMemoryBankModule(MemoryBankModule):
                 positives.append(positive)
             else:
                 positives.append(output_normed[i])
+
+            ipdb.set_trace()
             
             # Mine negatives using groundtruth labels
             if not self.false_neg_remove:
@@ -115,7 +119,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
         # TODO: so far selects top-1 nearest neighbor, try selecting farthest neighbor
         nearest_neighbours = torch.cat(positives)
-        #ipdb.set_trace() #check size
+        ipdb.set_trace() #check size
         
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)

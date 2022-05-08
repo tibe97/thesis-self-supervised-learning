@@ -80,7 +80,6 @@ class NTXentLoss(MemoryBankModule):
                 Contrastive Cross Entropy Loss value.
 
         """
-        ipdb.set_trace()
         device = out0.device
         batch_size, _ = out0.shape
 
