@@ -163,7 +163,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
         with torch.no_grad():
             #ipdb.set_trace()
             cluster_scores = torch.mm(output_normed, self.model.prototypes_layer.weight.t())
-            q = torch.exp(cluster_scores / self.epsilon).t()
+            q = torch.exp(cluster_scores / self.epsilon).to(output.device).t()
             
             q_batch = self.get_assignments(q, self.sinkhorn_iterations)
             
@@ -184,7 +184,6 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
                 K, B = Q.shape
 
-                ipdb.set_trace()
                 if self.gpus != 0:
                     u = torch.zeros(K).cuda()
                     r = torch.ones(K).cuda() / K
