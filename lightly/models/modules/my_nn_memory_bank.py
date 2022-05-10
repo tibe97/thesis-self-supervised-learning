@@ -3,6 +3,7 @@
 # Copyright (c) 2021. Lightly AG and its affiliates.
 # All Rights Reserved
 
+from black import out
 import torch
 import time
 import copy
@@ -156,7 +157,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
     def compute_assignments_batch(self, output: torch.Tensor):
                 
         
-        output_normed = torch.nn.functional.normalize(output, dim=1)
+        output_normed = torch.nn.functional.normalize(output, dim=1).to(output.device)
         
 
         #compute cluster assignments
@@ -184,6 +185,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
                 K, B = Q.shape
 
+                ipdb.set_trace()
                 if self.gpus != 0:
                     u = torch.zeros(K).cuda()
                     r = torch.ones(K).cuda() / K
