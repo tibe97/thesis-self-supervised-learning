@@ -155,13 +155,12 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
     def compute_assignments_batch(self, output: torch.Tensor):
                 
-        
+        ipdb.set_trace()
         output_normed = torch.nn.functional.normalize(output, dim=1).to(output.device)
         
 
         #compute cluster assignments
         with torch.no_grad():
-            #ipdb.set_trace()
             cluster_scores = torch.mm(output_normed, self.model.prototypes_layer.weight.t())
             q = torch.exp(cluster_scores / self.epsilon).to(output.device).t()
             
