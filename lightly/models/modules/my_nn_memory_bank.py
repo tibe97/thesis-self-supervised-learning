@@ -3,7 +3,6 @@
 # Copyright (c) 2021. Lightly AG and its affiliates.
 # All Rights Reserved
 
-from black import out
 import torch
 import time
 import copy
