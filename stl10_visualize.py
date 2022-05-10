@@ -183,6 +183,7 @@ for batch_size in batch_sizes:
             x, y, _ = next(iter(dataloader_test))
            
             embeddings, _, _ = benchmark_model.model(x)
+            ipdb.set_trace()
             
             wandb.log({
                 "embeddings": wandb.Table(
