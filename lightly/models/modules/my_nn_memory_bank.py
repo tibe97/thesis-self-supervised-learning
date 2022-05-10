@@ -155,16 +155,15 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
     def compute_assignments_batch(self, output: torch.Tensor):
                 
-        ipdb.set_trace()
-        output_normed = torch.nn.functional.normalize(output, dim=1).to(output.device)
+        output_normed = torch.nn.functional.normalize(output, dim=1).to('cpu')
         
 
         #compute cluster assignments
         with torch.no_grad():
             cluster_scores = torch.mm(output_normed, self.model.prototypes_layer.weight.t())
-            q = torch.exp(cluster_scores / self.epsilon).to(output.device).t()
+            q = torch.exp(cluster_scores / self.epsilon).to('cpu').t()
             
-            q_batch = self.get_assignments(q, self.sinkhorn_iterations)
+            q_batch = self.sinkhorn_cpu(q, self.sinkhorn_iterations)
             
             # transform soft assignment into hard assignments to get cluster
             clusters_batch = torch.argmax(q_batch, dim=1)
@@ -192,6 +191,29 @@ class MyNNMemoryBankModule(MemoryBankModule):
                     u = torch.zeros(K)
                     r = torch.ones(K) / K
                     c = torch.ones(B) / B
+
+                for _ in range(nmb_iters):
+                    u = torch.sum(Q, dim=1)
+
+                    Q *= (r / u).unsqueeze(1)
+                    Q *= (c / torch.sum(Q, dim=0)).unsqueeze(0)
+
+                return (Q / torch.sum(Q, dim=0, keepdim=True)).t().float()
+        return Q.t()
+
+
+    def sinkhorn_cpu(self, Q, nmb_iters):
+        if self.use_sinkhorn:
+            with torch.no_grad():
+                sum_Q = torch.sum(Q)
+                Q /= sum_Q
+
+                K, B = Q.shape
+
+                
+                u = torch.zeros(K)
+                r = torch.ones(K) / K
+                c = torch.ones(B) / B
 
                 for _ in range(nmb_iters):
                     u = torch.sum(Q, dim=1)
