@@ -183,7 +183,7 @@ for batch_size in batch_sizes:
             x, y, _ = next(iter(dataloader_test))
            
             embeddings, _, _ = benchmark_model.model(x)
-            ipdb.set_trace()
+            
             
             wandb.log({
                 "embeddings": wandb.Table(
@@ -193,7 +193,8 @@ for batch_size in batch_sizes:
             })
             
             prototypes = benchmark_model.model.prototypes_layer.weight
-            batch_similarities  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
+            batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
+            ipdb.set_trace()
            
             wandb.log({
                 "prototypes": wandb.Table(

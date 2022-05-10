@@ -173,7 +173,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
             # for visualization and debug
             batch_similarities = torch.max(q_batch, dim=1)
         
-        return batch_similarities
+        return batch_similarities, clusters_batch
 
 
     def sinkhorn(self, Q, nmb_iters):
