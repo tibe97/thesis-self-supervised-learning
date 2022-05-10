@@ -184,6 +184,7 @@ class MyNNMemoryBankModule(MemoryBankModule):
 
                 K, B = Q.shape
 
+                ipdb.set_trace()
                 if self.gpus != 0:
                     u = torch.zeros(K).cuda()
                     r = torch.ones(K).cuda() / K
