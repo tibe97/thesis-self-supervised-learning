@@ -216,26 +216,10 @@ for batch_size in batch_sizes:
                                                 title="Similarities of batch vs clusters")})
 
                 #wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
-                proto_to_class = wandb.Table(data=[list(r) for r in list(proto_to_class)], columns = ["class", "prototype"])
+                proto_to_class = wandb.Table(data=[list(r) for r in list(proto_to_class)])
                 wandb.log({"Prototypes to Class" : wandb.plot.scatter(proto_to_class, "class", "prototye",
                                                 title="Class assignment for each prototype")})
-                """
-                prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
-                checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
-                checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
                 
-
-                with open(f'{logs_dir}/metadata.tsv', 'w') as file: 
-                    file.write(str(y.tolist()))
-
-                # Set up config.
-                config = projector.ProjectorConfig()
-                embedding = config.embeddings.add()
-                # The name of the tensor will be suffixed by `/.ATTRIBUTES/VARIABLE_VALUE`.
-                embedding.tensor_name = prototypes_var.name
-                embedding.metadata_path = 'metadata.tsv'
-                projector.visualize_embeddings(logs_dir, config)
-                """
             
 
             # delete model and trainer + free up cuda memory
