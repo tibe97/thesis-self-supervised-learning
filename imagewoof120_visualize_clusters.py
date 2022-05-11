@@ -198,7 +198,7 @@ for batch_size in batch_sizes:
 
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
-                #ipdb.set_trace()
+                
 
                 for i, cluster in enumerate(batch_clusters):
                     proto_to_class[cluster, y[i]] += 1
@@ -220,7 +220,7 @@ for batch_size in batch_sizes:
                 wandb.log({"Prototypes to Class" : wandb.plot.scatter(proto_to_class, "class", "prototye",
                                                 title="Class assignment for each prototype")})
                 
-            
+            ipdb.set_trace()
 
             # delete model and trainer + free up cuda memory
             del benchmark_model
