@@ -216,10 +216,11 @@ for batch_size in batch_sizes:
                                                 title="Similarities of batch vs clusters")})
 
                 #wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
+                """
                 proto_to_class = wandb.Table(data=[list(r) for r in list(proto_to_class)])
                 wandb.log({"Prototypes to Class" : wandb.plot.scatter(proto_to_class, "class", "prototye",
                                                 title="Class assignment for each prototype")})
-                
+                """
             ipdb.set_trace()
 
             # delete model and trainer + free up cuda memory
