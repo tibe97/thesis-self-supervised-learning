@@ -24,8 +24,8 @@ from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, FalseNegRemove_TrueLabels
-import tensorflow as tf
-from tensorboard.plugins import projector
+#import tensorflow as tf
+#from tensorboard.plugins import projector
 
 checkpoint_path = "checkpoints/ImageWoof120/Imagewoof_NEG_SoftNegatives.ckpt"
 num_workers = 2
@@ -199,7 +199,7 @@ for batch_size in batch_sizes:
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
                 ipdb.set_trace()
-                
+
                 for i, cluster in enumerate(batch_clusters):
                     proto_to_class[cluster, y[i]] += 1
             
