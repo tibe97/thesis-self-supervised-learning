@@ -27,7 +27,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 #import tensorflow as tf
 #from tensorboard.plugins import projector
 
-checkpoint_path = "checkpoints/ImageWoof120/Imagewoof_NEG_SoftNegatives.ckpt"
+checkpoint_path = "checkpoints/ImageWoof120/Imagewoof_NEG_SoftNeg.ckpt"
 num_workers = 2
 memory_bank_size = 4096
 
