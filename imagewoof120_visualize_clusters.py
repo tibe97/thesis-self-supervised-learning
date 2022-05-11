@@ -198,7 +198,7 @@ for batch_size in batch_sizes:
 
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
-                ipdb.set_trace()
+                #ipdb.set_trace()
 
                 for i, cluster in enumerate(batch_clusters):
                     proto_to_class[cluster, y[i]] += 1
@@ -215,7 +215,7 @@ for batch_size in batch_sizes:
                 wandb.log({"batch similarities" : wandb.plot.scatter(table, "cluster", "similarity",
                                                 title="Similarities of batch vs clusters")})
 
-
+                wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
 
                 """
                 prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
