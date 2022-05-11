@@ -216,8 +216,8 @@ for batch_size in batch_sizes:
                                                 title="Similarities of batch vs clusters")})
 
                 #wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
-                #proto_to_class = wandb.Table(data=proto_to_class, columns = ["class", "prototype"])
-                wandb.log({"Prototypes to Class" : wandb.plot.scatter(list(proto_to_class), "class", "prototye",
+                proto_to_class = wandb.Table(data=list(proto_to_class), columns = ["class", "prototype"])
+                wandb.log({"Prototypes to Class" : wandb.plot.scatter(proto_to_class, "class", "prototye",
                                                 title="Class assignment for each prototype")})
                 """
                 prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
