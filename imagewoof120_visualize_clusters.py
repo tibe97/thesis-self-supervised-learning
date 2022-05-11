@@ -27,7 +27,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 import tensorflow as tf
 from tensorboard.plugins import projector
 
-checkpoint_path = "checkpoint/Soft_NEG/epoch=799-step=31999.ckpt"
+checkpoint_path = "checkpoints/ImageWoof120/Imagewoof_NEG_SoftNegatives.ckpt"
 num_workers = 2
 memory_bank_size = 4096
 
@@ -68,7 +68,7 @@ num_ftrs=512
 nn_size=2 ** 16
 
 # benchmark
-n_runs = 10 # optional, increase to create multiple runs and report mean + std
+n_runs = 1 # optional, increase to create multiple runs and report mean + std
 batch_sizes = [512]
 
 # use a GPU if available
@@ -187,43 +187,53 @@ for batch_size in batch_sizes:
             logger = WandbLogger(project="ssl_imagewoof120_visualize_debug")  
             logger.log_hyperparams(params=params_dict)
 
-            x, y, _ = next(iter(dataloader_test))
-           
+            proto_to_class = torch.zeros(nmb_prototypes, classes)
+            class_to_protos = torch.zeros(classes, nmb_prototypes)
+            for step in range(10):
+                x, y, _ = next(iter(dataloader_test))
             
-            embeddings, _, _ = benchmark_model.model(x)
-            prototypes = benchmark_model.model.prototypes_layer.weight
-            batch_similarities  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
-           
-            wandb.log({
-                "embeddings": wandb.Table(
-                    columns = list(range(prototypes.shape[1])),
-                    data = prototypes.tolist()
-                )
-            })
+                embeddings, _, _ = benchmark_model.model(x)
+                prototypes = benchmark_model.model.prototypes_layer.weight
+                batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
 
-            data = [[y, x] for (y, x) in zip(batch_similarities.indices, batch_similarities.values)]
-            table = wandb.Table(data=data, columns = ["cluster", "similarity"])
-            wandb.log({"batch similarities" : wandb.plot.scatter(table, "cluster", "similarity",
-                                            title="Similarities of batch vs clusters")})
-
-
-            """
-            prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
-            checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
-            checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
+                prototypes = benchmark_model.model.prototypes_layer.weight
+                batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
+                ipdb.set_trace()
+                
+                for i, cluster in enumerate(batch_clusters):
+                    proto_to_class[cluster, y[i]] += 1
             
+                wandb.log({
+                    "embeddings": wandb.Table(
+                        columns = list(range(prototypes.shape[1])),
+                        data = prototypes.tolist()
+                    )
+                })
 
-            with open(f'{logs_dir}/metadata.tsv', 'w') as file: 
-                file.write(str(y.tolist()))
+                data = [[y, x] for (y, x) in zip(batch_similarities.indices, batch_similarities.values)]
+                table = wandb.Table(data=data, columns = ["cluster", "similarity"])
+                wandb.log({"batch similarities" : wandb.plot.scatter(table, "cluster", "similarity",
+                                                title="Similarities of batch vs clusters")})
 
-            # Set up config.
-            config = projector.ProjectorConfig()
-            embedding = config.embeddings.add()
-            # The name of the tensor will be suffixed by `/.ATTRIBUTES/VARIABLE_VALUE`.
-            embedding.tensor_name = prototypes_var.name
-            embedding.metadata_path = 'metadata.tsv'
-            projector.visualize_embeddings(logs_dir, config)
-            """
+
+
+                """
+                prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
+                checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
+                checkpoint.save(os.path.join(logs_dir, "embedding.ckpt"))
+                
+
+                with open(f'{logs_dir}/metadata.tsv', 'w') as file: 
+                    file.write(str(y.tolist()))
+
+                # Set up config.
+                config = projector.ProjectorConfig()
+                embedding = config.embeddings.add()
+                # The name of the tensor will be suffixed by `/.ATTRIBUTES/VARIABLE_VALUE`.
+                embedding.tensor_name = prototypes_var.name
+                embedding.metadata_path = 'metadata.tsv'
+                projector.visualize_embeddings(logs_dir, config)
+                """
             
 
             # delete model and trainer + free up cuda memory
