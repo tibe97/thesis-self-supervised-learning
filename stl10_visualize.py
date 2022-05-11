@@ -166,6 +166,8 @@ gpu_memory_usage = []
 for batch_size in batch_sizes:
     for model_name, BenchmarkModel in zip(model_names, models):
         runs = []
+        proto_to_class = torch.zeros(100, 10)
+        class_to_protos = torch.zeros(10, 100)
         for seed in range(n_runs):
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
@@ -179,38 +181,40 @@ for batch_size in batch_sizes:
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_stl10_visualize_debug")  
             logger.log_hyperparams(params=params_dict)
+            for i in range(10):
+                #x, y, _ = next(iter(dataloader_test))
+                x, y, _ = next(iter(dataloader_train_kNN))
+            
+                embeddings, _, _ = benchmark_model.model(x)
+                
+                
+                wandb.log({
+                    "embeddings": wandb.Table(
+                        columns = list(range(embeddings.shape[1])),
+                        data = embeddings.tolist()
+                    )
+                })
+                
+                prototypes = benchmark_model.model.prototypes_layer.weight
+                batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
+                ipdb.set_trace()
+                for i, cluster in enumerate(batch_clusters):
+                    proto_to_class[cluster, y[i]] += 1
+                    
+            
 
-            x, y, _ = next(iter(dataloader_test))
-           
-            embeddings, _, _ = benchmark_model.model(x)
-            
-            
-            wandb.log({
-                "embeddings": wandb.Table(
-                    columns = list(range(embeddings.shape[1])),
-                    data = embeddings.tolist()
-                )
-            })
-            
-            prototypes = benchmark_model.model.prototypes_layer.weight
-            batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
-            ipdb.set_trace()
-           
-            wandb.log({
-                "prototypes": wandb.Table(
-                    columns = list(range(prototypes.shape[1])),
-                    data = prototypes.tolist()
-                )
-            })
+                wandb.log({
+                    "prototypes": wandb.Table(
+                        columns = list(range(prototypes.shape[1])),
+                        data = prototypes.tolist()
+                    )
+                })
 
-            data = [[y, x] for (y, x) in zip(batch_similarities.indices, batch_similarities.values)]
-            table = wandb.Table(data=data, columns = ["cluster", "similarity"])
-            wandb.log({"batch similarities" : wandb.plot.scatter(table, "cluster", "similarity",
-                                            title="Similarities of batch vs clusters")})
+                data = [[y, x] for (y, x) in zip(batch_similarities.indices, batch_similarities.values)]
+                table = wandb.Table(data=data, columns = ["cluster", "similarity"])
+                wandb.log({"batch similarities" : wandb.plot.scatter(table, "cluster", "similarity",
+                                                title="Similarities of batch vs clusters")})
 
-
-            
-            
 
             
 
