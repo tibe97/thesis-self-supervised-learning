@@ -189,7 +189,7 @@ for batch_size in batch_sizes:
 
             proto_to_class = torch.zeros(nmb_prototypes, classes)
             class_to_protos = torch.zeros(classes, nmb_prototypes)
-            for step in range(10):
+            for step in range(3):
                 x, y, _ = next(iter(dataloader_test))
             
                 embeddings, _, _ = benchmark_model.model(x)
@@ -215,8 +215,10 @@ for batch_size in batch_sizes:
                 wandb.log({"batch similarities" : wandb.plot.scatter(table, "cluster", "similarity",
                                                 title="Similarities of batch vs clusters")})
 
-                wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
-
+                #wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
+                proto_to_class = wandb.Table(data=proto_to_class, columns = ["class", "prototype"])
+                wandb.log({"Prototypes to Class" : wandb.plot.scatter(proto_to_class, "class", "prototye",
+                                                title="Class assignment for each prototype")})
                 """
                 prototypes_var = tf.Variable(embeddings.tolist(), name='prototypes')
                 checkpoint = tf.train.Checkpoint(embedding=prototypes_var)
