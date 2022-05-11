@@ -145,7 +145,7 @@ def get_data_loaders(batch_size: int):
     dataloader_test = torch.utils.data.DataLoader(
         dataset_test,
         batch_size=batch_size,
-        shuffle=False,
+        shuffle=True,
         drop_last=False,
         num_workers=num_workers
     )
