@@ -217,7 +217,7 @@ for batch_size in batch_sizes:
 
                 #wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
                 
-                proto_to_class_table = wandb.Table(data=[[i, torch.argmax(proto_to_class[i,:])] for i in range(nmb_prototypes)])
+                proto_to_class_table = wandb.Table(data=[[i, torch.argmax(proto_to_class[i,:])] for i in range(nmb_prototypes)], columns = ["prototype", "class"])
                 wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                                 title="Class assignment for each prototype")})
                 
