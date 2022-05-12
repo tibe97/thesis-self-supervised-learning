@@ -189,6 +189,7 @@ for batch_size in batch_sizes:
 
             proto_to_class = torch.zeros(nmb_prototypes, classes)
             class_to_protos = torch.zeros(classes, nmb_prototypes)
+            proto_to_class_list = []
             for step in range(20):
                 x, y, _ = next(iter(dataloader_test))
             
@@ -196,10 +197,9 @@ for batch_size in batch_sizes:
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
 
-                prototypes = benchmark_model.model.prototypes_layer.weight
-                batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
                 
 
+                # For each example in the batch, take its assigned cluster and look-up to its real class
                 for i, cluster in enumerate(batch_clusters):
                     proto_to_class[cluster, y[i]] += 1
             
@@ -217,11 +217,17 @@ for batch_size in batch_sizes:
 
                 #wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
                 
+                """
                 proto_to_class_table = wandb.Table(data=[[i, torch.argmax(proto_to_class[i,:])] for i in range(nmb_prototypes)], columns = ["prototype", "class"])
                 wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                                 title="Class assignment for each prototype")})
-                
-           
+                """
+                for i in range(nmb_prototypes):
+                    proto_to_class_list.append([i, torch.argmax(proto_to_class[i,:])])
+
+            proto_to_class_table = wandb.Table(data=proto_to_class_list, columns = ["prototype", "class"])
+            wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
+                                            title="Class assignment for each prototype")})
 
             # delete model and trainer + free up cuda memory
             del benchmark_model
