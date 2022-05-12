@@ -228,7 +228,7 @@ for batch_size in batch_sizes:
             proto_to_class_table = wandb.Table(data=proto_to_class_list, columns = ["prototype", "class"])
             wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                             title="Class assignment for each prototype")})
-
+            ipdb.set_trace()
             # delete model and trainer + free up cuda memory
             del benchmark_model
             torch.cuda.empty_cache()
