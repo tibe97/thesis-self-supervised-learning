@@ -125,6 +125,7 @@ class NTXentLoss(MemoryBankModule):
 
             # the logits are the similarity matrix divided by the temperature
             logits = torch.einsum('nc,mc->nm', output, output) / self.temperature
+            ipdb.set_trace()
             # We need to removed the similarities of samples to themselves
             logits = logits[~torch.eye(2*batch_size, dtype=torch.bool, device=out0.device)].view(2*batch_size, -1)
             ipdb.set_trace()
