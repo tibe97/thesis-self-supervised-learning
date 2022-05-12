@@ -338,7 +338,7 @@ class NNNModel_Neg(BenchmarkModule):
         else:
             # warming up with classical instance discrimination of same augmented image
             _, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
-            _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, update=False)
+            _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
 
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
             loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
