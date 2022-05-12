@@ -189,7 +189,7 @@ for batch_size in batch_sizes:
 
             proto_to_class = torch.zeros(nmb_prototypes, classes)
             class_to_protos = torch.zeros(classes, nmb_prototypes)
-            for step in range(3):
+            for step in range(20):
                 x, y, _ = next(iter(dataloader_test))
             
                 embeddings, _, _ = benchmark_model.model(x)
@@ -221,7 +221,7 @@ for batch_size in batch_sizes:
                 wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                                 title="Class assignment for each prototype")})
                 
-            ipdb.set_trace()
+           
 
             # delete model and trainer + free up cuda memory
             del benchmark_model
