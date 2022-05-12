@@ -57,7 +57,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
     def forward(self,
                 output: torch.Tensor,
                 y: torch.Tensor,
-                num_nn: int,
+                num_neg: int,
                 epoch: int = None,
                 max_epochs: int = 400,
                 update: bool = False):
@@ -98,18 +98,19 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
 
             # Mine negatives using groundtruth labels
-            if not self.false_neg_remove:
-                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[:num_false_negatives]))            
+            if not self.false_neg_remove: # mine random TRUE negatives from bank
+                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len( idx_bank_negatives ))[:num_neg]]))            
             else:
-                # False Negatives removal from batch
+                # False Negatives removal from batch using True labels
                 # remove false negatives from batch (i.e. positives) and replace them with samples
                 # from memory bank
-                mask_positives = torch.where(y==p_class)[0]
-                num_false_negatives = mask_positives.shape[0]
+                print("Debug - False Neg Removal")
+                idx_batch_positives = torch.where(y==p_class)[0]
+                num_false_negatives = idx_batch_positives.shape[0]
                 neg = output_normed
                 if num_false_negatives > 0:
-                    idx_positives = torch.Tensor(list(set(range(output.shape[0])) - set(mask_positives.tolist()))).to(torch.int).to(output.device) # removes indexes of false negatives 
-                    neg = torch.index_select(output_normed, dim=0, index=idx_positives)
+                    idx_batch_negatives = torch.Tensor(list(set(range(output.shape[0])) - set(idx_batch_positives.tolist()))).to(torch.int).to(output.device) # removes indexes of false negatives 
+                    neg = torch.index_select(output_normed, dim=0, index=idx_batch_negatives)
                     # replace removed samples from batch
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_negatives))[:num_false_negatives]])), dim=0)
                 negatives.append(neg)
@@ -121,6 +122,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
         
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
+        ipdb.set_trace()
         
         return nearest_neighbours, negatives
 

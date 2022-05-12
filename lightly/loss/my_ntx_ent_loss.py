@@ -128,7 +128,6 @@ class MyNTXentLoss(MemoryBankModule):
             # are stacked in a matrix at the i-th index. At the end we have to reshape the result into a vector
             # We also have to prepare the tensor of negatives accordingly
             sim_neg = torch.einsum('nzc,ncm->nzm', torch.transpose(torch.unsqueeze(out0, 0), 0, 1), negatives)
-            ipdb.set_trace()
             sim_neg = torch.squeeze(sim_neg, 1)
 
             # set the labels to the first "class", i.e. sim_pos,

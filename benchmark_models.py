@@ -514,8 +514,8 @@ class FalseNegRemove_TrueLabels(BenchmarkModule):
             #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
         else:
             # warming up with classical instance discrimination of same augmented image
-            _, _, q0_assign = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
-            _, _, q1_assign = self.nn_replacer(z1.detach(), self.num_negatives, update=False)
+            _, _, q0_assign = self.nn_replacer(z0.detach(), y, self.num_negatives, update=False) 
+            _, _, q1_assign = self.nn_replacer(z1.detach(), y, self.num_negatives, update=False)
 
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
             loss0, _, _ = self.criterion(z0, p1, q0, q1, None) # return swav_loss for the plots
