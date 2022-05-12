@@ -167,8 +167,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["PosMining_TrueLabels"]
-models = [PosMining_TrueLabels]
+model_names = ["SimCLRModel"]
+models = [SimCLRModel]
 
 
 bench_results = []
@@ -190,7 +190,7 @@ for batch_size in batch_sizes:
                                                 my_nn_memory_bank_size, 
                                                 use_sinkhorn, 
                                                 temperature, 
-                                                num_negatives, 
+                                                batch_size-1, 
                                                 add_swav_loss,
                                                 false_negative_remove,
                                                 soft_neg=soft_neg)

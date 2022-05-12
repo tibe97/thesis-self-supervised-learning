@@ -145,6 +145,46 @@ class NNCLRModel(BenchmarkModule):
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
 
+
+class NNCLRModel_LossCheck(BenchmarkModule):
+    def __init__(self, 
+                dataloader_kNN, 
+                num_classes,
+                temperature: float=0.1,
+                num_negatives: int=255):
+        super().__init__(dataloader_kNN, num_classes)
+        # create a ResNet backbone and remove the classification head
+        resnet = torchvision.models.resnet18()
+        last_conv_channels = list(resnet.children())[-1].in_features
+        self.backbone = nn.Sequential(
+            *list(resnet.children())[:-1],
+            nn.Conv2d(last_conv_channels, num_ftrs, 1),
+        )
+        # create a simclr model based on ResNet
+        self.resnet_simclr = \
+            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=False)
+
+        self.nn_replacer = GTNNMemoryBankModule(size=nn_size, false_neg_remove=True)
+
+    def forward(self, x):
+        self.resnet_simclr(x)
+
+    def training_step(self, batch, batch_idx):
+        (x0, x1), _, _ = batch
+        (z0, p0), (z1, p1) = self.resnet_simclr(x0, x1)
+        z0, neg0 = self.nn_replacer(z0.detach(), update=False)
+        z1, neg1 = self.nn_replacer(z1.detach(), update=True)
+        loss = 0.5 * (self.criterion(z0, p1, _, _, neg0)[2] + self.criterion(z1, p0, _, _, neg1)[2])
+        self.log('train_loss_ssl', loss)
+        return loss
+
+    def configure_optimizers(self):
+        optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=6e-2,
+                                momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
+        return [optim], [scheduler]
+
 class NNNModel(BenchmarkModule):
     def __init__(self, dataloader_kNN, 
                 num_classes, 

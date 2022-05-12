@@ -96,8 +96,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
             else:
                 positives.append(output_normed[i])
 
-            
-            
+
             # Mine negatives using groundtruth labels
             if not self.false_neg_remove:
                 negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[:num_false_negatives]))            
