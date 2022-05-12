@@ -104,7 +104,6 @@ class GTNNMemoryBankModule(MemoryBankModule):
                 # False Negatives removal from batch using True labels
                 # remove false negatives from batch (i.e. positives) and replace them with samples
                 # from memory bank
-                print("Debug - False Neg Removal")
                 idx_batch_positives = torch.where(y==p_class)[0]
                 num_false_negatives = idx_batch_positives.shape[0]
                 neg = output_normed
@@ -122,7 +121,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
         
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
-        ipdb.set_trace()
+       
         
         return nearest_neighbours, negatives
 
