@@ -196,13 +196,15 @@ for batch_size in batch_sizes:
                 embeddings, _, _ = benchmark_model.model(x)
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
-
+                ipdb.set_trace()
                 
 
-                # For each example in the batch, take its assigned cluster and look-up to its real class
+                # For each example in the batch, take its assigned cluster and look-up its real class given by label y
+                # After each batch, take argmax of the counting matrix. For each prototype there will be one dominant class.
+                # Plot over multiple batches to see if the dominant class for each prototype changes
                 for i, cluster in enumerate(batch_clusters):
                     proto_to_class[cluster, y[i]] += 1
-            
+                    ipdb.set_trace()
                 wandb.log({
                     "embeddings": wandb.Table(
                         columns = list(range(prototypes.shape[1])),
