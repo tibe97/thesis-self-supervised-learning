@@ -137,4 +137,4 @@ class MemoryBankModule(torch.nn.Module):
         if labels is not None:
             return output, bank, bank_labels
         
-        return output, bank, bank_labels
+        return output, bank
