@@ -125,7 +125,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
         
         # stack all negative samples for each positive along row dimension
         negatives = torch.stack(negatives) # shape = (num_positives, num_negatives, embedding_size)
-        ipdb.set_trace()
+       
         
         return nearest_neighbours, negatives
 
