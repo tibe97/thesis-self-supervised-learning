@@ -694,10 +694,10 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         )
         # create a simclr model based on ResNet
         self.model = \
-            MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
+            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=True, soft_neg=False)
-        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=add_swav_loss)
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=False)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
         self.max_epochs = max_epochs
@@ -706,20 +706,11 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         self.model(x)
 
     def training_step(self, batch, batch_idx):
-        """
-        
-        # Trying to place it before passing the inputs through the model
-        with torch.no_grad():
-            w = self.model.prototypes_layer.weight.data.clone()
-            w = torch.nn.functional.normalize(w, dim=1, p=2)
-            self.model.prototypes_layer.weight.copy_(w)
-            torch.autograd.set_detect_anomaly(True)
-        """
 
         # get the two image transformations
         (x0, x1), y, _ = batch
         # forward pass of the transformations
-        (z0, p0, _), (z1, p1, _) = self.model(x0, x1)
+        (z0, p0), (z1, p1) = self.model(x0, x1)
         # calculate loss for NNCLR
         
         # sample neighbors, similarities with the sampled negatives and the cluster 
