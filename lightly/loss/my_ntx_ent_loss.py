@@ -91,10 +91,6 @@ class MyNTXentLoss(MemoryBankModule):
                     Predicted cluster assignement directly taken from the output of the prototype 
                     layer of the network.
                     Used for SwAV loss (optional)
-                sim_negatives: 
-                    Computed similarities between the nearest neighbors and the negatives
-                    sampled with hard negative mining. We just return the similarities because 
-                    it's all we need to compute the loss.
 
             Returns:
                 Contrastive Cross Entropy Loss value.
