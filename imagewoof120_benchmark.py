@@ -33,11 +33,11 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, NegMining_TrueLabels, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, SupervisedClustering, SwAVModel, PosMining_TrueLabels, PosMining_FalseNegRemove_TrueLabels
 
-#num_workers = 12
+
 num_workers = 12
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 2048
+my_nn_memory_bank_size = 4096
 temperature=0.5
 warmup_epochs=0
 

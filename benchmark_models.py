@@ -541,14 +541,11 @@ class PosMining_TrueLabels(BenchmarkModule):
                 num_classes, 
                 warmup_epochs: int=0, 
                 max_epochs: int=400, 
-                nmb_prototypes: int=30, 
                 mem_size: int=2048,
-                use_sinkhorn: bool=True,
                 temperature: float=0.1,
                 num_negatives: int=256,
-                add_swav_loss: bool=False,
-                false_negative_remove: bool=True,
-                soft_neg: bool=False):
+                false_negative_remove: bool=True):
+                
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -561,7 +558,7 @@ class PosMining_TrueLabels(BenchmarkModule):
         self.model = \
             lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
         
-        self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=True, soft_neg=False)
+        self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, false_neg_remove=True)
         self.criterion = lightly.loss.NTXentLoss()
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
@@ -676,14 +673,11 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
                 num_classes, 
                 warmup_epochs: int=0, 
                 max_epochs: int=400, 
-                nmb_prototypes: int=30, 
-                mem_size: int=2048,
-                use_sinkhorn: bool=True,
+                mem_size: int=4096,
                 temperature: float=0.5,
                 num_negatives: int=256,
-                add_swav_loss: bool=False,
-                false_negative_remove: bool=True,
-                soft_neg: bool=False):
+                false_negative_remove: bool=True):
+
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -696,7 +690,7 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         self.model = \
             lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
         
-        self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=True, soft_neg=False)
+        self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, false_neg_remove=True)
         self.criterion = MyNTXentLoss(temperature=0.5, num_negatives=num_negatives, add_swav_loss=False)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives

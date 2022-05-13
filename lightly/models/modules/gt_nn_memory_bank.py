@@ -41,8 +41,8 @@ class GTNNMemoryBankModule(MemoryBankModule):
         >>> loss = 0.5 * (criterion(z0, p1) + criterion(z1, p0))
 
     """
-    def __init__(self, model, size: int = 2 ** 16, epsilon: float = 0.05, sinkhorn_iterations: int = 3, gpus: int = 0, 
-                use_sinkhorn: bool = False, false_neg_remove: bool = False, soft_neg: bool = False):
+    def __init__(self, model, size: int = 2 ** 16, epsilon: float = 0.05, gpus: int = 0, 
+                false_neg_remove: bool = False):
         super(GTNNMemoryBankModule, self).__init__(size)
         self.model = model
         self.epsilon = epsilon #division coefficient for cluster assignemnt computation

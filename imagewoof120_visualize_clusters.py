@@ -31,7 +31,7 @@ checkpoint_path = "checkpoints/ImageWoof120/ImageWoof_NEG_SoftNeg.ckpt"
 num_workers = 2
 memory_bank_size = 4096
 
-my_nn_memory_bank_size = 2048
+my_nn_memory_bank_size = 4096
 temperature=0.5
 warmup_epochs=0
 nmb_prototypes=300
