@@ -107,11 +107,15 @@ class GTNNMemoryBankModule(MemoryBankModule):
                 idx_batch_positives = torch.where(y==p_class)[0]
                 num_false_negatives = idx_batch_positives.shape[0]
                 neg = output_normed
+                ipdb.set_trace()
                 if num_false_negatives > 0:
                     idx_batch_negatives = torch.Tensor(list(set(range(output.shape[0])) - set(idx_batch_positives.tolist()))).to(torch.int).to(output.device) # removes indexes of false negatives 
+                    ipdb.set_trace()
                     neg = torch.index_select(output_normed, dim=0, index=idx_batch_negatives)
                     # replace removed samples from batch
+                    ipdb.set_trace()
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_negatives))[:num_false_negatives]])), dim=0)
+                    ipdb.set_trace()
                 negatives.append(neg)
 
 

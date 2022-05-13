@@ -718,8 +718,8 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         z0, neg0 = self.nn_replacer(z0.detach(), y, self.num_negatives, epoch=self.current_epoch, update=False) 
         z1, neg1 = self.nn_replacer(z1.detach(), y, self.num_negatives, epoch=self.current_epoch, update=True)
 
-        _, _, c_loss0 = self.criterion(z0, p1, _, _, neg0) # return swav_loss for the plots
-        _, _, c_loss1 = self.criterion(z1, p0, _, _, neg1)
+        _, _, c_loss0 = self.criterion(z0, p1, _, _, torch.cat((neg0, neg1), dim=0)) # return swav_loss for the plots
+        _, _, c_loss1 = self.criterion(z1, p0, _, _, torch.cat((neg1, neg0), dim=0))
         loss = 0.5 * (c_loss0 + c_loss1)
             
             
