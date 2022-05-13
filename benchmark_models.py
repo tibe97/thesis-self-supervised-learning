@@ -579,8 +579,8 @@ class PosMining_TrueLabels(BenchmarkModule):
         
         # sample neighbors, similarities with the sampled negatives and the cluster 
         # assignements of the original Z
-        z0, _ = self.nn_replacer(z0.detach(), y, self.num_negatives, epoch=self.current_epoch, update=False) 
-        z1, _ = self.nn_replacer(z1.detach(), y, self.num_negatives, epoch=self.current_epoch, update=True)
+        z0, _ = self.nn_replacer(z0.detach(), y, epoch=self.current_epoch, update=False) 
+        z1, _ = self.nn_replacer(z1.detach(), y, epoch=self.current_epoch, update=True)
 
         loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
             
@@ -679,7 +679,7 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
-                temperature: float=0.1,
+                temperature: float=0.5,
                 num_negatives: int=256,
                 add_swav_loss: bool=False,
                 false_negative_remove: bool=True,
@@ -697,7 +697,7 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
             lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
         
         self.nn_replacer = GTNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=True, soft_neg=False)
-        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=False)
+        self.criterion = MyNTXentLoss(temperature=0.5, num_negatives=num_negatives, add_swav_loss=False)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
         self.max_epochs = max_epochs
@@ -715,8 +715,8 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         
         # sample neighbors, similarities with the sampled negatives and the cluster 
         # assignements of the original Z
-        z0, neg0 = self.nn_replacer(z0.detach(), y, self.num_negatives, epoch=self.current_epoch, update=False) 
-        z1, neg1 = self.nn_replacer(z1.detach(), y, self.num_negatives, epoch=self.current_epoch, update=True)
+        z0, neg0 = self.nn_replacer(z0.detach(), y, epoch=self.current_epoch, update=False) 
+        z1, neg1 = self.nn_replacer(z1.detach(), y, epoch=self.current_epoch, update=True)
 
         _, _, c_loss0 = self.criterion(z0, p1, _, _, torch.cat((neg0, neg1), dim=1)) # return swav_loss for the plots
         _, _, c_loss1 = self.criterion(z1, p0, _, _, torch.cat((neg1, neg0), dim=1))

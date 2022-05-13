@@ -57,7 +57,6 @@ class GTNNMemoryBankModule(MemoryBankModule):
     def forward(self,
                 output: torch.Tensor,
                 y: torch.Tensor,
-                num_neg: int,
                 epoch: int = None,
                 max_epochs: int = 400,
                 update: bool = False):
@@ -99,7 +98,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
 
             # Mine negatives using groundtruth labels
             if not self.false_neg_remove: # mine random TRUE negatives from bank
-                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len( idx_bank_negatives ))[:num_neg]]))            
+                negatives.append(torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len( idx_bank_negatives ))[:output.shape[0]]]))            
             else:
                 # False Negatives removal from batch using True labels
                 # remove false negatives from batch (i.e. positives) and replace them with samples
