@@ -100,7 +100,7 @@ class MyNTXentLoss(MemoryBankModule):
         device = out0.device
         batch_size, _ = out0.shape
 
-        ipdb.set_trace()
+        
         # normalize the output to length 1
         out0 = torch.nn.functional.normalize(out0, dim=1)
         out1 = torch.nn.functional.normalize(out1, dim=1)
