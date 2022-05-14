@@ -47,11 +47,9 @@ class GTNNMemoryBankModule(MemoryBankModule):
         self.model = model
         self.epsilon = epsilon #division coefficient for cluster assignemnt computation
         self.get_assignments = self.sinkhorn
-        self.sinkhorn_iterations = sinkhorn_iterations
         self.gpus = gpus
-        self.use_sinkhorn = use_sinkhorn
         self.false_neg_remove = false_neg_remove
-        self.soft_neg = soft_neg
+   
         
 
     def forward(self,
