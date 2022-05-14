@@ -168,7 +168,7 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 model_names = ["PosMining_FalseNegRemove_TrueLabels"]
-models = [PosMining_TrueLabels]
+models = [PosMining_FalseNegRemove_TrueLabels]
 
 
 bench_results = []
