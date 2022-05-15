@@ -105,7 +105,7 @@ class MyNTXentLoss(MemoryBankModule):
         out0 = torch.nn.functional.normalize(out0, dim=1)
         out1 = torch.nn.functional.normalize(out1, dim=1)
 
-
+        ipdb.set_trace()
         # We use the cosine similarity, which is a dot product (einsum) here,
         # as all vectors are already normalized to unit length.
         # Notation in einsum: n = batch_size, c = embedding_size and k = memory_bank_size.
@@ -125,13 +125,11 @@ class MyNTXentLoss(MemoryBankModule):
             # are stacked in a matrix at the i-th index. At the end we have to reshape the result into a vector
             # We also have to prepare the tensor of negatives accordingly
             sim_neg = torch.einsum('nzc,ncm->nzm', torch.transpose(torch.unsqueeze(out0, 0), 0, 1), negatives)
-            
             sim_neg = torch.squeeze(sim_neg, 1)
 
             # set the labels to the first "class", i.e. sim_pos,
             # so that it is maximized in relation to sim_neg
             logits = torch.cat([sim_pos, sim_neg], dim=1) / self.temperature
-            
             labels = torch.zeros(logits.shape[0], device=device, dtype=torch.long)
             
         else:

@@ -116,7 +116,7 @@ class GTNNMemoryBankModule(MemoryBankModule):
                 """
                 # Debug: just append the batch without touching it
 
-                neg = torch.cat((output[:i], output[i+1:]))
+                neg = torch.cat((output_normed[:i], output_normed[i+1:]))
                 negatives.append(neg)
 
 
