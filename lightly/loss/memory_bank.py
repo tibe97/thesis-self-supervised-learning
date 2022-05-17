@@ -68,7 +68,6 @@ class MemoryBankModule(torch.nn.Module):
         # want to pollute our checkpoints
         self.bank = torch.randn(dim, self.size)
         self.bank = torch.nn.functional.normalize(self.bank, dim=0)
-        #self.labels = [None] * dim
         self.labels = torch.ones(self.size) * -1
         self.bank_ptr = torch.LongTensor([0])
 
