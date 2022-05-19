@@ -193,6 +193,7 @@ for batch_size in batch_sizes:
             class_images = {}
             for step in range(30):
                 x, y, _ = next(iter(dataloader_test))
+                ipdb.set_trace()
                 if len(class_images.keys) < classes:
                     for i,label in enumerate(y):
                         if label not in class_images.keys:
