@@ -191,7 +191,7 @@ for batch_size in batch_sizes:
             class_to_protos = torch.zeros(classes, nmb_prototypes)
             proto_to_class_list = []
             class_images = {}
-            for step in range(20):
+            for step in range(30):
                 x, y, _ = next(iter(dataloader_test))
                 
                 embeddings, _, _ = benchmark_model.model(x)
