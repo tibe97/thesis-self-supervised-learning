@@ -190,9 +190,10 @@ for batch_size in batch_sizes:
             proto_to_class = torch.zeros(nmb_prototypes, classes)
             class_to_protos = torch.zeros(classes, nmb_prototypes)
             proto_to_class_list = []
+            class_images = {}
             for step in range(20):
                 x, y, _ = next(iter(dataloader_test))
-            
+                
                 embeddings, _, _ = benchmark_model.model(x)
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
@@ -236,8 +237,8 @@ for batch_size in batch_sizes:
             for i in range(nmb_prototypes):
                 top_3_indices = torch.topk(proto_to_class[i,:], 3)[1]
                 top_3_percentages = [proto_to_class[i,k]/torch.sum(proto_to_class[i,:]) for k in top_3_indices]
-                table_list.append([i, top_3_indices[0], top_3_percentages[0], top_3_indices[1], top_3_percentages[1], top_3_indices[2], top_3_percentages[2]])
-            table_columns = ["prototype", "top1_proto", "top1_%", "top2_proto", "top2_%", "top3_proto", "top3_%"]
+                table_list.append([i, top_3_indices[0], top_3_percentages[0]*100, top_3_indices[1], top_3_percentages[1]*100, top_3_indices[2], top_3_percentages[2]*100])
+            table_columns = ["prototype", "top1_class", "top1_%", "top2_class", "top2_%", "top3_class", "top3_%"]
             table = wandb.Table(data=table_list, columns=table_columns)
             wandb.log({"Prototypes_table": table})
 
