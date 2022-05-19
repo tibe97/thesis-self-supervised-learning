@@ -202,7 +202,7 @@ for batch_size in batch_sizes:
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
                 
-                ipdb.set_trace()
+                
 
                 # For each example in the batch, take its assigned cluster and look-up its real class given by label y
                 # After each batch, take argmax of the counting matrix. For each prototype there will be one dominant class.
