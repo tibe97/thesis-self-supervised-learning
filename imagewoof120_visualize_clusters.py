@@ -196,8 +196,8 @@ for batch_size in batch_sizes:
                 
                 if len(class_images.keys()) < classes:
                     for i,label in enumerate(y):
-                        if label not in class_images.keys():
-                            class_images[label] = wandb.Image(x[i])
+                        if label.item() not in class_images.keys():
+                            class_images[label.item()] = wandb.Image(x[i])
                 embeddings, _, _ = benchmark_model.model(x)
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
