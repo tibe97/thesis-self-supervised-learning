@@ -241,7 +241,7 @@ for batch_size in batch_sizes:
             for i in range(nmb_prototypes):
                 top_3_indices = torch.topk(proto_to_class[i,:], 3)[1]
                 top_3_percentages = [proto_to_class[i,k]/torch.sum(proto_to_class[i,:]) for k in top_3_indices]
-                table_list.append([i, top_3_indices[0], top_3_percentages[0]*100, class_images[top_3_indices[0]], top_3_indices[1], top_3_percentages[1]*100, class_images[top_3_indices[1]], top_3_indices[2], top_3_percentages[2]*100, class_images[top_3_indices[2]]])
+                table_list.append([i, top_3_indices[0], top_3_percentages[0]*100, class_images[top_3_indices[0]].item(), top_3_indices[1], top_3_percentages[1]*100, class_images[top_3_indices[1]].item(), top_3_indices[2], top_3_percentages[2]*100, class_images[top_3_indices[2]].item()])
             table_columns = ["prototype", "top1_class", "top1_%", "top1_image", "top2_class", "top2_%", "top2_image", "top3_class", "top3_%", "top3_image"]
             table = wandb.Table(data=table_list, columns=table_columns)
             wandb.log({"Prototypes_table": table})
