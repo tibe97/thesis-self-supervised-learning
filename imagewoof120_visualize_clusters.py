@@ -196,7 +196,7 @@ for batch_size in batch_sizes:
                 embeddings, _, _ = benchmark_model.model(x)
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
-                ipdb.set_trace()
+                
                 
 
                 # For each example in the batch, take its assigned cluster and look-up its real class given by label y
@@ -204,7 +204,6 @@ for batch_size in batch_sizes:
                 # Plot over multiple batches to see if the dominant class for each prototype changes
                 for i, cluster in enumerate(batch_clusters):
                     proto_to_class[cluster, y[i]] += 1
-                    ipdb.set_trace()
                 wandb.log({
                     "embeddings": wandb.Table(
                         columns = list(range(prototypes.shape[1])),
@@ -224,13 +223,24 @@ for batch_size in batch_sizes:
                 wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                                 title="Class assignment for each prototype")})
                 """
+                '''
                 for i in range(nmb_prototypes):
                     proto_to_class_list.append([i, torch.argmax(proto_to_class[i,:])])
-
+                '''
+            '''
             proto_to_class_table = wandb.Table(data=proto_to_class_list, columns = ["prototype", "class"])
             wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                             title="Class assignment for each prototype")})
-            ipdb.set_trace()
+            '''
+            table_list = []
+            for i in range(nmb_prototypes):
+                top_3_indices = torch.topk(proto_to_class[i,:], 3)[1]
+                top_3_percentages = [proto_to_class[i,k]/torch.sum(proto_to_class[i,:]) for k in top_3_indices]
+                table_list.append([i, top_3_indices[0], top_3_percentages[0], top_3_indices[1], top_3_percentages[1], top_3_indices[2], top_3_percentages[2]])
+            table_columns = ["prototype", "top1_proto", "top1_%", "top2_proto", "top2_%", "top3_proto", "top3_%"]
+            table = wandb.Table(data=table_list, columns=table_columns)
+            wandb.log({"Prototypes_table": table})
+
             # delete model and trainer + free up cuda memory
             del benchmark_model
             torch.cuda.empty_cache()
