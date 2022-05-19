@@ -624,7 +624,7 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         
         # sample neighbors, similarities with the sampled negatives and the cluster 
         # assignements of the original Z
-        _, x0_neg = self.nn_replacer(z0.detach(), y, epoch=self.current_epoch, update=False) 
+        pos0, x0_neg = self.nn_replacer(z0.detach(), y, epoch=self.current_epoch, update=False) 
         _, p0_neg = self.nn_replacer(p0.detach(), y, epoch=self.current_epoch, update=False) 
 
         _, x1_neg = self.nn_replacer(z1.detach(), y, epoch=self.current_epoch, update=True)
@@ -636,8 +636,7 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         _, _, c_loss1 = self.criterion(z1, p0, _, _, torch.cat((x1_neg, p0_neg), dim=1))
         loss = 0.5 * (c_loss0 + c_loss1)
 
-        ipdb.set_trace()
-            
+        ipdb.set_trace()            
             
         # log loss and return
         self.log('train_loss_ssl', loss)
