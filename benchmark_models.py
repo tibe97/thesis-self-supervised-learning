@@ -632,8 +632,11 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
 
 
         _, _, c_loss0 = self.criterion(z0, p1, _, _, torch.cat((x0_neg, p1_neg), dim=1)) # return swav_loss for the plots
+        _, _, c_loss0_check = self.criterion(z0, p1, _, _, None) 
         _, _, c_loss1 = self.criterion(z1, p0, _, _, torch.cat((x1_neg, p0_neg), dim=1))
         loss = 0.5 * (c_loss0 + c_loss1)
+
+        ipdb.set_trace()
             
             
         # log loss and return
