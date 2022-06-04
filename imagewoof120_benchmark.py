@@ -201,7 +201,7 @@ for batch_size in batch_sizes:
             logger = WandbLogger(project="ssl_imagewoof120_validation")  
             logger.log_hyperparams(params=params_dict)
 
-            logger.watch(benchmark_model.model) # log gradients
+            #logger.watch(benchmark_model.model) # log gradients
             trainer = pl.Trainer(max_epochs=max_epochs, 
                                 gpus=gpus,
                                 logger=logger,
