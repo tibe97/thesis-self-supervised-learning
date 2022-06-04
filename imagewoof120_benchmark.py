@@ -23,6 +23,7 @@ from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 from torchvision.datasets import ImageFolder
 import lightly
+from lightly.data.collate import MoCoCollateFunction
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
@@ -167,8 +168,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["PosMining_FalseNegRemove_TrueLabels"]
-models = [PosMining_FalseNegRemove_TrueLabels]
+model_names = ["MoCo_256"]
+models = [MocoModel]
 
 
 bench_results = []
