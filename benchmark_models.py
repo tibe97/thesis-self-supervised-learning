@@ -55,7 +55,7 @@ class MocoModel(BenchmarkModule):
         #self.resnet_moco = \
         #    lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, m=0.99, batch_shuffle=True)
         self.resnet_moco = \
-            lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, m=0, batch_shuffle=True) # No momentum update
+            lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, m=0.5, batch_shuffle=True) # No momentum update
         # create our loss with the optional memory bank
         self.criterion = lightly.loss.NTXentLoss(
             temperature=0.1,
