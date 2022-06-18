@@ -22,8 +22,8 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 num_workers = 12
-#memory_bank_size = 4096
-memory_bank_size = 1024 # try Moco with smaller mem bank
+memory_bank_size = 4096
+
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 knn_k = 200
 knn_t = 0.1
@@ -52,8 +52,10 @@ class MocoModel(BenchmarkModule):
         )
 
         # create a moco model based on ResNet
+        #self.resnet_moco = \
+        #    lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, m=0.99, batch_shuffle=True)
         self.resnet_moco = \
-            lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, m=0.99, batch_shuffle=True)
+            lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, m=0, batch_shuffle=True) # No momentum update
         # create our loss with the optional memory bank
         self.criterion = lightly.loss.NTXentLoss(
             temperature=0.1,
