@@ -627,16 +627,16 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         
         # sample neighbors, similarities with the sampled negatives and the cluster 
         # assignements of the original Z
-        pos0, x0_neg = self.nn_replacer(z0.detach(), y, epoch=self.current_epoch, update=False) 
+        _, z0_neg = self.nn_replacer(z0.detach(), y, epoch=self.current_epoch, update=False) 
         _, p0_neg = self.nn_replacer(p0.detach(), y, epoch=self.current_epoch, update=False) 
 
-        _, x1_neg = self.nn_replacer(z1.detach(), y, epoch=self.current_epoch, update=True)
+        _, z1_neg = self.nn_replacer(z1.detach(), y, epoch=self.current_epoch, update=True)
         _, p1_neg = self.nn_replacer(p1.detach(), y, epoch=self.current_epoch, update=False) 
 
 
-        _, _, c_loss0 = self.criterion(z0, p1, _, _, torch.cat((x0_neg, p1_neg), dim=1)) # return swav_loss for the plots
+        _, _, c_loss0 = self.criterion(z0, p1, _, _, torch.cat((z0_neg, p1_neg), dim=1)) # return swav_loss for the plots
         _, _, c_loss0_check = self.criterion(z0, p1, _, _, None) 
-        _, _, c_loss1 = self.criterion(z1, p0, _, _, torch.cat((x1_neg, p0_neg), dim=1))
+        _, _, c_loss1 = self.criterion(z1, p0, _, _, torch.cat((z1_neg, p0_neg), dim=1))
         loss = 0.5 * (c_loss0 + c_loss1)
 
         ipdb.set_trace()            

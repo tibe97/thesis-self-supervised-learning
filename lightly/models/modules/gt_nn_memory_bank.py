@@ -114,8 +114,8 @@ class GTNNMemoryBankModule(MemoryBankModule):
                     
                     neg = torch.cat((neg, torch.index_select(bank_normed, dim=0, index=idx_bank_negatives[torch.randperm(len(idx_bank_negatives))[:num_false_negatives]])), dim=0)
                 """
+                
                 # Debug: just append the batch without touching it
-
                 neg = torch.cat((output_normed[:i], output_normed[i+1:]))
                 negatives.append(neg)
 
