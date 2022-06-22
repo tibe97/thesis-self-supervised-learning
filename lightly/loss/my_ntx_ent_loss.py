@@ -134,6 +134,7 @@ class MyNTXentLoss(MemoryBankModule):
             # so that it is maximized in relation to sim_neg
             logits = torch.cat([sim_pos, sim_neg], dim=1) / self.temperature
             labels = torch.zeros(logits.shape[0], device=device, dtype=torch.long)
+            ipdb.set_trace()
             
         else:
             # use other samples from batch as negatives
@@ -147,7 +148,7 @@ class MyNTXentLoss(MemoryBankModule):
             # The labels point from a sample in out_i to its equivalent in out_(1-i)
             labels = torch.arange(batch_size, device=device, dtype=torch.long)
             labels = torch.cat([labels + batch_size - 1, labels])
-        
+            ipdb.set_trace()
 
         
         
