@@ -117,6 +117,7 @@ class MyNTXentLoss(MemoryBankModule):
             # sim_pos is of shape (batch_size, 1) and sim_pos[i] denotes the similarity
             # of the i-th sample in the batch to its positive pair
             sim_pos = torch.einsum('nc,nc->n', out0, out1).unsqueeze(-1).to(device)
+            sim_pos = torch.cat([sim_pos, torch.einsum('nc,nc->n', out1, out0).unsqueeze(-1).to(device)], dim=0)
 
             # Compute sim_neg with negatives. Problem: for each positive there are different negatives.
             # We can't use the same einsum. We can use batch matrix multiplication einsum:
