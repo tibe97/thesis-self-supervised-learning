@@ -639,7 +639,7 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
         _, _, c_loss1 = self.criterion(z1, p0, _, _, torch.cat((z1_neg, p0_neg), dim=1))
         loss = 0.5 * (c_loss0 + c_loss1)
 
-        #ipdb.set_trace()            
+        ipdb.set_trace()            
             
         # log loss and return
         self.log('train_loss_ssl', loss)
