@@ -371,7 +371,7 @@ class NNNModel_Pos(BenchmarkModule):
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
-                temperature: float=0.1,
+                temperature: float=0.5,
                 num_negatives: int=256,
                 add_swav_loss: bool=False,
                 false_negative_remove: bool=False,
