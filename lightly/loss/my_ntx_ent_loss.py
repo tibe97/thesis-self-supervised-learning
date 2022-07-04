@@ -158,11 +158,12 @@ class MyNTXentLoss(MemoryBankModule):
         loss = contrastive_loss
         swav_loss = None
         
-        alpha = torch.tensor(1.0) # swav_loss influence on the overall loss
+        #alpha = torch.tensor(1.0) # swav_loss influence on the overall loss
         if self.add_swav_loss and q0_assign is not None: # and negatives is not None: 
             p1 = self.softmax(q1 / self.temperature)
             swav_loss = - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))
-            loss += alpha * swav_loss
+            #loss += alpha * swav_loss
+            loss += swav_loss
             
         return loss, swav_loss, contrastive_loss
 
