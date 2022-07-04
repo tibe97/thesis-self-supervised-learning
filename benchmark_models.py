@@ -460,7 +460,7 @@ class PosMining_TrueLabels(BenchmarkModule):
                 warmup_epochs: int=0, 
                 max_epochs: int=400, 
                 mem_size: int=2048,
-                temperature: float=0.1,
+                temperature: float=0.5,
                 num_negatives: int=256,
                 false_negative_remove: bool=True):
                 

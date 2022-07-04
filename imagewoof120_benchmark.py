@@ -39,7 +39,7 @@ num_workers = 12
 memory_bank_size = 4096
 
 my_nn_memory_bank_size = 4096
-temperature=0.1
+temperature=0.5
 warmup_epochs=0
 
 nmb_prototypes=120
@@ -168,7 +168,7 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN_Pos"]
+model_names = ["PosMining_TrueLabels"]
 models = [PosMining_TrueLabels]
 
 
