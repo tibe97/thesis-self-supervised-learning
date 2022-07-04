@@ -36,9 +36,9 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, NegMini
 
 
 num_workers = 12
-memory_bank_size = 4096
+memory_bank_size = 2048
 
-my_nn_memory_bank_size = 4096
+my_nn_memory_bank_size = 2048
 temperature=0.5
 warmup_epochs=0
 
