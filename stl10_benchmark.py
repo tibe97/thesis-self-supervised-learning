@@ -159,8 +159,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["SwAVModel"]
-models = [SwAVModel]
+model_names = ["NNN_Neg"]
+models = [NNNModel_Neg]
 
 
 bench_results = []
@@ -173,7 +173,7 @@ for batch_size in batch_sizes:
         for seed in range(n_runs):
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
-            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes, max_epochs=max_epochs)
+            benchmark_model = BenchmarkModel(dataloader_train_kNN, classes, max_epochs=max_epochs, temperature=temperature)
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg"]:
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
