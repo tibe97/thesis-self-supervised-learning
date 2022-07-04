@@ -43,7 +43,7 @@ temperature=0.5
 warmup_epochs=0
 
 nmb_prototypes=120
-num_negatives=512
+num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
 false_negative_remove = False
