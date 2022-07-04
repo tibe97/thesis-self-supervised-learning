@@ -39,11 +39,11 @@ num_workers = 12
 memory_bank_size = 4096
 
 my_nn_memory_bank_size = 4096
-temperature=0.5
+temperature=0.1
 warmup_epochs=0
 
 nmb_prototypes=120
-num_negatives=256
+num_negatives=512
 use_sinkhorn = True
 add_swav_loss = True
 false_negative_remove = False
@@ -168,8 +168,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["MoCo_256"]
-models = [MocoModel]
+model_names = ["NNN_Pos"]
+models = [PosMining_TrueLabels]
 
 
 bench_results = []
