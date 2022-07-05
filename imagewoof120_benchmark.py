@@ -183,7 +183,7 @@ for batch_size in batch_sizes:
             pl.seed_everything(seed)
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes, max_epochs=max_epochs, temperature=temperature)
-            if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove", "SupervisedClustering", "SwAV"]:
+            if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove", "SupervisedClustering"]:
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
                                                 max_epochs,
