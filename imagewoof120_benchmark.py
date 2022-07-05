@@ -45,7 +45,7 @@ warmup_epochs=0
 nmb_prototypes=120
 num_negatives=256
 use_sinkhorn = True
-add_swav_loss = True
+add_swav_loss = False
 false_negative_remove = False
 soft_neg = False
 
@@ -168,8 +168,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["SwAV"]
-models = [SwAVModel]
+model_names = ["NNN_Pos"]
+models = [NNNModel_Pos]
 
 
 bench_results = []

@@ -435,7 +435,8 @@ class NNNModel_Pos(BenchmarkModule):
 
             loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
             loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, None)
-            loss = 0.5 * (loss0 + loss1)
+            #loss = 0.5 * (loss0 + loss1)
+            loss = 0.5 * (c_loss0 + c_loss1)
             # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
             #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
             if swav_loss1 is not None:
@@ -766,7 +767,7 @@ class SwAVModel(BenchmarkModule):
     def __init__(self, dataloader_kNN, 
                 num_classes, 
                 warmup_epochs: int=0,
-                max_epochs: int=800, 
+                max_epochs: int=400, 
                 nmb_prototypes: int=120, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
@@ -787,8 +788,8 @@ class SwAVModel(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=True, false_neg_remove=False, soft_neg=False)
-        #self.criterion = lightly.loss.NTXentLoss()
-        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=True)
+        self.criterion = lightly.loss.NTXentLoss()
+        #self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=True)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
         self.max_epochs = max_epochs
