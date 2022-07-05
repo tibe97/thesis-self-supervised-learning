@@ -23,7 +23,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 num_workers = 12
-memory_bank_size = 4096
+memory_bank_size = 1024
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 knn_k = 200
@@ -70,6 +70,55 @@ class MocoModel(BenchmarkModule):
         # https://colab.research.google.com/github/facebookresearch/moco/blob/colab-notebook/colab/moco_cifar10_demo.ipynb
         loss_1 = self.criterion(*self.resnet_moco(x0, x1))
         loss_2 = self.criterion(*self.resnet_moco(x1, x0))
+        loss = 0.5 * (loss_1 + loss_2)
+        self.log('train_loss_ssl', loss)
+        return loss
+
+    def configure_optimizers(self):
+        optim = torch.optim.SGD(self.resnet_moco.parameters(), lr=6e-2,
+                                momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
+        return [optim], [scheduler]
+
+class Moco_NNCLR_Model(BenchmarkModule):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
+        super().__init__(dataloader_kNN, num_classes)
+        # create a ResNet backbone and remove the classification head
+        #resnet = lightly.models.ResNetGenerator('resnet-18', num_splits=8)
+        #s#elf.backbone = nn.Sequential(
+        #    *list(resnet.children())[:-1],
+        #    nn.AdaptiveAvgPool2d(1),
+        #)
+        self.max_epochs = max_epochs
+        resnet = torchvision.models.resnet18()
+        last_conv_channels = list(resnet.children())[-1].in_features
+        self.backbone = nn.Sequential(
+            *list(resnet.children())[:-1],
+            nn.Conv2d(last_conv_channels, num_ftrs, 1),
+        )
+
+        # create a moco model based on ResNet
+        self.resnet_moco = \
+            lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, m=0.99, batch_shuffle=True)
+        
+        # create our loss with the optional memory bank
+        self.criterion = lightly.loss.NTXentLoss(
+            temperature=0.1,
+            memory_bank_size=memory_bank_size)
+        
+        self.nn_replacer = NNMemoryBankModule(size=nn_size)
+
+    def forward(self, x):
+        self.resnet_moco(x)
+
+    def training_step(self, batch, batch_idx):
+        (x0, x1), _, _ = batch
+        # We use a symmetric loss (model trains faster at little compute overhead)
+        # https://colab.research.google.com/github/facebookresearch/moco/blob/colab-notebook/colab/moco_cifar10_demo.ipynb
+        z0 = self.nn_replacer(x0.detach(), update=False)
+        z1 = self.nn_replacer(x1.detach(), update=True)
+        loss_1 = self.criterion(*self.resnet_moco(z0, x1))
+        loss_2 = self.criterion(*self.resnet_moco(z1, x0))
         loss = 0.5 * (loss_1 + loss_2)
         self.log('train_loss_ssl', loss)
         return loss
