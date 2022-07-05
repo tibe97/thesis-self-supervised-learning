@@ -289,11 +289,13 @@ class NNNModel_Neg(BenchmarkModule):
         if self.current_epoch > self.warmup_epochs-1:
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
-            _, neg0, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
-            _, neg1, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=True)
+            _, z0_neg, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
+            _, z1_neg, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=True)
+            _, p0_neg, q0_assign, _ = self.nn_replacer(p0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
+            _, p1_neg, q1_assign, _ = self.nn_replacer(p1.detach(), self.num_negatives, epoch=self.current_epoch, update=False)
 
-            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, neg1) # return swav_loss for the plots
-            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, neg0)
+            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, torch.cat((z0_neg, p1_neg), dim=1)) # return swav_loss for the plots
+            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, torch.cat((z1_neg, p0_neg), dim=1))
             loss = 0.5 * (loss0 + loss1)
             # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
             #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
