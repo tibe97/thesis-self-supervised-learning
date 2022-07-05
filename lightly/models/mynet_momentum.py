@@ -281,6 +281,7 @@ class MyNet_Momentum(nn.Module, _MomentumEncoderMixin):
 
         
     def on_after_backward(self):
+        ipdb.set_trace()
         for name, p in self.named_parameters():
             if "prototypes_layer" in name:
                 ipdb.set_trace() # check that it deletes gradients
