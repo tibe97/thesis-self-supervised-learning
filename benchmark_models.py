@@ -772,6 +772,7 @@ class SwAVModel(BenchmarkModule):
                 use_sinkhorn: bool=True,
                 temperature: float=0.5,
                 num_negatives: int=256,
+                soft_neg: bool=False,
                 add_swav_loss: bool=True):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
