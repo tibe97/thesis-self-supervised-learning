@@ -748,9 +748,8 @@ class NNNModel_Neg_Momentum(BenchmarkModule):
         self.log('train_loss_ssl', loss)
 
         for name, p in self.model.named_parameters():
-           
             if "prototypes_layer" in name:
-                ipdb.set_trace() # check that it deletes gradients
+                #ipdb.set_trace() # check that it deletes gradients
                 p.grad = None
 
         return loss
