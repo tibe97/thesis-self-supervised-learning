@@ -747,10 +747,7 @@ class NNNModel_Neg_Momentum(BenchmarkModule):
         # log loss and return
         self.log('train_loss_ssl', loss)
 
-        for name, p in self.model.named_parameters():
-            if "prototypes_layer" in name:
-                #ipdb.set_trace() # check that it deletes gradients
-                p.grad = None
+        self.model.on_after_backward()
 
         return loss
 
@@ -773,7 +770,7 @@ class SwAVModel(BenchmarkModule):
                 nmb_prototypes: int=30, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
-                temperature: float=0.1,
+                temperature: float=0.5,
                 num_negatives: int=256,
                 add_swav_loss: bool=True):
         super().__init__(dataloader_kNN, num_classes)
@@ -805,7 +802,6 @@ class SwAVModel(BenchmarkModule):
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
             
-
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
@@ -815,7 +811,7 @@ class SwAVModel(BenchmarkModule):
             # sample neighbors, similarities with the sampled negatives and the cluster 
             # assignements of the original Z
             _, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
-            _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=True)
+            _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=False)
 
             _, swav_loss0, _ = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
             _, swav_loss1, _ = self.criterion(z1, p0, q1_assign, q0, None)
@@ -835,6 +831,9 @@ class SwAVModel(BenchmarkModule):
             self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         # log loss and return
         self.log('train_loss_ssl', loss)
+
+        self.model.on_after_backward()
+
         return loss
 
     def configure_optimizers(self):
