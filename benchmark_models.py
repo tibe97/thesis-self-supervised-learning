@@ -81,7 +81,7 @@ class MocoModel(BenchmarkModule):
         return [optim], [scheduler]
 
 class Moco_NNCLR_Model(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400, temperature=0.1):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         #resnet = lightly.models.ResNetGenerator('resnet-18', num_splits=8)
