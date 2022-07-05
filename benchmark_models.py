@@ -746,6 +746,13 @@ class NNNModel_Neg_Momentum(BenchmarkModule):
             self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         # log loss and return
         self.log('train_loss_ssl', loss)
+
+        for name, p in self.model.named_parameters():
+            ipdb.set_trace()
+            if "prototypes_layer" in name:
+                ipdb.set_trace() # check that it deletes gradients
+                p.grad = None
+
         return loss
 
     def configure_optimizers(self):
