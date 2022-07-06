@@ -788,8 +788,7 @@ class SwAVModel(BenchmarkModule):
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
         
         self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=True, false_neg_remove=False, soft_neg=False)
-        self.criterion = lightly.loss.NTXentLoss()
-        #self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=True)
+        self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=True)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
         self.max_epochs = max_epochs
@@ -809,32 +808,22 @@ class SwAVModel(BenchmarkModule):
         # forward pass of the transformations
         (z0, p0, q0), (z1, p1, q1) = self.model(x0, x1)
         # calculate loss for NNCLR
-        if self.current_epoch > self.warmup_epochs-1:
-            # sample neighbors, similarities with the sampled negatives and the cluster 
-            # assignements of the original Z
-            _, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
-            _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=False)
+        
+        # sample neighbors, similarities with the sampled negatives and the cluster 
+        # assignements of the original Z
+        _, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, epoch=self.current_epoch, update=False) 
+        _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, epoch=self.current_epoch, update=False)
 
-            _, swav_loss0, _ = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
-            _, swav_loss1, _ = self.criterion(z1, p0, q1_assign, q0, None)
-            loss = 0.5 * (swav_loss0 + swav_loss1)
-            if swav_loss1 is not None:
-                self.log('train_swav_loss', loss)
-        else:
-            # warming up with classical instance discrimination of same augmented image
-            _, _, q0_assign, _ = self.nn_replacer(z0.detach(), self.num_negatives, update=False) 
-            _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, update=False)
-
-            # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
-            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
-            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, None)
-            loss = 0.5 * (loss0 + loss1)
-            self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
-            self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
+        _, swav_loss0, _ = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
+        _, swav_loss1, _ = self.criterion(z1, p0, q1_assign, q0, None)
+        loss = 0.5 * (swav_loss0 + swav_loss1)
+        if swav_loss1 is not None:
+            self.log('train_swav_loss', loss)
+        
         # log loss and return
         self.log('train_loss_ssl', loss)
 
-        self.model.on_after_backward()
+        #self.model.on_after_backward()
 
         return loss
 
