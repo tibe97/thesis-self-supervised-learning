@@ -771,7 +771,7 @@ class SwAVModel(BenchmarkModule):
                 max_epochs: int=400, 
                 nmb_prototypes: int=120, 
                 mem_size: int=2048,
-                use_sinkhorn: bool=True,
+                use_sinkhorn: bool=False,
                 temperature: float=0.1,
                 num_negatives: int=256,
                 soft_neg: bool=False,
@@ -788,7 +788,7 @@ class SwAVModel(BenchmarkModule):
         self.model = \
             MyNet(self.backbone, nmb_prototypes=nmb_prototypes, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=256)
         
-        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=True, false_neg_remove=False, soft_neg=False)
+        self.nn_replacer = MyNNMemoryBankModule(self.model, size=mem_size, gpus=gpus, use_sinkhorn=use_sinkhorn, false_neg_remove=False, soft_neg=False)
         self.criterion = MyNTXentLoss(temperature=temperature, num_negatives=num_negatives, add_swav_loss=True)
         self.warmup_epochs = warmup_epochs
         self.num_negatives = num_negatives
