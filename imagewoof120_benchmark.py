@@ -50,19 +50,6 @@ false_negative_remove = False
 soft_neg = False
 
 
-params_dict = dict({
-    "memory_bank_size": my_nn_memory_bank_size,
-    "temperature": temperature,
-    "warmup_epochs": warmup_epochs,
-    "nmb_prototypes": nmb_prototypes,
-    "num_negatives": num_negatives,
-    "use_sinkhorn": use_sinkhorn,
-    "add_swav_loss": add_swav_loss,
-    "false_negative_remove": false_negative_remove,
-    "soft_neg": soft_neg
-})
-
-
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 max_epochs = 800
@@ -76,6 +63,22 @@ nn_size=2 ** 16
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
 batch_sizes = [512]
+
+
+params_dict = dict({
+    "memory_bank_size": my_nn_memory_bank_size,
+    "temperature": temperature,
+    "warmup_epochs": warmup_epochs,
+    "nmb_prototypes": nmb_prototypes,
+    "num_negatives": num_negatives,
+    "use_sinkhorn": use_sinkhorn,
+    "add_swav_loss": add_swav_loss,
+    "false_negative_remove": false_negative_remove,
+    "soft_neg": soft_neg,
+    "batch_size": batch_sizes[0]
+})
+
+
 
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0

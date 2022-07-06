@@ -768,7 +768,7 @@ class SwAVModel(BenchmarkModule):
                 num_classes, 
                 warmup_epochs: int=0,
                 max_epochs: int=400, 
-                nmb_prototypes: int=120, 
+                nmb_prototypes: int=300, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
                 temperature: float=0.5,
@@ -828,7 +828,7 @@ class SwAVModel(BenchmarkModule):
         return loss
 
     def configure_optimizers(self):
-        optim = torch.optim.SGD(self.model.parameters(), lr=6e-3,
+        optim = torch.optim.SGD(self.model.parameters(), lr=6e-2,
                                 momentum=0.9, weight_decay=5e-4)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, self.max_epochs)
         return [optim], [scheduler]
