@@ -762,6 +762,7 @@ class NNNModel_Neg_Momentum(BenchmarkModule):
 class SwAVModel(BenchmarkModule):
     """
     SwAV from 'https://github.com/facebookresearch/swav/blob/main/main_swav.py' but without multi-crop augmentation.
+    https://github.com/Lightning-AI/lightning-bolts/blob/master/pl_bolts/models/self_supervised/swav/swav_module.py
     Scheduler and optimizer are the same of the other methods for ease of comparison, but in reality SwAV uses LARC optimizer.
     """
     def __init__(self, dataloader_kNN, 
@@ -771,7 +772,7 @@ class SwAVModel(BenchmarkModule):
                 nmb_prototypes: int=120, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
-                temperature: float=0.5,
+                temperature: float=0.1,
                 num_negatives: int=256,
                 soft_neg: bool=False,
                 add_swav_loss: bool=True):

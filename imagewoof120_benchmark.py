@@ -39,7 +39,7 @@ num_workers = 12
 memory_bank_size = 2048
 
 my_nn_memory_bank_size = 2048
-temperature=0.5
+temperature=0.1
 warmup_epochs=0
 
 nmb_prototypes=120
