@@ -768,7 +768,7 @@ class SwAVModel(BenchmarkModule):
                 num_classes, 
                 warmup_epochs: int=0,
                 max_epochs: int=400, 
-                nmb_prototypes: int=300, 
+                nmb_prototypes: int=120, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
                 temperature: float=0.5,
@@ -804,7 +804,7 @@ class SwAVModel(BenchmarkModule):
             w = torch.nn.functional.normalize(w, dim=1, p=2)
             self.model.prototypes_layer.weight.copy_(w)
         """ 
-           
+
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
