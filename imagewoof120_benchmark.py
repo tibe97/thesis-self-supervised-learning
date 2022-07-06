@@ -39,7 +39,7 @@ num_workers = 12
 memory_bank_size = 2048
 
 my_nn_memory_bank_size = 2048
-temperature=0.1
+temperature=0.5
 warmup_epochs=0
 
 nmb_prototypes=120
@@ -171,8 +171,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["SwAV"]
-models = [SwAVModel]
+model_names = ["NNN_Pos"]
+models = [NNNModel_Pos]
 
 
 bench_results = []

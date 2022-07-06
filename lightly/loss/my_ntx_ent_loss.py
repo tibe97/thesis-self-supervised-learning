@@ -60,6 +60,7 @@ class MyNTXentLoss(MemoryBankModule):
         self.num_negatives = num_negatives
         self.softmax = nn.Softmax(dim=1)
         self.add_swav_loss = add_swav_loss
+        self.temperature_swav = 0.1
 
         if abs(self.temperature) < self.eps:
             raise ValueError('Illegal temperature: abs({}) < 1e-8'
@@ -160,7 +161,7 @@ class MyNTXentLoss(MemoryBankModule):
         
         #alpha = torch.tensor(1.0) # swav_loss influence on the overall loss
         if self.add_swav_loss and q0_assign is not None: # and negatives is not None: 
-            p1 = self.softmax(q1 / self.temperature)
+            p1 = self.softmax(q1 / self.temperature_swav)
             swav_loss = - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))
             #loss += alpha * swav_loss
             loss += swav_loss
