@@ -38,7 +38,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, NegMini
 num_workers = 12
 memory_bank_size = 2048
 
-my_nn_memory_bank_size = 2048
+my_nn_memory_bank_size = 4096
 temperature=0.5
 warmup_epochs=0
 
@@ -62,7 +62,7 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [512]
+batch_sizes = [256]
 
 
 params_dict = dict({
@@ -171,8 +171,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN_Pos"]
-models = [NNNModel_Pos]
+model_names = ["NNN_Neg"]
+models = [NNNModel_Neg]
 
 
 bench_results = []
