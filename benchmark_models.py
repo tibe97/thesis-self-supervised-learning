@@ -370,7 +370,7 @@ class NNNModel_Pos(BenchmarkModule):
                 num_classes, 
                 warmup_epochs: int=0, 
                 max_epochs: int=400, 
-                nmb_prototypes: int=30, 
+                nmb_prototypes: int=120, 
                 mem_size: int=2048,
                 use_sinkhorn: bool=True,
                 temperature: float=0.5,
