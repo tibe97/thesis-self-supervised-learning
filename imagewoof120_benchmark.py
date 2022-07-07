@@ -43,7 +43,7 @@ temperature=0.5
 warmup_epochs=0
 
 nmb_prototypes=120
-num_negatives=255
+num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
 false_negative_remove = False
@@ -171,8 +171,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN_Neg"]
-models = [NNNModel_Neg]
+model_names = ["NNN_POs"]
+models = [NNNModel_Pos]
 
 
 bench_results = []
