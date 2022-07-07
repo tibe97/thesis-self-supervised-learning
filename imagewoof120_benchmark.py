@@ -38,9 +38,9 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, NegMini
 num_workers = 12
 memory_bank_size = 2048
 
-my_nn_memory_bank_size = 4096
+my_nn_memory_bank_size = 2048
 temperature=0.5
-warmup_epochs=20
+warmup_epochs=0
 
 nmb_prototypes=120
 num_negatives=256 # not used since it's computed as (batch_size-1)
@@ -62,7 +62,7 @@ nn_size=2 ** 16
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [256]
+batch_sizes = [512]
 
 
 params_dict = dict({
