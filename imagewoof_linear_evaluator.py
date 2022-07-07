@@ -15,6 +15,7 @@ from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from torchvision.transforms.transforms import CenterCrop
 from lightly.models.modules import my_nn_memory_bank
+from lightly.models.nnclr import NNCLR
 from lightly.utils import BenchmarkModule
 from lightly.models.modules import NNMemoryBankModule
 from lightly.models.mynet import MyNet
@@ -26,7 +27,7 @@ from lightly.linear_evaluation.ssl_finetuner import SSLFineTuner
 from lightly.linear_evaluation.transforms import SwAVFinetuneTransform
 from lightly.linear_evaluation.dataset_normalizations import imagenet_normalization, stl10_normalization
 from lightly.linear_evaluation.imagenet_datamodule import ImagenetDataModule
-
+from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, NegMining_TrueLabels, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, SupervisedClustering, SwAVModel, PosMining_TrueLabels, PosMining_FalseNegRemove_TrueLabels, NNNModel_Neg_Momentum, Moco_NNCLR_Model
 
 
 num_workers = 12
@@ -147,51 +148,13 @@ def get_data_loaders(batch_size: int):
 
 
 
-class MockupModel(pl.LightningModule):
-    def __init__(self):
-        super().__init__()
-        # create a ResNet backbone and remove the classification head
-        resnet = torchvision.models.resnet18()
-        last_conv_channels = list(resnet.children())[-1].in_features
-        self.backbone = nn.Sequential(
-            *list(resnet.children())[:-1],
-            nn.Conv2d(last_conv_channels, num_ftrs, 1),
-        )
-        # create a simclr model based on ResNet
-        self.resnet_simclr = \
-            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
-        self.criterion = lightly.loss.NTXentLoss()
-
-        self.nn_replacer = NNMemoryBankModule(size=nn_size)
-
-    def forward(self, x):
-        self.resnet_simclr(x)
-
-    def training_step(self, batch, batch_idx):
-        (x0, x1), _, _ = batch
-        (z0, p0), (z1, p1) = self.resnet_simclr(x0, x1)
-        z0 = self.nn_replacer(z0.detach(), update=False)
-        z1 = self.nn_replacer(z1.detach(), update=True)
-        loss = 0.5 * (self.criterion(z0, p1) + self.criterion(z1, p0))
-        self.log('train_loss_ssl', loss)
-        return loss
-
-    def configure_optimizers(self):
-        optim = torch.optim.SGD(self.resnet_simclr.parameters(), lr=6e-2,
-                                momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, max_epochs)
-        return [optim], [scheduler]
-
-
-
-
 def cli_main():  # pragma: no cover
 
     seed_everything(1234)
 
     parser = ArgumentParser()
     parser.add_argument('--dataset', type=str, help='stl10, imagenet', default='stl10')
-    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='lightly/linear_evaluation/epoch=799-step=28799.ckpt')
+    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/NNCLR.ckpt')
     parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
 
     parser.add_argument("--batch_size", default=64, type=int, help="batch size per gpu")
@@ -212,8 +175,8 @@ def cli_main():  # pragma: no cover
     args = parser.parse_args()
 
 
-    model_names = ["Mockup"]
-    models = [MockupModel]
+    model_names = ["NNCLR"]
+    models = [NNCLR]
 
     ckpt_path = args.ckpt_path
 
@@ -228,7 +191,7 @@ def cli_main():  # pragma: no cover
                 pl.seed_everything(seed)
                 dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
                 #benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, dataloader_train_kNN, dm.num_classes, strict=False)
-                benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
+                benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN)
 
 
                 logger = WandbLogger(project="ssl_linear_evaluation_imagewoof120")  
