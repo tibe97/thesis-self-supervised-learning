@@ -219,7 +219,8 @@ def cli_main():  # pragma: no cover
                     max_epochs=args.num_epochs,
                     distributed_backend=distributed_backend,
                     sync_batchnorm=True if gpus > 1 else False,
-                    logger=logger
+                    logger=logger,
+                    check_val_every_n_epoch=10
                 )
 
                 trainer.fit(tuner, train_dataloader=dataloader_train_kNN, val_dataloaders=dataloader_test)
