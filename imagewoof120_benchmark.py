@@ -202,16 +202,16 @@ for batch_size in batch_sizes:
                 """
                 benchmark_model = BenchmarkModel.load_from_checkpoint(
                                                 checkpoint_path=checkpoint_path,
-                                                dataloader_train_kNN, 
-                                                classes, warmup_epochs, 
-                                                max_epochs,
-                                                nmb_prototypes, 
-                                                my_nn_memory_bank_size, 
-                                                use_sinkhorn, 
-                                                temperature, 
-                                                batch_size-1, 
-                                                add_swav_loss,
-                                                false_negative_remove,
+                                                dataloader_kNN=dataloader_train_kNN, 
+                                                num_classes=classes,
+                                                warmup_epochs=warmup_epochs, 
+                                                max_epochs=max_epochs,
+                                                nmb_prototypes=nmb_prototypes, 
+                                                mem_size=my_nn_memory_bank_size, 
+                                                use_sinkhorn=use_sinkhorn, 
+                                                temperature=temperature, 
+                                                num_negatives=batch_size-1, 
+                                                add_swav_loss=add_swav_loss,
                                                 soft_neg=soft_neg)
            
 
