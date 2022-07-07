@@ -53,6 +53,10 @@ input_size=128
 num_ftrs=512
 nn_size=2 ** 16
 
+# benchmark
+n_runs = 1 # optional, increase to create multiple runs and report mean + std
+batch_sizes = [256]
+
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
     "temperature": temperature,
@@ -70,10 +74,6 @@ logs_root_dir = ('stl10_logs')
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
 
-
-# benchmark
-n_runs = 1 # optional, increase to create multiple runs and report mean + std
-batch_sizes = [256]
 
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0
