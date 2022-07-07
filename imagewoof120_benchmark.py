@@ -171,10 +171,10 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN_Neg"]
-models = [NNNModel_Neg]
+model_names = ["NNN_Pos"]
+models = [NNNModel_Pos]
 
-
+checkpoint_path = "checkpoints/ImageWoof120/pos_mining_epoch=380.ckpt"
 bench_results = []
 gpu_memory_usage = []
 
@@ -187,7 +187,22 @@ for batch_size in batch_sizes:
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes, max_epochs=max_epochs, temperature=temperature)
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg", "FalseNegRemove", "SupervisedClustering"]:
+                """
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
+                                                classes, warmup_epochs, 
+                                                max_epochs,
+                                                nmb_prototypes, 
+                                                my_nn_memory_bank_size, 
+                                                use_sinkhorn, 
+                                                temperature, 
+                                                batch_size-1, 
+                                                add_swav_loss,
+                                                false_negative_remove,
+                                                soft_neg=soft_neg)
+                """
+                benchmark_model = BenchmarkModel.load_from_checkpoint(
+                                                checkpoint_path=checkpoint_path,
+                                                dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
                                                 max_epochs,
                                                 nmb_prototypes, 
