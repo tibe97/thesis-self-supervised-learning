@@ -337,8 +337,6 @@ class NNNModel_Neg(BenchmarkModule):
             loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, torch.cat((z0_neg, p1_neg), dim=1)) # return swav_loss for the plots
             loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, torch.cat((z1_neg, p0_neg), dim=1))
             loss = 0.5 * (loss0 + loss1)
-            # loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, neg1) + self.criterion(z1, p0, q1_assign, q0, neg0))
-            #loss = 0.5 * (self.criterion(z0, p1, q0_assign, q1, None) + self.criterion(z1, p0, q1_assign, q0, None))
             if swav_loss1 is not None:
                 self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
             self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
@@ -348,11 +346,11 @@ class NNNModel_Neg(BenchmarkModule):
             _, _, q1_assign, _ = self.nn_replacer(z1.detach(), self.num_negatives, update=True)
 
             # q tensors are just placeholders, we use them for the SwAV loss only for Swapped Prediction Task
-            loss0, swav_loss0, c_loss0 = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
-            loss1, swav_loss1, c_loss1 = self.criterion(z1, p0, q1_assign, q0, None)
-            loss = 0.5 * (loss0 + loss1)
+            _, swav_loss0, _ = self.criterion(z0, p1, q0_assign, q1, None) # return swav_loss for the plots
+            _, swav_loss1, _ = self.criterion(z1, p0, q1_assign, q0, None)
+            loss = 0.5 * (swav_loss0 + swav_loss1)
             self.log('train_swav_loss', 0.5*(swav_loss0 + swav_loss1))
-            self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
+            #self.log('train_contrastive_loss', 0.5*(c_loss0 + c_loss1))
         # log loss and return
         self.log('train_loss_ssl', loss)
         return loss
@@ -404,15 +402,6 @@ class NNNModel_Pos(BenchmarkModule):
 
     def training_step(self, batch, batch_idx):
         
-        """
-        # Trying to place it before passing the inputs through the model
-        with torch.no_grad():
-            w = self.model.prototypes_layer.weight.data.clone()
-            w = torch.nn.functional.normalize(w, dim=1, p=2)
-            self.model.prototypes_layer.weight.copy_(w)
-            torch.autograd.set_detect_anomaly(True)
-        """
-
         # get the two image transformations
         (x0, x1), _, _ = batch
         # forward pass of the transformations
@@ -637,7 +626,6 @@ class PosMining_FalseNegRemove_TrueLabels(BenchmarkModule):
 
         z1, z1_neg = self.nn_replacer(z1.detach(), y, epoch=self.current_epoch, update=True)
         _, p1_neg = self.nn_replacer(p1.detach(), y, epoch=self.current_epoch, update=False) 
-
 
         _, _, c_loss0 = self.criterion(z0, p1, _, _, torch.cat((z0_neg, p1_neg), dim=1)) # return swav_loss for the plots
         #_, _, c_loss0_check = self.criterion(z0, p1, _, _, None) 

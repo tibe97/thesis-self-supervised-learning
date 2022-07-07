@@ -40,7 +40,7 @@ memory_bank_size = 2048
 
 my_nn_memory_bank_size = 4096
 temperature=0.5
-warmup_epochs=0
+warmup_epochs=20
 
 nmb_prototypes=120
 num_negatives=256
