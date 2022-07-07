@@ -43,7 +43,7 @@ temperature=0.5
 warmup_epochs=20
 
 nmb_prototypes=120
-num_negatives=256
+num_negatives=256 # not used since it's computed as (batch_size-1)
 use_sinkhorn = True
 add_swav_loss = True
 false_negative_remove = False

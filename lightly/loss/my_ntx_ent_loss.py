@@ -126,9 +126,7 @@ class MyNTXentLoss(MemoryBankModule):
             # Each positive becomes a sample indexed along "i", while the negatives for the i-th positive
             # are stacked in a matrix at the i-th index. At the end we have to reshape the result into a vector
             # We also have to prepare the tensor of negatives accordingly
-            
-            #sim_neg = torch.einsum('nzc,ncm->nzm', torch.unsqueeze(out0, 1), negatives)
-            #sim_neg = torch.squeeze(sim_neg, 1)
+        
             sim_neg = torch.einsum('nc,ncm->nm', out0, negatives)
             sim_neg = torch.cat([sim_neg, torch.einsum('nc,ncm->nm', out1, negatives)], dim=0)
       
@@ -163,7 +161,6 @@ class MyNTXentLoss(MemoryBankModule):
         if self.add_swav_loss and q0_assign is not None: # and negatives is not None: 
             p1 = self.softmax(q1 / self.temperature_swav)
             swav_loss = - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))
-            #loss += alpha * swav_loss
             loss += swav_loss
             
         return loss, swav_loss, contrastive_loss

@@ -38,12 +38,20 @@ memory_bank_size = 4096
 my_nn_memory_bank_size = 2048
 temperature=0.5
 warmup_epochs=0
-nmb_prototypes=100
+nmb_prototypes=30
 num_negatives=256
 use_sinkhorn = True
 add_swav_loss = True
 false_negative_remove = False
-soft_neg = True
+soft_neg = False
+
+max_epochs = 400
+knn_k = 200
+knn_t = 0.1
+classes = 10
+input_size=128
+num_ftrs=512
+nn_size=2 ** 16
 
 params_dict = dict({
     "memory_bank_size": my_nn_memory_bank_size,
@@ -54,19 +62,14 @@ params_dict = dict({
     "use_sinkhorn": use_sinkhorn,
     "add_swav_loss": add_swav_loss,
     "false_negative_remove": false_negative_remove,
-    "soft_neg": soft_neg
+    "soft_neg": soft_neg,
+    "batch_size": batch_sizes[0]
 })
 
 logs_root_dir = ('stl10_logs')
 
 # set max_epochs to 800 for long run (takes around 10h on a single V100)
-max_epochs = 400
-knn_k = 200
-knn_t = 0.1
-classes = 10
-input_size=128
-num_ftrs=512
-nn_size=2 ** 16
+
 
 # benchmark
 n_runs = 1 # optional, increase to create multiple runs and report mean + std
@@ -159,8 +162,8 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN_Neg"]
-models = [NNNModel_Neg]
+model_names = ["NNN_Pos"]
+models = [NNNModel_Pos]
 
 
 bench_results = []
@@ -182,7 +185,7 @@ for batch_size in batch_sizes:
                                                 my_nn_memory_bank_size, 
                                                 use_sinkhorn, 
                                                 temperature, 
-                                                num_negatives, 
+                                                batch_size-1, 
                                                 add_swav_loss,
                                                 false_negative_remove,
                                                 soft_neg=soft_neg)
