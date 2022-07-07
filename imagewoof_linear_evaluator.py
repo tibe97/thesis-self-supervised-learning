@@ -216,6 +216,16 @@ def cli_main():  # pragma: no cover
 
     ckpt_path = args.ckpt_path
 
+    params_dict = dict({
+        "ckpt_path": ckpt_path,
+        "batch_size": args.batch_size,
+        "num_epochs": args.num_epochs,
+        "learning_rate": args.learning_rate,
+        "gamma": args.gamma,
+        "final_lr": args.final_lr
+    })
+
+
     bench_results = []
     gpu_memory_usage = []
 

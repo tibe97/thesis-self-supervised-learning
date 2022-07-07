@@ -162,6 +162,7 @@ class MyNTXentLoss(MemoryBankModule):
             p1 = self.softmax(q1 / self.temperature_swav)
             swav_loss = - torch.mean(torch.sum(q0_assign * torch.log(p1), dim=1))
             loss += swav_loss
+            ipdb.set_trace()
             
         return loss, swav_loss, contrastive_loss
 
