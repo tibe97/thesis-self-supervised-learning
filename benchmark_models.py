@@ -377,7 +377,7 @@ class NNNModel_Pos(BenchmarkModule):
                 use_sinkhorn: bool=True,
                 temperature: float=0.5,
                 num_negatives: int=256,
-                add_swav_loss: bool=False,
+                add_swav_loss: bool=True,
                 false_negative_remove: bool=False,
                 soft_neg: bool=False):
         super().__init__(dataloader_kNN, num_classes)
