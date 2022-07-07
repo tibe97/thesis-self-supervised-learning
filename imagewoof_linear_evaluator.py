@@ -158,8 +158,8 @@ class MockupModel(pl.LightningModule):
             nn.Conv2d(last_conv_channels, num_ftrs, 1),
         )
         # create a simclr model based on ResNet
-        self.resnet_simclr = \
-            lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
+        #self.resnet_simclr = lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
+        self.resnet_simclr = lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs)
         self.criterion = lightly.loss.NTXentLoss()
 
         self.nn_replacer = NNMemoryBankModule(size=nn_size)
