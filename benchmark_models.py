@@ -30,7 +30,7 @@ knn_k = 200
 knn_t = 0.1
 classes = 10
 input_size=128
-num_ftrs=512
+num_ftrs=256
 nn_size=2 ** 16
 # use a GPU if available
 gpus = -1 if torch.cuda.is_available() else 0
