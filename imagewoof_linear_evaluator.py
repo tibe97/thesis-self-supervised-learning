@@ -214,7 +214,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["Mockup"]
-    models = [SwAVModel]
+    models = [PosMining_FalseNegRemove_TrueLabels]
 
     ckpt_path = args.ckpt_path
 
