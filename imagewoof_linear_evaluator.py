@@ -190,7 +190,7 @@ def cli_main():  # pragma: no cover
 
     parser = ArgumentParser()
     parser.add_argument('--dataset', type=str, help='stl10, imagenet', default='stl10')
-    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/MoCo.ckpt')
+    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/SimCLR.ckpt')
     parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
 
     parser.add_argument("--batch_size", default=256, type=int, help="batch size per gpu")
