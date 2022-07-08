@@ -191,7 +191,7 @@ def cli_main():  # pragma: no cover
 
     parser = ArgumentParser()
     parser.add_argument('--dataset', type=str, help='stl10, imagenet', default='stl10')
-    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/NNCLR.ckpt')
+    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/SwAV.ckpt')
     parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
 
     parser.add_argument("--batch_size", default=256, type=int, help="batch size per gpu")
@@ -213,7 +213,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["Mockup"]
-    models = [NNCLRModel]
+    models = [SwAVModel]
 
     ckpt_path = args.ckpt_path
 
