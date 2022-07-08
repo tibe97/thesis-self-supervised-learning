@@ -30,7 +30,7 @@ from lightly.models.modules.my_nn_memory_bank import MyNNMemoryBankModule
 from lightly.loss.my_ntx_ent_loss import MyNTXentLoss
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
-from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, SwAVModel
+from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, PosMining_TrueLabels, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, SwAVModel
 
 num_workers = 12
 memory_bank_size = 4096
@@ -152,7 +152,7 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
 """
 
 model_names = ["NNN_Pos"]
-models = [NNCLRModel]
+models = [PosMining_TrueLabels]
 checkpoint_path = "checkpoints/STL10/PosMining_Epoch200.ckpt"
 
 bench_results = []
@@ -167,7 +167,7 @@ for batch_size in batch_sizes:
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes, max_epochs=max_epochs, temperature=temperature)
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg"]:
-                """
+                
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
                                                 max_epochs,
@@ -193,7 +193,7 @@ for batch_size in batch_sizes:
                                                 num_negatives=batch_size-1, 
                                                 add_swav_loss=add_swav_loss,
                                                 soft_neg=soft_neg)
-
+                """
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="STL10_knn_validation")  
             logger.log_hyperparams(params=params_dict)
