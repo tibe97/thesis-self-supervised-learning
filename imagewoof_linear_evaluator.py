@@ -238,7 +238,7 @@ def cli_main():  # pragma: no cover
             for seed in range(n_runs):
                 pl.seed_everything(seed)
                 dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
-                benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, dataloader_train_kNN, dm.num_classes, strict=False)
+                benchmark_model = BenchmarkModel(dataloader_train_kNN, 120).load_from_checkpoint(ckpt_path, dataloader_train_kNN, 120, strict=False)
                 #benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=120, nmb_prototypes=nmb_prototypes)
                 #benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=10, strict=False)
                 #benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
