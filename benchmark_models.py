@@ -115,7 +115,7 @@ class SimCLRModel(BenchmarkModule):
         return [optim], [scheduler]
 
 class NNCLRModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400, temperature: float=0.5):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
