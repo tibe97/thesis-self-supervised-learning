@@ -153,7 +153,7 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
 
 model_names = ["NNN_Pos"]
 models = [NNNModel_Pos]
-
+checkpoint_path = "checkpoints/ImageWoof120/PosMining_Epoch200.ckpt"
 
 bench_results = []
 gpu_memory_usage = []
@@ -167,6 +167,7 @@ for batch_size in batch_sizes:
             dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
             benchmark_model = BenchmarkModel(dataloader_train_kNN, classes, max_epochs=max_epochs, temperature=temperature)
             if model_name in ["NNN", "NNN_Pos", "NNN_Neg"]:
+                """
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 
                                                 classes, warmup_epochs, 
                                                 max_epochs,
@@ -177,6 +178,20 @@ for batch_size in batch_sizes:
                                                 batch_size-1, 
                                                 add_swav_loss,
                                                 false_negative_remove,
+                                                soft_neg=soft_neg)
+                """
+                benchmark_model = BenchmarkModel.load_from_checkpoint(
+                                                checkpoint_path=checkpoint_path,
+                                                dataloader_kNN=dataloader_train_kNN, 
+                                                num_classes=classes,
+                                                warmup_epochs=warmup_epochs, 
+                                                max_epochs=max_epochs,
+                                                nmb_prototypes=nmb_prototypes, 
+                                                mem_size=my_nn_memory_bank_size, 
+                                                use_sinkhorn=use_sinkhorn, 
+                                                temperature=temperature, 
+                                                num_negatives=batch_size-1, 
+                                                add_swav_loss=add_swav_loss,
                                                 soft_neg=soft_neg)
 
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
