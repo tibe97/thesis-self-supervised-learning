@@ -115,7 +115,7 @@ class SimCLRModel(BenchmarkModule):
         return [optim], [scheduler]
 
 class NNCLRModel(BenchmarkModule):
-    def __init__(self, dataloader_kNN, num_classes):
+    def __init__(self, dataloader_kNN, num_classes, max_epochs: int=400):
         super().__init__(dataloader_kNN, num_classes)
         # create a ResNet backbone and remove the classification head
         resnet = torchvision.models.resnet18()
@@ -130,6 +130,7 @@ class NNCLRModel(BenchmarkModule):
         self.criterion = lightly.loss.NTXentLoss()
 
         self.nn_replacer = NNMemoryBankModule(size=nn_size)
+        self.max_epochs=max_epochs
 
     def forward(self, x):
         self.resnet_simclr(x)
