@@ -243,9 +243,10 @@ def cli_main():  # pragma: no cover
                 #benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=10, strict=False)
                 benchmark_model = BenchmarkModel(dataloader_train_kNN, 120)
                 #benchmarck_model = BenchmarkModel()
+                checkpoint = torch.load(ckpt_path)
                 logger = WandbLogger(project="ssl_linear_evaluation_imagewoof120")  
                 logger.log_hyperparams(params=params_dict)
-                benchmark_model.backbone.load_state_dict(ckpt_path, strict=False)
+                benchmark_model.backbone.load_state_dict(checkpoint, strict=False)
                 tuner = SSLFineTuner(
                     benchmark_model.backbone,
                     in_features=args.in_features,
