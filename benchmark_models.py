@@ -174,7 +174,7 @@ class NNCLRModel(BenchmarkModule):
         )
         # create a simclr model based on ResNet
         self.resnet_simclr = \
-            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
+            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=1)
         self.criterion = lightly.loss.NTXentLoss()
 
         self.nn_replacer = NNMemoryBankModule(size=nn_size)
