@@ -171,7 +171,7 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN_Pos"]
+model_names = ["TrueLabels"]
 models = [NNNModel_Pos]
 
 checkpoint_path = "checkpoints/ImageWoof120/pos_mining_epoch=380.ckpt"
