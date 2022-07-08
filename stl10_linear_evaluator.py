@@ -219,7 +219,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["Mockup"]
-    models = [SwAVModel]
+    models = [SimCLRModel]
 
     ckpt_path = args.ckpt_path
 
