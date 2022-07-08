@@ -151,7 +151,7 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
 
-model_names = ["NNN_Pos"]
+model_names = ["PosMining_True"]
 models = [PosMining_TrueLabels]
 checkpoint_path = "checkpoints/STL10/PosMining_Epoch200.ckpt"
 
