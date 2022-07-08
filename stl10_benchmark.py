@@ -153,7 +153,7 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
 
 model_names = ["NNN_Pos"]
 models = [NNNModel_Pos]
-checkpoint_path = "checkpoints/ImageWoof120/PosMining_Epoch200.ckpt"
+checkpoint_path = "checkpoints/STL10/PosMining_Epoch200.ckpt"
 
 bench_results = []
 gpu_memory_usage = []
