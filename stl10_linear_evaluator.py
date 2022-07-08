@@ -163,8 +163,8 @@ class MockupModel(pl.LightningModule):
             nn.Conv2d(last_conv_channels, num_ftrs, 1),
         )
         # create a simclr model based on ResNet
-        self.resnet_simclr = lightly.models.SimCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
-        #self.resnet_simclr = lightly.models.SimCLR(self.backbone, num_ftrs=num_ftrs)
+        #self.resnet_simclr = lightly.models.SimCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
+        self.resnet_simclr = lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs)
         #self.resnet_simclr = lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs)
         self.criterion = lightly.loss.NTXentLoss()
 
@@ -219,7 +219,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["Mockup"]
-    models = [SimCLRModel]
+    models = [Mo]
 
     ckpt_path = args.ckpt_path
 
