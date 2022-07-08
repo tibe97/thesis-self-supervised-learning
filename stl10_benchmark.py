@@ -152,7 +152,7 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
 """
 
 model_names = ["NNN_Pos"]
-models = [NNNModel_Pos]
+models = [NNCLRModel]
 checkpoint_path = "checkpoints/STL10/PosMining_Epoch200.ckpt"
 
 bench_results = []
