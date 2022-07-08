@@ -159,7 +159,8 @@ class MockupModel(pl.LightningModule):
         )
         # create a simclr model based on ResNet
         #self.resnet_simclr = lightly.models.MoCo(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2)
-        self.resnet_simclr = lightly.models.SimCLR(self.backbone, num_ftrs=num_ftrs)
+        #self.resnet_simclr = lightly.models.SimCLR(self.backbone, num_ftrs=num_ftrs)
+        self.resnet_simclr = lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs)
         self.criterion = lightly.loss.NTXentLoss()
 
         self.nn_replacer = NNMemoryBankModule(size=nn_size)
@@ -190,7 +191,7 @@ def cli_main():  # pragma: no cover
 
     parser = ArgumentParser()
     parser.add_argument('--dataset', type=str, help='stl10, imagenet', default='stl10')
-    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/SimCLR.ckpt')
+    parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/NNCLR.ckpt')
     parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
 
     parser.add_argument("--batch_size", default=256, type=int, help="batch size per gpu")
