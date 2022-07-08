@@ -200,6 +200,7 @@ def cli_main():  # pragma: no cover
     parser.add_argument('--num_epochs', default=100, type=int, help="number of epochs")
 
     # fine-tuner params
+    parser.add_argument('--protos', default=120, type=int, help="protos")
     parser.add_argument('--in_features', type=int, default=512)
     parser.add_argument('--dropout', type=float, default=0.)
     parser.add_argument('--learning_rate', type=float, default=0.3)
@@ -238,7 +239,7 @@ def cli_main():  # pragma: no cover
                 pl.seed_everything(seed)
                 dataloader_train_ssl, dataloader_train_kNN, dataloader_test = get_data_loaders(batch_size)
                 #benchmark_model = BenchmarkModel(dataloader_train_kNN, dm.num_classes).load_from_checkpoint(ckpt_path, dataloader_train_kNN, dm.num_classes, strict=False)
-                benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=120)
+                benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=120, nmb_prototypes=)
                 #benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
 
                 logger = WandbLogger(project="ssl_linear_evaluation_imagewoof120")  
