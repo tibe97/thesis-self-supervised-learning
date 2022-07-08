@@ -214,7 +214,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["Mockup"]
-    models = [PosMining_FalseNegRemove_TrueLabels]
+    models = [NNNModel_Pos]
 
     ckpt_path = args.ckpt_path
 
