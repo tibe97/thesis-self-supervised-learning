@@ -138,7 +138,7 @@ class NNCLR(nn.Module):
         self.out_dim = out_dim
 
         self.projection_mlp = \
-            _projection_mlp(num_ftrs, proj_hidden_dim, out_dim, num_mlp_layers)
+            _projection_mlp(num_ftrs, proj_hidden_dim, 2*out_dim, num_mlp_layers)
         
         self.prediction_mlp = \
             _prediction_mlp(out_dim, pred_hidden_dim, out_dim)
