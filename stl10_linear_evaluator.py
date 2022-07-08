@@ -205,7 +205,7 @@ def cli_main():  # pragma: no cover
     parser.add_argument('--num_epochs', default=100, type=int, help="number of epochs")
 
     # fine-tuner params
-    parser.add_argument('--protos', default=120, type=int, help="protos")
+    parser.add_argument('--protos', default=60, type=int, help="protos")
     parser.add_argument('--in_features', type=int, default=512)
     parser.add_argument('--dropout', type=float, default=0.)
     parser.add_argument('--learning_rate', type=float, default=0.3)
