@@ -214,7 +214,7 @@ def cli_main():  # pragma: no cover
 
 
     model_names = ["Mockup"]
-    models = [NNCLR]
+    models = [NNCLRModel]
 
     ckpt_path = args.ckpt_path
 
