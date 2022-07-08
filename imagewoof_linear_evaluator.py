@@ -245,7 +245,7 @@ def cli_main():  # pragma: no cover
                 #benchmarck_model = BenchmarkModel()
                 logger = WandbLogger(project="ssl_linear_evaluation_imagewoof120")  
                 logger.log_hyperparams(params=params_dict)
-                benchmarck_model.backbone.load_state_dict(ckpt_path)
+                benchmark_model.backbone.load_state_dict(ckpt_path)
                 tuner = SSLFineTuner(
                     benchmark_model.backbone,
                     in_features=args.in_features,
