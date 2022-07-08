@@ -241,11 +241,11 @@ def cli_main():  # pragma: no cover
                 #benchmark_model = BenchmarkModel.load_from_checkpoint(ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=120, strict=False)
                 #benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=120, nmb_prototypes=nmb_prototypes)
                 #benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=10, strict=False)
-                #benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
-                benchmarck_model = BenchmarkModel()
+                benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
+                #benchmarck_model = BenchmarkModel()
                 logger = WandbLogger(project="ssl_linear_evaluation_imagewoof120")  
                 logger.log_hyperparams(params=params_dict)
-                benchmarck_model.backbone.load_state_dict(ckpt_path)
+                #benchmarck_model.backbone.load_state_dict(ckpt_path)
                 tuner = SSLFineTuner(
                     benchmark_model.backbone,
                     in_features=args.in_features,
