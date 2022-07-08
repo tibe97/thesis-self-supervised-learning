@@ -194,7 +194,7 @@ def cli_main():  # pragma: no cover
     parser.add_argument('--ckpt_path', type=str, help='path to ckpt', default='checkpoints/ImageWoof120/NNCLR.ckpt')
     parser.add_argument('--data_dir', type=str, help='path to dataset', default=os.getcwd())
 
-    parser.add_argument("--batch_size", default=256, type=int, help="batch size per gpu")
+    parser.add_argument("--batch_size", default=512, type=int, help="batch size per gpu")
     parser.add_argument("--num_workers", default=12, type=int, help="num of workers per GPU")
     parser.add_argument("--gpus", default=1, type=int, help="number of GPUs")
     parser.add_argument('--num_epochs', default=100, type=int, help="number of epochs")
