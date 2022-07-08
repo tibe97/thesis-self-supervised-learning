@@ -28,7 +28,7 @@ from lightly.linear_evaluation.ssl_finetuner import SSLFineTuner
 from lightly.linear_evaluation.transforms import SwAVFinetuneTransform
 from lightly.linear_evaluation.dataset_normalizations import imagenet_normalization, stl10_normalization
 from lightly.linear_evaluation.imagenet_datamodule import ImagenetDataModule
-from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, NegMining_TrueLabels, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, SupervisedClustering, SwAVModel, PosMining_TrueLabels, PosMining_FalseNegRemove_TrueLabels, NNNModel_Neg_Momentum, Moco_NNCLR_Model
+from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, NegMining_TrueLabels, SimCLRModel, SimSiamModel, BarlowTwinsModel,NNBYOLModel, NNNModel_Neg, NNNModel_Pos, SupervisedClustering, SwAVModel, PosMining_TrueLabels, PosMining_FalseNegRemove_TrueLabels, NNNModel_Neg_Momentum
 
 
 num_workers = 12
