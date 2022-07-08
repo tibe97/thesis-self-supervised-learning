@@ -170,11 +170,11 @@ class NNCLRModel(BenchmarkModule):
         last_conv_channels = list(resnet.children())[-1].in_features
         self.backbone = nn.Sequential(
             *list(resnet.children())[:-1],
-            nn.Conv2d(last_conv_channels, 1024, 1),
+            nn.Conv2d(last_conv_channels, num_ftrs, 1),
         )
         # create a simclr model based on ResNet
         self.resnet_simclr = \
-            lightly.models.NNCLR(self.backbone, num_ftrs=1024, num_mlp_layers=2)
+            lightly.models.NNCLR(self.backbone, num_ftrs=num_ftrs, num_mlp_layers=2, out_dim=512)
         self.criterion = lightly.loss.NTXentLoss()
 
         self.nn_replacer = NNMemoryBankModule(size=nn_size)
