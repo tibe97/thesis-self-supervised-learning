@@ -58,7 +58,7 @@ logs_root_dir = ('imagenette_logs')
 max_epochs = 800
 knn_k = 200
 knn_t = 0.1
-classes = 120
+classes = 10
 input_size=128
 num_ftrs=512
 nn_size=2 ** 16
@@ -246,13 +246,13 @@ def cli_main():  # pragma: no cover
                 benchmark_model = BenchmarkModel.load_from_checkpoint(checkpoint_path=ckpt_path, dataloader_kNN=dataloader_train_kNN, num_classes=120)
                 #benchmark_model = BenchmarkModel().load_from_checkpoint(ckpt_path, strict=False)
 
-                logger = WandbLogger(project="ssl_linear_evaluation_imagewoof120")  
+                logger = WandbLogger(project="ssl_linear_evaluation_STL10")  
                 logger.log_hyperparams(params=params_dict)
 
                 tuner = SSLFineTuner(
                     benchmark_model.backbone,
                     in_features=args.in_features,
-                    num_classes=dm.num_classes,
+                    num_classes=10,
                     epochs=args.num_epochs,
                     hidden_dim=None,
                     dropout=args.dropout,
