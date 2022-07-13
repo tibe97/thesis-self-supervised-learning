@@ -27,7 +27,7 @@ from benchmark_models import MocoModel, BYOLModel, NNCLRModel, NNNModel, SimCLRM
 #import tensorflow as tf
 #from tensorboard.plugins import projector
 
-checkpoint_path = "checkpoints/ImageWoof120/ImageWoof_NEG_SoftNeg.ckpt"
+checkpoint_path = "checkpoints/ImageWoof120/PosMining.ckpt"
 num_workers = 2
 memory_bank_size = 4096
 
@@ -162,8 +162,8 @@ model_names = ['MoCo_256', 'SimCLR_256', 'SimSiam_256', 'BarlowTwins_256',
 models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel, 
           BYOLModel, NNCLRModel, NNSimSiamModel, NNBYOLModel]
 """
-model_names = ["NNN_Neg"]
-models = [NNNModel_Neg]
+model_names = ["NNN_Pos"]
+models = [NNNModel_Pos]
 
 
 bench_results = []
@@ -186,18 +186,26 @@ for batch_size in batch_sizes:
             #logger = TensorBoardLogger('imagenette_runs', version=model_name)
             logger = WandbLogger(project="ssl_imagewoof120_visualize_debug")  
             logger.log_hyperparams(params=params_dict)
-
+            """
             proto_to_class = torch.zeros(nmb_prototypes, classes)
             class_to_protos = torch.zeros(classes, nmb_prototypes)
             proto_to_class_list = []
             class_images = {}
+            """
+            num_false_positives = []
             for step in range(10):
                 x, y, _ = next(iter(dataloader_test))
-                
+                (z0, p0, q0), (z1, p1, q1) = benchmark_model.model(x[0], x[1])
+
+
+
+                """
                 if len(class_images.keys()) < classes:
                     for i,label in enumerate(y):
                         if label.item() not in class_images.keys():
                             class_images[label.item()] = wandb.Image(x[i])
+                
+
                 embeddings, _, _ = benchmark_model.model(x)
                 prototypes = benchmark_model.model.prototypes_layer.weight
                 batch_similarities, batch_clusters  = benchmark_model.nn_replacer.compute_assignments_batch(embeddings)
@@ -223,7 +231,7 @@ for batch_size in batch_sizes:
 
                 #wandb.log({'prototypes to matrices': wandb.plots.HeatMap(list(range(classes)), list(range(nmb_prototypes)), proto_to_class, show_text=False)})
                 
-                """
+                
                 proto_to_class_table = wandb.Table(data=[[i, torch.argmax(proto_to_class[i,:])] for i in range(nmb_prototypes)], columns = ["prototype", "class"])
                 wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                                 title="Class assignment for each prototype")})
@@ -237,6 +245,7 @@ for batch_size in batch_sizes:
             wandb.log({"Prototypes to Class Assignments" : wandb.plot.scatter(proto_to_class_table, "prototype", "class",
                                             title="Class assignment for each prototype")})
             '''
+            """
             table_list = []
             for i in range(nmb_prototypes):
                 top_3_indices = torch.topk(proto_to_class[i,:], 3)[1]
@@ -245,7 +254,7 @@ for batch_size in batch_sizes:
             table_columns = ["prototype", "top1_class", "top1_%", "top1_image", "top2_class", "top2_%", "top2_image", "top3_class", "top3_%", "top3_image"]
             table = wandb.Table(data=table_list, columns=table_columns)
             wandb.log({"Prototypes_table": table})
-
+            """
             # delete model and trainer + free up cuda memory
             del benchmark_model
             torch.cuda.empty_cache()
