@@ -153,7 +153,7 @@ models = [MocoModel, SimCLRModel, SimSiamModel, BarlowTwinsModel,
 
 model_names = ["PosMining_True"]
 models = [PosMining_TrueLabels]
-checkpoint_path = "checkpoints/STL10/PosMining_Epoch200.ckpt"
+checkpoint_path = "checkpoints/ImageWoof120/PosMining.ckpt"
 
 bench_results = []
 gpu_memory_usage = []
