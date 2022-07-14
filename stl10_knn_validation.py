@@ -211,6 +211,7 @@ for batch_size in batch_sizes:
             benchmark_model.eval()
             val_results = trainer.validate(benchmark_model, val_dataloaders=dataloader_test)
             print("Top_1_accuracy: {}".format(val_results[1]))
+            logger.log('Val Accuracy', val_results[1])
 
             gpu_memory_usage.append(torch.cuda.max_memory_allocated())
             torch.cuda.reset_peak_memory_stats()
