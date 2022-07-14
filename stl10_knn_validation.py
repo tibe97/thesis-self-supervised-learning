@@ -76,7 +76,8 @@ logs_root_dir = ('stl10_logs')
 
 
 # use a GPU if available
-gpus = -1 if torch.cuda.is_available() else 0
+#gpus = -1 if torch.cuda.is_available() else 0
+gpus =  0
 distributed_backend = 'ddp' if torch.cuda.device_count() > 1 else None
 
 # The dataset structure should be like this:
