@@ -8,6 +8,7 @@ If you know how to fix this don't hesitate to create an issue or PR :)
 You can download the ImageNette dataset from here: https://cs.stanford.edu/~acoates/stl10/
 Results here: https://wandb.ai/tibe/STL10_knn_validation
 """
+from ipaddress import ip_address
 import os
 from pytorch_lightning import callbacks
 
@@ -21,6 +22,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torchvision import transforms
 from torchvision.transforms.transforms import CenterCrop
 import lightly
+import ipdb
 from torchvision.datasets import STL10
 from lightly.models.modules import my_nn_memory_bank
 from lightly.utils import BenchmarkModule
@@ -210,6 +212,7 @@ for batch_size in batch_sizes:
                                 )
             benchmark_model.eval()
             val_results = trainer.validate(benchmark_model, val_dataloaders=dataloader_test)
+            ipdb.set_trace()
             print("Top_1_accuracy: {}".format(val_results[1]))
             logger.log('Val Accuracy', val_results[1])
 
