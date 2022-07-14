@@ -207,8 +207,9 @@ for batch_size in batch_sizes:
                                 callbacks=[lr_monitor]
                                 #default_root_dir=logs_root_dir
                                 )
-           
+            benchmark_model.eval()
             trainer.validate(benchmark_model, val_dataloaders=dataloader_test)
+
             gpu_memory_usage.append(torch.cuda.max_memory_allocated())
             torch.cuda.reset_peak_memory_stats()
             runs.append(benchmark_model.max_accuracy)
