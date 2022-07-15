@@ -1,5 +1,4 @@
 
-![Lightly Logo](docs/logos/lightly_logo_crop.png)
 
 
 ![GitHub](https://img.shields.io/github/license/lightly-ai/lightly)
